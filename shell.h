@@ -1,0 +1,44 @@
+#ifndef SHELL_H
+#define SHELL_H
+
+#define PROMPT "\n$ "
+#define MAX_ARGS 100
+
+/* Struct definitions */
+
+/**
+ * struct BuiltinCmd - Represents a built-in command.
+ *
+ * @cmd: The command string.
+ *
+ * @action: A pointer to the function that implements the command's action.
+ *
+ * The BuiltinCmd struct defines a built-in command and its associated action.
+ */
+typedef struct {
+    char *cmd;
+    void (*action)(char **args);
+} BuiltinCmd;
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdbool.h>
+#include <dirent.h>
+#include <limits.h>
+#include <fcntl.h>
+
+/* Prototype functions */
+
+char **processCommand(char *cmd);
+void executeCommand(char **args, char **envp);
+int checkBuiltins(char *cmd, char **args);
+int isExecutable(const char *path);
+char *findExecutable(const char *cmd);
+int processCommandLineArguments(int ac, char **av, char **envp);
+void cdAction(char **args);
+
+#endif /* SHELL_H */
