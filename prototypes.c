@@ -135,8 +135,6 @@ int isExecutable(const char *path)
  *
  * @cmd: The command to find.
  *
- * @envp: The environment variables.
- *
  * Return: A pointer to the executable path if found, NULL otherwise.
  */
 char *findExecutable(const char *cmd)
