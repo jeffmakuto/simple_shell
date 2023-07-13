@@ -94,8 +94,7 @@ int checkBuiltins(char *cmd, char **args)
 {
 	int i;
 
-	BuiltinCmd builtins[] =
-	{
+	BuiltinCmd builtins[] = {
 		{"cd", cdAction},
 		{NULL, NULL}
 	};
