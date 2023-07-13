@@ -83,7 +83,8 @@ void executeCommand(char **args, char **envp)
 }
 
 /**
- * checkBuiltins - checks if a command is a built-in one and performs associated action
+ * checkBuiltins - checks if a command is a built-in one and
+ * performs associated action
  *
  * @cmd: the command to be checked
  *
