@@ -1,6 +1,19 @@
 #ifndef SHELL_H
 #define SHELL_H
 
+/* Header files */
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+#include <stdbool.h>
+#include <dirent.h>
+#include <limits.h>
+#include <fcntl.h>
+
+/* Define macros */
 #define PROMPT "\n$ "
 #define MAX_ARGS 100
 
@@ -20,19 +33,10 @@ typedef struct {
     void (*action)(char **args);
 } BuiltinCmd;
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <stdbool.h>
-#include <dirent.h>
-#include <limits.h>
-#include <fcntl.h>
-
 /* Prototype functions */
-
+void runInteractiveMode(char **envp);
+void runNonInteractiveMode(char **envp);
+void processCommandInput(char *cmd, char **envp);
 char **processCommand(char *cmd);
 void executeCommand(char **args, char **envp);
 int checkBuiltins(char *cmd, char **args);
