@@ -163,7 +163,7 @@ char *findExecutable(const char *cmd)
 	free(pathEnv);
 	if (foundExecutable)
 		return (foundExecutable);
-	perror("Command not found");
+	perror("./hsh: No such file or directory");
 	return (NULL);
 }
 
