@@ -47,6 +47,5 @@ char *findExecutable(const char *cmd);
 int processCommandLineArguments(int ac, char **av, char **envp);
 void cdAction(char **args);
 int changeDirectory(const char *targetDir);
-void exitAction(char **args);
 
 #endif /* SHELL_H */

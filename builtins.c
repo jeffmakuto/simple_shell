@@ -16,7 +16,6 @@ int checkBuiltins(char *cmd, char **args)
 
 	BuiltinCmd builtins[] = {
 		{"cd", cdAction},
-		{"exit", exitAction},
 		{NULL, NULL}
 	};
 
@@ -116,26 +115,5 @@ int changeDirectory(const char *targetDir)
 		return (-1);
 	}
 	return (0);
-}
-
-/**
- * exitAction - Exits the shell with the specified exit status.
- *
- * @args: An array of command arguments where args[1]
- * contains the exit status.
- *
- * This function terminates the shell with the specified
- * exit status. If no exit status is provided, the default
- * exit status is 0.
- *
- * Return: Void
- */
-void exitAction(char **args)
-{
-	int status = 0;
-
-	if (args[1])
-		status = atoi(args[1]);
-	exit(status);
 }
 
