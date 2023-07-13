@@ -150,7 +150,6 @@ char *findExecutable(const char *cmd)
 	}
 	pathEnv = strdup(path);
 	dir = strtok(pathEnv, ":");
-
 	while (dir)
 	{
 		dirLen = strlen(dir);
@@ -176,7 +175,6 @@ char *findExecutable(const char *cmd)
 		dir = strtok(NULL, ":");
 	}
 	free(pathEnv);
-
 	if (foundExecutable)
 		return (foundExecutable);
 	perror("Command not found");
