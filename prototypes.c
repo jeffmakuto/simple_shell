@@ -88,6 +88,8 @@ void executeCommand(char **args, char **envp)
  *
  * @cmd: the command to be checked
  *
+ * @args: the arguments passed to the command
+ *
  * Return: 1 if the command is a built-in one else 0
  */
 int checkBuiltins(char *cmd, char **args)
@@ -128,7 +130,8 @@ int isExecutable(const char *path)
 }
 
 /**
- * findExecutable - Searches for the executable in the system's PATH environment variable.
+ * findExecutable - Searches for the executable in the system's
+ * PATH environment variable.
  *
  * @cmd: The command to find.
  *
@@ -178,10 +181,7 @@ char *findExecutable(const char *cmd)
 
 	if (foundExecutable)
 		return (foundExecutable);
-	else
-	{
-		perror("Command not found");
-		return (NULL);
-	}
+	perror("Command not found");
+	return (NULL);
 }
 
