@@ -36,7 +36,7 @@ typedef struct {
 /* Prototype functions */
 void runInteractiveMode(char **envp);
 void runNonInteractiveMode(char **envp);
-void processCommandInput(char *cmd, char **envp);
+int processCommandInput(char *cmd, char **envp);
 char **processCommand(char *cmd);
 void executeCommand(char **args, char **envp);
 int checkBuiltins(char *cmd, char **args);

@@ -12,8 +12,9 @@ void runInteractiveMode(char **envp)
 	char *cmd = NULL;
 	size_t n = 0;
 	ssize_t bytesRead;
+	int shouldExit = 0;
 
-	while (1)
+	while (!shouldExit)
 	{
 		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 		bytesRead = getline(&cmd, &n, stdin);
@@ -26,7 +27,7 @@ void runInteractiveMode(char **envp)
 		}
 
 		if (*cmd != '\n')
-			processCommandInput(cmd, envp);
+			shouldExit = processCommandInput(cmd, envp);
 	}
 	free(cmd);
 }
@@ -43,11 +44,12 @@ void runNonInteractiveMode(char **envp)
 	char *cmd = NULL;
 	size_t n = 0;
 	ssize_t bytesRead;
+	int shouldExit = 0;
 
-	while ((bytesRead = getline(&cmd, &n, stdin)) != -1)
+	while (!shouldExit && (bytesRead = getline(&cmd, &n, stdin)) != -1)
 	{
 		if (*cmd != '\n')
-			processCommandInput(cmd, envp);
+			shouldExit = processCommandInput(cmd, envp);
 	}
 	free(cmd);
 }
@@ -59,12 +61,12 @@ void runNonInteractiveMode(char **envp)
  *
  * @envp: The environment variables
  *
- * Return: Void
+ * Return: 1 if the program should exit, 0 otherwise.
  */
-void processCommandInput(char *cmd, char **envp)
+int processCommandInput(char *cmd, char **envp)
 {
 	char **args, *executable;
-	int i;
+	int i, shouldExit = 0;
 
 	cmd[strcspn(cmd, "\n")] = '\0'; /* Remove trailing newline */
 	args = processCommand(cmd);
@@ -75,23 +77,25 @@ void processCommandInput(char *cmd, char **envp)
 		{
 			free(args[0]);
 			free(args);
-			return;
+			shouldExit = 1;
 		}
-
-		if (!checkBuiltins(args[0], args))
+		else
 		{
-			executable = findExecutable(args[0]);
-
-			if (executable)
+			if (!checkBuiltins(args[0], args))
 			{
-				args[0] = executable;
-				executeCommand(args, envp);
+				executable = findExecutable(args[0]);
+				if (executable)
+				{
+					args[0] = executable;
+					executeCommand(args, envp);
+				}
 			}
-		}
 
 		for (i = 0; args[i]; i++)
 			free(args[i]);
 		free(args);
+		}
 	}
+	return (shouldExit);
 }
 
