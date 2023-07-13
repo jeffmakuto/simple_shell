@@ -28,9 +28,10 @@
  *
  * The BuiltinCmd struct defines a built-in command and its associated action.
  */
-typedef struct {
-    char *cmd;
-    void (*action)(char **args);
+typedef struct BuiltinCmd
+{
+	char *cmd;
+	void (*action)(char **args);
 } BuiltinCmd;
 
 /* Prototype functions */
