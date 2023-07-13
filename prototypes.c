@@ -83,37 +83,23 @@ void executeCommand(char **args, char **envp)
 }
 
 /**
- * checkBuiltins - checks if a command is a built-in one and
- * performs associated action
+ * isAbsolutePath - Checks if the given path is an absolute path.
  *
- * @cmd: the command to be checked
+ * @path: The path to check.
  *
- * @args: the arguments passed to the command
- *
- * Return: 1 if the command is a built-in one else 0
+ * Return: true if the path is an absolute path and executable,
+ * false otherwise.
  */
-int checkBuiltins(char *cmd, char **args)
+bool isAbsolutePath(const char *path)
 {
-	int i;
-
-	BuiltinCmd builtins[] = {
-		{"cd", cdAction},
-		{NULL, NULL}
-	};
-
-	i = 0;
-
-	while (builtins[i].cmd)
+	if (path[0] == '/')
 	{
-		if (strcmp(cmd, builtins[i].cmd) == 0)
-		{
-			if (builtins[i].action)
-				builtins[i].action(args);
-			return (1); /* it's a built-in command */
-		}
-		i++;
+		if (isExecutable(path))
+			return (true);
+		perror("./hsh: No such file or directory\n");
+		return (false);
 	}
-	return (0); /* not a built-in command */
+	return (false);
 }
 
 /**
@@ -143,6 +129,8 @@ char *findExecutable(const char *cmd)
 	size_t dirLen, cmdLen;
 	char *foundExecutable = NULL;
 
+	if (isAbsolutePath(cmd))
+		return (strdup(cmd));
 	if (!path)
 	{
 		perror("PATH environment variable not found");
@@ -155,7 +143,6 @@ char *findExecutable(const char *cmd)
 		dirLen = strlen(dir);
 		cmdLen = strlen(cmd);
 		executablePath = malloc(dirLen + cmdLen + 2);
-
 		if (!executablePath)
 		{
 			perror("Memory allocation failed");
@@ -165,7 +152,6 @@ char *findExecutable(const char *cmd)
 		memcpy(executablePath, dir, dirLen);
 		executablePath[dirLen] = '/';
 		memcpy(executablePath + dirLen + 1, cmd, cmdLen + 1);
-
 		if (isExecutable(executablePath))
 		{
 			foundExecutable = executablePath;

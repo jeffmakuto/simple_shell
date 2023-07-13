@@ -1,6 +1,40 @@
 #include "shell.h"
 
 /**
+ * checkBuiltins - checks if a command is a built-in one and
+ * performs associated action
+ *
+ * @cmd: the command to be checked
+ *
+ * @args: the arguments passed to the command
+ *
+ * Return: 1 if the command is a built-in one else 0
+ */
+int checkBuiltins(char *cmd, char **args)
+{
+	int i;
+
+	BuiltinCmd builtins[] = {
+		{"cd", cdAction},
+		{NULL, NULL}
+	};
+
+	i = 0;
+
+	while (builtins[i].cmd)
+	{
+		if (strcmp(cmd, builtins[i].cmd) == 0)
+		{
+			if (builtins[i].action)
+				builtins[i].action(args);
+			return (1); /* it's a built-in command */
+		}
+		i++;
+	}
+	return (0); /* not a built-in command */
+}
+
+/**
  * cdAction - change directory to the specified path.
  *
  * @args: An array of command arguments where args[1]

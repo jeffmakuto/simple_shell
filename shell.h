@@ -41,6 +41,7 @@ int processCommandInput(char *cmd, char **envp);
 char **processCommand(char *cmd);
 void executeCommand(char **args, char **envp);
 int checkBuiltins(char *cmd, char **args);
+bool isAbsolutePath(const char *path);
 int isExecutable(const char *path);
 char *findExecutable(const char *cmd);
 int processCommandLineArguments(int ac, char **av, char **envp);
