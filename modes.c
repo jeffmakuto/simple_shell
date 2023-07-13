@@ -76,8 +76,12 @@ int processCommandInput(char *cmd, char **envp)
 		if (strcmp("exit", args[0]) == 0)
 		{
 			free(args[0]);
-			free(args);
 			shouldExit = 1;
+			/* If an argument is provided to the exit command */
+			if (args[1])
+				exit(atoi(args[1]));
+			else
+				exit(0);
 		}
 		else
 		{
