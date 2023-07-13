@@ -55,35 +55,64 @@ int checkBuiltins(char *cmd, char **args)
  */
 void cdAction(char **args)
 {
-	char *targetDir, cwd[PATH_MAX];
+	char *targetDir;
 
-	if (args[1] == NULL)
-		return;
-	targetDir = args[1];
-	if (strcmp(targetDir, "~") == 0)
+	if (args[1] == NULL || strcmp(args[1], "") == 0 ||
+			strcmp(args[1], "~") == 0 || strcmp(args[1], "$HOME") == 0)
 	{
 		targetDir = getenv("HOME");
 		if (!targetDir)
+		{
+			perror("cd error");
 			return;
+		}
 	}
-	else if (strcmp(targetDir, "-") == 0)
+	else if (strcmp(args[1], "-") == 0)
 	{
 		targetDir = getenv("OLDPWD");
 		if (!targetDir)
+		{
+			perror("cd error");
 			return;
+		}
 		write(STDOUT_FILENO, targetDir, strlen(targetDir));
 		write(STDOUT_FILENO, "\n", 1);
 	}
+	else
+		targetDir = args[1];
+
+	if (changeDirectory(targetDir))
+		return;
+}
+
+/**
+ * changeDirectory - Change the current working directory to the
+ * target directory.
+ *
+ * @targetDir: The target directory to change to.
+ *
+ * Return: On success, returns 0. On failure, returns -1.
+ */
+int changeDirectory(const char *targetDir)
+{
+	char cwd[PATH_MAX];
+
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 	{
 		perror("cd error");
-		return;
+		return (-1);
 	}
+
 	if (chdir(targetDir))
 	{
 		perror("cd error");
-		return;
+		return (-1);
 	}
+
 	if (setenv("OLDPWD", cwd, 1))
+	{
 		perror("cd error");
+		return (-1);
+	}
+	return (0);
 }
