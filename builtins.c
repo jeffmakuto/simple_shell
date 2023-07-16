@@ -63,7 +63,7 @@ void cdAction(char **args)
 		targetDir = getenv("HOME");
 		if (!targetDir)
 		{
-			perror("cd error");
+			perror("./hsh: cd error");
 			return;
 		}
 	}
@@ -72,7 +72,7 @@ void cdAction(char **args)
 		targetDir = getenv("OLDPWD");
 		if (!targetDir)
 		{
-			perror("cd error");
+			perror("./hsh: cd error");
 			return;
 		}
 		write(STDOUT_FILENO, targetDir, strlen(targetDir));
@@ -99,19 +99,19 @@ int changeDirectory(const char *targetDir)
 
 	if (getcwd(cwd, sizeof(cwd)) == NULL)
 	{
-		perror("cd error");
+		perror("./hsh: cd error");
 		return (-1);
 	}
 
 	if (chdir(targetDir))
 	{
-		perror("cd error");
+		perror("./hsh: cd error");
 		return (-1);
 	}
 
 	if (setenv("OLDPWD", cwd, 1))
 	{
-		perror("cd error");
+		perror("./hsh: cd error");
 		return (-1);
 	}
 	return (0);

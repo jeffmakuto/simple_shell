@@ -15,7 +15,7 @@ char **processCommand(char *cmd)
 
 	if (!args)
 	{
-		perror("malloc error");
+		perror("./hsh: malloc error");
 		return (NULL);
 	}
 
@@ -27,7 +27,7 @@ char **processCommand(char *cmd)
 
 		if (!args[argCount])
 		{
-			perror("strdup error");
+			perror("./hsh: strdup error");
 
 			/* Free previously allocated strings */
 			for (i = 0; i < argCount; i++)
@@ -67,14 +67,14 @@ void executeCommand(char **args, char **envp)
 	pid = fork();
 	if (pid < 0)
 	{
-		perror("fork error");
+		perror("./hsh: fork error");
 		return;
 	}
 	if (pid == 0)
 	{
 		if (execve(args[0], args, envp) == -1)
 		{
-			perror("./hsh: No such file or directory\n");
+			perror("./hsh: execve error");
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -96,7 +96,7 @@ bool isAbsolutePath(const char *path)
 	{
 		if (isExecutable(path))
 			return (true);
-		perror("./hsh: No such file or directory\n");
+		perror("./hsh: ");
 		return (false);
 	}
 	return (false);
@@ -133,7 +133,7 @@ char *findExecutable(const char *cmd)
 		return (strdup(cmd));
 	if (!path)
 	{
-		perror("PATH environment variable not found");
+		perror("./hsh: PATH environment variable not found");
 		return (NULL);
 	}
 	pathEnv = strdup(path);
@@ -145,7 +145,7 @@ char *findExecutable(const char *cmd)
 		executablePath = malloc(dirLen + cmdLen + 2);
 		if (!executablePath)
 		{
-			perror("Memory allocation failed");
+			perror("./hsh: Memory allocation failed");
 			free(pathEnv);
 			return (NULL);
 		}
@@ -163,7 +163,7 @@ char *findExecutable(const char *cmd)
 	free(pathEnv);
 	if (foundExecutable)
 		return (foundExecutable);
-	perror("./hsh: No such file or directory");
+	perror("./hsh: ");
 	return (NULL);
 }
 

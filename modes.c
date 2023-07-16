@@ -22,7 +22,7 @@ void runInteractiveMode(char **envp)
 		if (bytesRead == -1)
 		{
 			free(cmd);
-			perror("getline error");
+			perror("./hsh: getline error");
 			exit(EXIT_FAILURE);
 		}
 
