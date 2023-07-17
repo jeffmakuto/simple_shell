@@ -52,5 +52,8 @@ void setenvAction(char **args);
 void unsetenvAction(char **args);
 char *replaceVariableWithValue(const char *variable, char **envp);
 void expandVariables(char **args, char **envp);
+void sigintHandler(int signum);
+void handleIORedirection(char **args);
+void executePipedCommands(char *cmds, char **envp);
 
 #endif /* SHELL_H */

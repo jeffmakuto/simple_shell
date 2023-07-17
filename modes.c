@@ -12,22 +12,20 @@ void runInteractiveMode(char **envp)
 	char *cmd = NULL;
 	size_t n = 0;
 	ssize_t bytesRead;
-	int shouldExit = 0;
 
-	while (!shouldExit)
+	signal(SIGINT, sigintHandler);
+	while (1)
 	{
 		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
 		bytesRead = getline(&cmd, &n, stdin);
-
 		if (bytesRead == -1)
 		{
 			free(cmd);
 			perror("./hsh: getline error");
 			exit(EXIT_FAILURE);
 		}
-
 		if (*cmd != '\n')
-			shouldExit = processCommandInput(cmd, envp);
+			executePipedCommands(cmd, envp);
 	}
 	free(cmd);
 }
@@ -45,12 +43,13 @@ void runNonInteractiveMode(char **envp)
 	size_t n = 0;
 	ssize_t bytesRead;
 
+	signal(SIGINT, sigintHandler);
 	while ((bytesRead = getline(&cmd, &n, stdin)) != -1)
 	{
 		if (*cmd != '\n')
 		{
 			cmd[bytesRead - 1] = '\0'; /* Remove trailing newline */
-			executeMultipleCommands(cmd, envp);
+			executePipedCommands(cmd, envp);
 		}
 	}
 	free(cmd);
