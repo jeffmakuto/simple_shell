@@ -62,9 +62,7 @@ char **processCommand(char *cmd)
 void executeCommand(char **args, char **envp)
 {
 	pid_t pid;
-	int status, i;
-
-	handleIORedirection(args);
+	int status;
 
 	pid = fork();
 	if (pid < 0)
@@ -82,10 +80,6 @@ void executeCommand(char **args, char **envp)
 	}
 	else
 		waitpid(pid, &status, 0);
-
-	for (i = 0; args[i]; i++)
-		free(args[i]);
-	free(args);
 }
 
 /**
