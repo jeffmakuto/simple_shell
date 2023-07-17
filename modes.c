@@ -133,13 +133,15 @@ int executeMultipleCommands(char *commands, char **envp)
 		if (args)
 		{
 			executeCommand(args, envp);
-			commandExitStatus = 0;
-			/* Get the exit status of the last executed command (if any) */
+			/* Wait for the child process to complete and get its exit status. */
+			wait(&commandExitStatus);
+			/* Check if the child process exited normally. */
 			if (WIFEXITED(commandExitStatus))
 				commandExitStatus = WEXITSTATUS(commandExitStatus);
-			/* Update the exit status of the last executed command */
+			else
+				commandExitStatus = 1; /* Set non-zero exit status in case of abnormal termination. */
 			lastCommandExitStatus = commandExitStatus;
-			/* Free the allocated memory for the arguments */
+			/* Free the allocated memory for the arguments. */
 			for (i = 0; args[i]; i++)
 				free(args[i]);
 			free(args);
