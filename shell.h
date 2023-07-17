@@ -50,5 +50,9 @@ void cdAction(char **args);
 int changeDirectory(const char *targetDir);
 void setenvAction(char **args);
 void unsetenvAction(char **args);
+char *replaceVariableWithValue(const char *variable, char **envp);
+void expandVariables(char **args, char **envp);
+void executeSingleCommand(char *cmd, char **envp);
+void executeMultipleCommands(char *args, char **envp);
 
 #endif /* SHELL_H */
