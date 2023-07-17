@@ -50,9 +50,6 @@ void cdAction(char **args);
 int changeDirectory(const char *targetDir);
 void setenvAction(char **args);
 void unsetenvAction(char **args);
-char *replaceVariableWithValue(const char *variable, char **envp);
-void expandVariables(char **args, char **envp);
-void handleIORedirection(char **args);
-void executePipedCommands(char *cmds, char **envp);
+int executeMultipleCommands(char *commands, char **envp);
 
 #endif /* SHELL_H */

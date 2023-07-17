@@ -66,10 +66,16 @@ void runNonInteractiveMode(char **envp)
  */
 int processCommandInput(char *cmd, char **envp)
 {
-	char **args, *executable;
+	char **args, *executable, *semicolonPos;
 	int i, shouldExit = 0;
 
 	cmd[strcspn(cmd, "\n")] = '\0'; /* Remove trailing newline */
+
+	/* Check if the command contains a semicolon to execute multiple commands */
+	semicolonPos = strchr(cmd, ';');
+	if (semicolonPos)
+		return (executeMultipleCommands(cmd, envp));
+	/* If there's no semicolon, process the single command as before */
 	args = processCommand(cmd);
 
 	if (args)
@@ -86,8 +92,6 @@ int processCommandInput(char *cmd, char **envp)
 		}
 		else
 		{
-			expandVariables(args, envp);
-
 			if (!checkBuiltins(args[0], args))
 			{
 				executable = findExecutable(args[0]);
@@ -107,68 +111,40 @@ int processCommandInput(char *cmd, char **envp)
 }
 
 /**
- * expandVariables - Expands variables in command arguments.
+ * executeMultipleCommands - Execute multiple commands separated by semicolons.
  *
- * @args: The array of command arguments.
+ * @commands: The command string containing multiple commands separated
+ * by semicolons.
  *
- * @envp: Array of strings of environment variables.
+ * @envp: Array of strings representing the environment variables.
  *
- * This function checks each argument in the args array for variables
- * (strings starting with '$') and replaces them with their corresponding
- * values from the environment.
+ * Return: Exit status of the last executed command.
  */
-void expandVariables(char **args, char **envp)
+int executeMultipleCommands(char *commands, char **envp)
 {
-	char *variable, *value;
-	int i;
+	int lastCommandExitStatus = 0, i, commandExitStatus;
+	char *command, **args;
+	char *saveptr; /* For strtok_r, thread-safe version of strtok */
 
-	for (i = 0; args[i]; i++)
+	command = strtok_r(commands, ";", &saveptr);
+	while (command)
 	{
-		if (args[i][0] == '$')
+		args = processCommand(command);
+		if (args)
 		{
-			variable = args[i] + 1; /* Skip the '$' sign */
-			value = replaceVariableWithValue(variable, envp);
-
-			if (value)
-			{
+			executeCommand(args, envp);
+			commandExitStatus = 0;
+			/* Get the exit status of the last executed command (if any) */
+			if (WIFEXITED(commandExitStatus))
+				commandExitStatus = WEXITSTATUS(commandExitStatus);
+			/* Update the exit status of the last executed command */
+			lastCommandExitStatus = commandExitStatus;
+			/* Free the allocated memory for the arguments */
+			for (i = 0; args[i]; i++)
 				free(args[i]);
-				args[i] = value;
-			}
-			else
-			{
-				/* If the variable is not found in the environment,
-				 * replace it with an empty string
-				 */
-				free(args[i]);
-				args[i] = strdup("");
-			}
+			free(args);
 		}
+		command = strtok_r(NULL, ";", &saveptr);
 	}
+	return (lastCommandExitStatus);
 }
-
-/**
- * replaceVariableWithValue - Replaces variables with their values from envp.
- *
- * @variable: The variable name to be replaced (without the '$' sign).
- * @envp: Array of strings of environment variables.
- *
- * Return: A newly allocated string containing the value of the variable.
- * The caller is responsible for freeing the memory.
- */
-char *replaceVariableWithValue(const char *variable, char **envp)
-{
-	char *value = NULL;
-	int i;
-
-	for (i = 0; envp[i]; i++)
-	{
-		if (strncmp(envp[i], variable, strlen(variable)) == 0 &&
-				envp[i][strlen(variable)] == '=')
-		{
-			value = strdup(envp[i] + strlen(variable) + 1);
-			break;
-		}
-	}
-	return (value);
-}
-
