@@ -12,8 +12,8 @@
  */
 void sigintHandler(int signum)
 {
-	write(STDOUT_FILENO, "\n", 1);
-	write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+	(void)signum;
+	write(STDOUT_FILENO, "\n$ ", 3);
 }
 
 /**
@@ -89,9 +89,9 @@ void handleIORedirection(char **args)
  */
 void executePipedCommands(char *cmds, char **envp)
 {
-	char *cmd, *end, *cmds_copy = strdup(cmds), *cmd_with_redirection;
-	int pipefd[2];
-	int inputfd = STDIN_FILENO;
+	char *cmd, **args, *end, *cmds_copy = strdup(cmds), *cmd_with_redirection;
+	int i, pipefd[2], inputfd = STDIN_FILENO;
+	pid_t pid;
 
 	while ((cmd = strsep(&cmds_copy, "|")))
 	{
@@ -115,7 +115,7 @@ void executePipedCommands(char *cmds, char **envp)
 				return;
 			}
 		}
-		pid_t pid = fork();
+		pid = fork();
 		if (pid < 0)
 		{
 			perror("./hsh: fork error");
@@ -135,7 +135,14 @@ void executePipedCommands(char *cmds, char **envp)
 				close(pipefd[0]);
 				close(pipefd[1]);
 			}
-			executeCommand(cmd, envp);
+			args = processCommand(cmd); /* Process the current command */
+			if (args)
+			{
+				executeCommand(args, envp); /* Execute the command */
+				for (i = 0; args[i]; i++)
+					free(args[i]);
+				free(args);
+			}
 			exit(EXIT_SUCCESS);
 		}
 		else

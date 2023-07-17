@@ -64,9 +64,6 @@ void executeCommand(char **args, char **envp)
 	pid_t pid;
 	int status, i;
 
-	args = processCommand(cmd);
-	if (!args)
-		return;
 	handleIORedirection(args);
 
 	pid = fork();
