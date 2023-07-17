@@ -166,4 +166,3 @@ char *findExecutable(const char *cmd)
 	perror("./hsh: ");
 	return (NULL);
 }
-
