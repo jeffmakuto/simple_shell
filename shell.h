@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <limits.h>
 #include <fcntl.h>
+#include <errno.h>
 
 /* Define macros */
 #define PROMPT "\n$ "
@@ -47,5 +48,7 @@ char *findExecutable(const char *cmd);
 int processCommandLineArguments(int ac, char **av, char **envp);
 void cdAction(char **args);
 int changeDirectory(const char *targetDir);
+void setenvAction(char **args);
+void unsetenvAction(char **args);
 
 #endif /* SHELL_H */

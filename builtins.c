@@ -16,6 +16,8 @@ int checkBuiltins(char *cmd, char **args)
 
 	BuiltinCmd builtins[] = {
 		{"cd", cdAction},
+		{"setenv", setenvAction},
+		{"unsetenv", unsetenvAction},
 		{NULL, NULL}
 	};
 
@@ -117,3 +119,46 @@ int changeDirectory(const char *targetDir)
 	return (0);
 }
 
+/**
+ * setenvAction - Set a new environment variable or modify an existing one.
+ *
+ * @args: An array of command arguments where args[1] is the variable name and
+ * args[2] is the value to be set.
+ *
+ * This function sets a new environment variable or modifies an existing one.
+ *
+ * Return: Void
+ */
+void setenvAction(char **args)
+{
+	if (!args[1] || !args[2])
+	{
+		fprintf(stderr, "%s: setenv: Invalid arguments\n", args[0]);
+		return;
+	}
+
+	if (setenv(args[1], args[2], 1) == -1)
+		fprintf(stderr, "%s: setenv error\n", args[0]);
+}
+
+/**
+ * unsetenvAction - Remove an environment variable.
+ *
+ * @args: An array of command arguments where args[1] is the variable
+ * name to be unset.
+ *
+ * This function removes an environment variable.
+ *
+ * Return: Void
+ */
+void unsetenvAction(char **args)
+{
+	if (!args[1])
+	{
+		fprintf(stderr, "%s: unsetenv: Missing variable name\n", args[0]);
+		return;
+	}
+
+	if (unsetenv(args[1]) == -1)
+		fprintf(stderr, "%s: unsetenv error\n", args[0]);
+}
