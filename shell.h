@@ -15,7 +15,7 @@
 #include <errno.h>
 
 /* Define macros */
-#define PROMPT "\n$ "
+#define PROMPT "\n($) "
 #define MAX_ARGS 100
 
 /* Struct definitions */
