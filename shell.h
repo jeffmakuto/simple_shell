@@ -39,6 +39,7 @@ typedef struct BuiltinCmd
 void runInteractiveMode(char **envp);
 void runNonInteractiveMode(char **envp);
 int processCommandInput(char *cmd, char **envp);
+int processSingleCommand(char *cmd, char **envp);
 char **processCommand(char *cmd);
 void executeCommand(char **args, char **envp);
 int checkBuiltins(char *cmd, char **args);
@@ -48,5 +49,7 @@ char *findExecutable(const char *cmd);
 int processCommandLineArguments(int ac, char **av, char **envp);
 void cdAction(char **args);
 int changeDirectory(const char *targetDir);
+void setenvAction(char **args);
+void unsetenvAction(char **args);
 
 #endif /* SHELL_H */

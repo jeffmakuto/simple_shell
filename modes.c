@@ -66,12 +66,57 @@ void runNonInteractiveMode(char **envp)
  */
 int processCommandInput(char *cmd, char **envp)
 {
-	char **args, *executable;
-	int i, shouldExit = 0;
+	char **commands = NULL, *token;
+	int i, numCommands = 0, shouldExit = 0;
 
 	cmd[strcspn(cmd, "\n")] = '\0'; /* Remove trailing newline */
-	args = processCommand(cmd);
+	token = strtok(cmd, ";");
+	while (token && numCommands < MAX_ARGS)
+	{
+		commands = realloc(commands, sizeof(char *) * (numCommands + 1));
+		if (!commands)
+		{
+			perror("./hsh: realloc error");
+			exit(EXIT_FAILURE);
+		}
+		commands[numCommands] = strdup(token);
+		if (!commands[numCommands])
+		{
+			perror("./hsh: strdup error");
+			/* Free previously allocated strings */
+			for (i = 0; i < numCommands; i++)
+				free(commands[i]);
+			free(commands);
+			exit(EXIT_FAILURE);
+		}
+		numCommands++;
+		token = strtok(NULL, ";");
+	}
+	for (i = 0; i < numCommands; i++)
+	{
+		if (commands[i][0] != '\0') /* Skip empty commands */
+			shouldExit = shouldExit || processSingleCommand(commands[i], envp);
+		free(commands[i]);
+	}
+	free(commands);
+	return (shouldExit);
+}
 
+/**
+ * processSingleCommand - Process a single command
+ *
+ * @cmd: The command string
+ *
+ * @envp: The environment variables
+ *
+ * Return: 1 if the program should exit, 0 otherwise.
+ */
+int processSingleCommand(char *cmd, char **envp)
+{
+	char **args, *executable;
+	int shouldExit = 0, i;
+
+	args = processCommand(cmd);
 	if (args)
 	{
 		if (strcmp("exit", args[0]) == 0)
@@ -95,10 +140,9 @@ int processCommandInput(char *cmd, char **envp)
 					executeCommand(args, envp);
 				}
 			}
-
-		for (i = 0; args[i]; i++)
-			free(args[i]);
-		free(args);
+			for (i = 0; args[i]; i++)
+				free(args[i]);
+			free(args);
 		}
 	}
 	return (shouldExit);

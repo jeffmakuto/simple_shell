@@ -16,8 +16,8 @@ int checkBuiltins(char *cmd, char **args)
 
 	BuiltinCmd builtins[] = {
 		{"cd", cdAction},
-		/*{"setenv", setenvAction},
-		{"unsetenv", unsetenvAction},*/
+		{"setenv", setenvAction},
+		{"unsetenv", unsetenvAction},
 		{NULL, NULL}
 	};
 
@@ -117,5 +117,52 @@ int changeDirectory(const char *targetDir)
 		return (-1);
 	}
 	return (0);
+}
+
+/**
+ * setenvAction - Set environment variable with name and value.
+ *
+ * @args: An array of command arguments. args[1] should be the variable name,
+ * and args[2] should be the value to set.
+ *
+ * This function sets an environment variable with the given name and value.
+ * If either the variable name or value is missing, it prints an error message.
+ * If setting the environment variable fails, it prints an error using perror.
+ *
+ * Return: Void
+ */
+void setenvAction(char **args)
+{
+	if (!args[1] || !args[2])
+	{
+		fprintf(stderr, "Usage: setenv VARIABLE VALUE\n");
+		return;
+	}
+	if (setenv(args[1], args[2], 1))
+		perror("setenv");
+}
+
+/**
+ * unsetenvAction - Unset environment variable.
+ *
+ * @args: An array of command arguments. args[1] should be
+ * the variable name to unset.
+ *
+ * This function unsets an environment variable with the given name.
+ * If the variable name is missing, it prints an error message.
+ * If unsetting the environment variable fails, it prints an error
+ * using perror.
+ *
+ * Return: Void
+ */
+void unsetenvAction(char **args)
+{
+	if (!args[1])
+	{
+		fprintf(stderr, "Usage: unsetenv VARIABLE\n");
+		return;
+	}
+	if (unsetenv(args[1]) != 0)
+		perror("unsetenv");
 }
 
