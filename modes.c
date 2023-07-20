@@ -66,18 +66,57 @@ void runNonInteractiveMode(char **envp)
  */
 int processCommandInput(char *cmd, char **envp)
 {
-	char **args, *executable, *semicolonPos;
-	int i, shouldExit = 0;
+	char **commands = NULL, *token;
+	int i, numCommands = 0, shouldExit = 0;
 
 	cmd[strcspn(cmd, "\n")] = '\0'; /* Remove trailing newline */
+	token = strtok(cmd, ";");
+	while (token && numCommands < MAX_ARGS)
+	{
+		commands = realloc(commands, sizeof(char *) * (numCommands + 1));
+		if (!commands)
+		{
+			perror("./hsh: realloc error");
+			exit(EXIT_FAILURE);
+		}
+		commands[numCommands] = strdup(token);
+		if (!commands[numCommands])
+		{
+			perror("./hsh: strdup error");
+			/* Free previously allocated strings */
+			for (i = 0; i < numCommands; i++)
+				free(commands[i]);
+			free(commands);
+			exit(EXIT_FAILURE);
+		}
+		numCommands++;
+		token = strtok(NULL, ";");
+	}
+	for (i = 0; i < numCommands; i++)
+	{
+		if (commands[i][0] != '\0') /* Skip empty commands */
+			shouldExit = shouldExit || processSingleCommand(commands[i], envp);
+		free(commands[i]);
+	}
+	free(commands);
+	return (shouldExit);
+}
 
-	/* Check if the command contains a semicolon to execute multiple commands */
-	semicolonPos = strchr(cmd, ';');
-	if (semicolonPos)
-		return (executeMultipleCommands(cmd, envp));
-	/* If there's no semicolon, process the single command as before */
+/**
+ * processSingleCommand - Process a single command
+ *
+ * @cmd: The command string
+ *
+ * @envp: The environment variables
+ *
+ * Return: 1 if the program should exit, 0 otherwise.
+ */
+int processSingleCommand(char *cmd, char **envp)
+{
+	char **args, *executable;
+	int shouldExit = 0, i;
+
 	args = processCommand(cmd);
-
 	if (args)
 	{
 		if (strcmp("exit", args[0]) == 0)
@@ -101,52 +140,11 @@ int processCommandInput(char *cmd, char **envp)
 					executeCommand(args, envp);
 				}
 			}
-
-		for (i = 0; args[i]; i++)
-			free(args[i]);
-		free(args);
+			for (i = 0; args[i]; i++)
+				free(args[i]);
+			free(args);
 		}
 	}
 	return (shouldExit);
 }
 
-/**
- * executeMultipleCommands - Execute multiple commands separated by semicolons.
- *
- * @commands: The command string containing multiple commands separated
- * by semicolons.
- *
- * @envp: Array of strings representing the environment variables.
- *
- * Return: Exit status of the last executed command.
- */
-int executeMultipleCommands(char *commands, char **envp)
-{
-	int lastCommandExitStatus = 0, i, commandExitStatus;
-	char *command, **args;
-	char *saveptr; /* For strtok_r, thread-safe version of strtok */
-
-	command = strtok_r(commands, ";", &saveptr);
-	while (command)
-	{
-		args = processCommand(command);
-		if (args)
-		{
-			executeCommand(args, envp);
-			/* Wait for the child process to complete and get its exit status. */
-			wait(&commandExitStatus);
-			/* Check if the child process exited normally. */
-			if (WIFEXITED(commandExitStatus))
-				commandExitStatus = WEXITSTATUS(commandExitStatus);
-			else
-				commandExitStatus = 1; /* Set non-zero exit status in case of abnormal termination. */
-			lastCommandExitStatus = commandExitStatus;
-			/* Free the allocated memory for the arguments. */
-			for (i = 0; args[i]; i++)
-				free(args[i]);
-			free(args);
-		}
-		command = strtok_r(NULL, ";", &saveptr);
-	}
-	return (lastCommandExitStatus);
-}

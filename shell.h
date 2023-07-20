@@ -15,7 +15,7 @@
 #include <errno.h>
 
 /* Define macros */
-#define PROMPT "\n$ "
+#define PROMPT "\n($) "
 #define MAX_ARGS 100
 
 /* Struct definitions */
@@ -39,6 +39,7 @@ typedef struct BuiltinCmd
 void runInteractiveMode(char **envp);
 void runNonInteractiveMode(char **envp);
 int processCommandInput(char *cmd, char **envp);
+int processSingleCommand(char *cmd, char **envp);
 char **processCommand(char *cmd);
 void executeCommand(char **args, char **envp);
 int checkBuiltins(char *cmd, char **args);
@@ -50,6 +51,5 @@ void cdAction(char **args);
 int changeDirectory(const char *targetDir);
 void setenvAction(char **args);
 void unsetenvAction(char **args);
-int executeMultipleCommands(char *commands, char **envp);
 
 #endif /* SHELL_H */
