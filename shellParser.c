@@ -1,61 +1,6 @@
 #include "shell.h"
 
 /**
- * runInteractiveMode - Runs the shell in interactive mode.
- *
- * @envp: The environment variables.
- *
- * Return: Void
- */
-void runInteractiveMode(char **envp)
-{
-	char *cmd = NULL;
-	size_t n = 0;
-	ssize_t bytesRead;
-	int shouldExit = 0;
-
-	while (!shouldExit)
-	{
-		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
-		bytesRead = getline(&cmd, &n, stdin);
-
-		if (bytesRead == -1)
-		{
-			free(cmd);
-			perror("getline error");
-			exit(EXIT_FAILURE);
-		}
-
-		if (*cmd != '\n')
-			shouldExit = processCommandInput(cmd, envp);
-	}
-	free(cmd);
-}
-
-/**
- * runNonInteractiveMode - Runs the shell in non-interactive mode.
- *
- * @envp: The environment variables.
- *
- * Return: Void
- */
-void runNonInteractiveMode(char **envp)
-{
-	char *cmd = NULL;
-	size_t n = 0;
-	ssize_t bytesRead;
-	int shouldExit = 0;
-
-	while (!shouldExit && (bytesRead = getline(&cmd, &n, stdin)) != -1)
-	{
-		if (*cmd != '\n')
-			shouldExit = processCommandInput(cmd, envp);
-	}
-	free(cmd);
-}
-
-
-/**
  * processCommandInput - Process the command input
  *
  * @cmd: The command string
