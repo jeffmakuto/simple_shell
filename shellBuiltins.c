@@ -16,8 +16,6 @@ int checkBuiltins(char *cmd, char **args)
 
 	BuiltinCmd builtins[] = {
 		{"cd", cdAction},
-		{"setenv", setenvAction},
-		{"unsetenv", unsetenvAction},
 		{NULL, NULL}
 	};
 
