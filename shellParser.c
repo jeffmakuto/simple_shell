@@ -50,6 +50,70 @@ char **handleSemiColonCommands(const char *cmd, int *numCommands)
 	free(commandCopy);
 	return (commands);
 }
+/**
+ * handleAndOperator - Handles the "&&" operator and executes the next command
+ * only if the previous one succeeds (returns 0).
+ *
+ * @cmd: The command string
+ *
+ * @envp: The environment variables
+ *
+ * Return: 1 if the program should exit, 0 otherwise.
+ */
+int handleAndOperator(char *cmd, char **envp)
+{
+	char *token = "&&", *nextCmd = NULL;
+	int shouldExit = 0;
+
+	nextCmd = strstr(cmd, token);
+	if (nextCmd)
+	{
+		*nextCmd = '\0'; /* Null-terminate the first command */
+		nextCmd += strlen(token); /* Move to the start of the next command */
+		if (*nextCmd != '\0') /* Skip if there's nothing after && */
+			shouldExit = processCommandInput(nextCmd, envp);
+	}
+	shouldExit = processSingleCommand(cmd, envp) || shouldExit;
+
+	return (shouldExit);
+}
+
+/**
+ * handleOrOperator - Handles the "||" operator and executes the next command
+ * only if the previous one fails (returns non-zero).
+ *
+ * @cmd: The command string
+ *
+ * @envp: The environment variables
+ *
+ * Return: 1 if the program should exit, 0 otherwise.
+ */
+int handleOrOperator(char *cmd, char **envp)
+{
+	char *token = "||";
+	char *nextCmd = NULL;
+	int shouldExit = 0;
+
+	nextCmd = strstr(cmd, token);
+	if (nextCmd)
+	{
+		*nextCmd = '\0'; /* Null-terminate the first command */
+		nextCmd += strlen(token); /* Move to the start of the next command */
+
+		if (*nextCmd != '\0') /* Skip if there's nothing after || */
+		{
+			shouldExit = processCommandInput(cmd, envp);
+			if (!shouldExit) /* Only execute the next command if the previous one fails */
+				shouldExit = handleOrOperator(nextCmd, envp);
+		};
+	}
+	else
+	{
+		/* No || found, process the single command */
+		shouldExit = processSingleCommand(cmd, envp);
+	}
+	return (shouldExit);
+}
 
 /**
  * processCommandInput - Process the command input
@@ -71,7 +135,15 @@ int processCommandInput(char *cmd, char **envp)
 	for (i = 0; i < numCommands; i++)
 	{
 		if (commands[i][0] != '\0') /* Skip empty commands */
-			shouldExit = shouldExit || processSingleCommand(commands[i], envp);
+		{
+			/* Handle chaining with && and || */
+			if (strstr(commands[i], "&&"))
+				shouldExit = handleAndOperator(commands[i], envp);
+			else if (strstr(commands[i], "||"))
+				shouldExit = handleOrOperator(commands[i], envp);
+			else
+				shouldExit = processSingleCommand(commands[i], envp);
+		}
 		free(commands[i]);
 	}
 	free(commands);

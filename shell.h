@@ -39,6 +39,8 @@ typedef struct BuiltinCmd
 void runInteractiveMode(char **envp);
 void runNonInteractiveMode(char **envp);
 char **splitCommands(const char *cmd, int *numCommands);
+int handleAndOperator(char *cmd, char **envp);
+int handleOrOperator(char *cmd, char **envp);
 int processCommandInput(char *cmd, char **envp);
 int processSingleCommand(char *cmd, char **envp);
 char **processCommand(char *cmd);
