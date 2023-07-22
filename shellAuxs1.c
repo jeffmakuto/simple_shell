@@ -20,3 +20,39 @@ char *_strchr(char *s, char c)
 		return (s + i);
 	return ('\0');
 }
+/**
+ * _strdup -  function that duplicates a string
+ * in a newly allocated space in memory.
+ * @str: string to be copied.
+ * Return: Duplicated string in success.
+ */
+
+char *_strdup(char *str)
+{
+	int a = 0, b = 0;
+	char *new_s = NULL;
+
+	if (str == NULL)
+		return (NULL);
+
+	a = strlen(str);
+
+	new_s = malloc(sizeof(char) * (a + 1));
+
+	if (new_s == NULL)
+	{
+		perror("./hsh");
+		return (NULL);
+	}
+
+	if (a == 0 || new_s == 0)
+		return (NULL);
+
+	while (b < (a + 1))
+	{
+		new_s[b] = str[b];
+		b++;
+	}
+
+	return (new_s);
+}
