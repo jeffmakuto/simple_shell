@@ -105,7 +105,7 @@ int handleOrOperator(char *cmd, char **envp)
 			shouldExit = processCommandInput(cmd, envp);
 			if (!shouldExit) /* Only execute the next command if the previous one fails */
 				shouldExit = handleOrOperator(nextCmd, envp);
-		};
+		}
 	}
 	else
 	{
