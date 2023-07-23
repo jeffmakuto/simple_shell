@@ -122,7 +122,7 @@ int handleOrOperator(char *cmd, char **envp)
 		if (*nextCmd != '\0') /* Skip if there's nothing after || */
 		{
 			shouldExit = processCommandInput(cmd, envp);
-			if (!shouldExit) /* Only execute next command if the previous fails */
+			if (shouldExit) /* Only execute next command if the previous fails */
 				shouldExit = handleOrOperator(nextCmd, envp);
 		}
 	}
