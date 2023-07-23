@@ -12,7 +12,7 @@
  * Return: An array of strings, each representing an individual command.
  * The last element will be NULL. NULL will be returned in case of an error.
  */
-char **handleSemiColonCommands(const char *cmd, int *numCommands)
+char **handleSemiColonedCommands(const char *cmd, int *numCommands)
 {
 	char **commands = NULL, *token, *commandCopy = strdup(cmd);
 	int i;
@@ -148,7 +148,7 @@ int processCommandInput(char *cmd, char **envp)
 	char **commands = NULL;
 	int numCommands = 0, shouldExit = 0, i;
 
-	commands = handleSemiColonCommands(cmd, &numCommands);
+	commands = handleSemiColonedCommands(cmd, &numCommands);
 	if (!commands)
 		return (shouldExit); /* Return if there's an error splitting the commands */
 	for (i = 0; i < numCommands; i++)
