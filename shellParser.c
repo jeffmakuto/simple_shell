@@ -63,7 +63,7 @@ char **handleSemiColonCommands(const char *cmd, int *numCommands)
 int handleAndOperator(char *cmd, char **envp)
 {
 	char *token = "&&", *nextCmd = NULL, *originalCmd = NULL, *tempCmd = NULL;
-	int shouldExit = 0, prevCmdFailed = 0, exitStatus;
+	int shouldExit = 0, exitStatus;
 
 	originalCmd = strdup(cmd);
 	tempCmd = originalCmd;
@@ -73,30 +73,30 @@ int handleAndOperator(char *cmd, char **envp)
 		nextCmd += strlen(token); /* Move to the start of the next command */
 		if (*nextCmd)
 		{
-			if (!prevCmdFailed)
+			if (!shouldExit) /* Only execute next command if previous ones didn't fail */
 			{
 				exitStatus = processSingleCommand(tempCmd, envp);
 				if (exitStatus)
-				{
-					shouldExit = exitStatus;
-					prevCmdFailed = 1;
-					break;
-				}
+					shouldExit = 1; /* Set the flag to indicate a failure */
 			}
+		}
+		else
+		{
+			/* If the current command is empty (e.g., "command1 && "), break the loop */
+			break;
 		}
 		tempCmd = nextCmd; /* Move to the next command using tempCmd */
 	}
 	/* Process the last command (or only command if no "&&" found) */
-	if (*tempCmd && !prevCmdFailed)
+	if (*tempCmd && !shouldExit)
 	{
 		exitStatus = processSingleCommand(tempCmd, envp);
 		if (exitStatus != 0)
-			shouldExit = exitStatus;
+			shouldExit = 1; /* Set the flag to indicate a failure */
 	}
-	free(originalCmd); /* Free the copy of the original command */
+	free(originalCmd);
 	return (shouldExit);
 }
-
 /**
  * handleOrOperator - Handles the "||" operator and executes the next command
  * only if the previous one fails (returns non-zero).
