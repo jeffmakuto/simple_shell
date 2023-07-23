@@ -12,9 +12,9 @@ int lastExitStatus = 0;
  */
 char *replaceVariables(char *input)
 {
-	char *replacedStr = strdup(input);
-	char *ptr = replacedStr;
+	char *replacedStr = strdup(input), *ptr = replacedStr, *pathEnv, *newStr;
 	char pidStr[20]; /* Buffer to hold the process ID string */
+	size_t pathLen, replaceLen, newLen;
 
 	/* Replace $? with the exit status of the last command */
 	if (strstr(replacedStr, "$?"))
@@ -37,13 +37,30 @@ char *replaceVariables(char *input)
 	/* Handle $PATH */
 	if (strstr(replacedStr, "$PATH"))
 	{
-		char *pathEnv = getenv("PATH");
+		pathEnv = getenv("PATH");
 		if (pathEnv)
 		{
 			ptr = strstr(replacedStr, "$PATH");
-			*ptr = '\0';
-			strcat(replacedStr, pathEnv);
-			strcat(replacedStr, ptr + 5);
+			pathLen = strlen(pathEnv);
+			replaceLen = strlen("$PATH");
+			newLen = strlen(replacedStr) - replaceLen + pathLen;
+			newStr = malloc(newLen + 1);
+			if (!newStr)
+			{
+				perror("./hsh: malloc error");
+				free(replacedStr);
+				return (NULL);
+			}
+			/* Copy the part before $PATH */
+			strncpy(newStr, replacedStr, ptr - replacedStr);
+			newStr[ptr - replacedStr] = '\0';
+			/* Concatenate the actual PATH value */
+			strcat(newStr, pathEnv);
+			/* Concatenate the part after $PATH */
+			strcat(newStr, ptr + replaceLen);
+			/* Free the old replacedStr and use the new string */
+			free(replacedStr);
+			replacedStr = newStr;
 		}
 	}
 	return (replacedStr);
