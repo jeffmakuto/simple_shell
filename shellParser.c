@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * handleSemiColonCommands - Splits a command string by semicolons
+ * handleSemiColonedCommands - Splits a command string by semicolons
  * into individual commands.
  *
  * @cmd: The command string to be split.
@@ -73,7 +73,7 @@ int handleAndOperator(char *cmd, char **envp)
 		nextCmd += strlen(token); /* Move to the start of the next command */
 		if (*nextCmd)
 		{
-			if (!shouldExit) /* Only execute next command if previous ones didn't fail */
+			if (!shouldExit) /* Only execute next command if previous didn't fail */
 			{
 				exitStatus = processSingleCommand(tempCmd, envp);
 				if (exitStatus)
