@@ -18,6 +18,13 @@ char **processCommand(char *cmd)
 		perror("./hsh: malloc error");
 		return (NULL);
 	}
+	/* Ignore anything after the '#' character (comment handling) */
+	token = strtok(cmd, "#");
+	if (!token)
+	{
+		free(args);
+		return NULL;
+	}
 
 	token = strtok(cmd, " ");
 
