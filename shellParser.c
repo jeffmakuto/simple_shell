@@ -183,6 +183,9 @@ int processSingleCommand(char *cmd, char **envp)
 	char **args, *executable;
 	int shouldExit = 0, i;
 
+	/* Replace variables before processing the command */
+	cmd = replaceVariables(cmd);
+
 	args = processCommand(cmd);
 	if (args)
 	{
@@ -205,6 +208,7 @@ int processSingleCommand(char *cmd, char **envp)
 				{
 					args[0] = executable;
 					executeCommand(args, envp);
+					lastExitStatus = WEXITSTATUS(lastExitStatus);
 				}
 			}
 			for (i = 0; args[i]; i++)

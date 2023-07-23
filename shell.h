@@ -35,6 +35,8 @@ typedef struct BuiltinCmd
 	void (*action)(char **args);
 } BuiltinCmd;
 
+extern int lastExitStatus;
+
 /* Prototype functions */
 void runInteractiveMode(char **envp);
 void runNonInteractiveMode(char **envp);
@@ -43,6 +45,7 @@ int handleAndOperator(char *cmd, char **envp);
 int handleOrOperator(char *cmd, char **envp);
 int processCommandInput(char *cmd, char **envp);
 int processSingleCommand(char *cmd, char **envp);
+char *replaceVariables(char *input);
 char **processCommand(char *cmd);
 void executeCommand(char **args, char **envp);
 int checkBuiltins(char *cmd, char **args);
