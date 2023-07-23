@@ -1,7 +1,5 @@
 #include "shell.h"
 
-int lastExitStatus = 0;
-
 /**
  * replacePathVariable - Replace the $PATH variable in the string
  *
@@ -59,6 +57,7 @@ char *replaceVariables(char *input)
 {
 	char *replacedStr = strdup(input), *ptr = replacedStr;
 	char pidStr[20]; /* Buffer to hold the process ID string */
+	int lastExitStatus = 0;
 
 	/* Replace $? with the exit status of the last command */
 	if (strstr(replacedStr, "$?"))

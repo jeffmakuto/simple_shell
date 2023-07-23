@@ -45,7 +45,7 @@ char **handleSemiColonedCommands(const char *cmd, int *numCommands);
 int handleAndOperator(char *cmd, char **envp);
 int handleOrOperator(char *cmd, char **envp);
 int processCommandInput(char *cmd, char **envp);
-int processSingleCommand(char *cmd, char **envp);
+int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr);
 char *replaceVariables(char *input);
 char *replacePathVariable(char *input);
 char **processCommand(char *cmd);

@@ -63,7 +63,7 @@ char **handleSemiColonedCommands(const char *cmd, int *numCommands)
 int handleAndOperator(char *cmd, char **envp)
 {
 	char *token = "&&", *nextCmd = NULL, *originalCmd = NULL, *tempCmd = NULL;
-	int shouldExit = 0, exitStatus;
+	int shouldExit = 0, exitStatus, lastExitStatus = 0;
 
 	originalCmd = strdup(cmd);
 	tempCmd = originalCmd;
@@ -75,7 +75,7 @@ int handleAndOperator(char *cmd, char **envp)
 		{
 			if (!shouldExit) /* Only execute next command if previous didn't fail */
 			{
-				exitStatus = processSingleCommand(tempCmd, envp);
+				exitStatus = processSingleCommand(tempCmd, envp, &lastExitStatus);
 				if (exitStatus)
 					shouldExit = 1; /* Set the flag to indicate a failure */
 			}
@@ -90,7 +90,7 @@ int handleAndOperator(char *cmd, char **envp)
 	/* Process the last command (or only command if no "&&" found) */
 	if (*tempCmd && !shouldExit)
 	{
-		exitStatus = processSingleCommand(tempCmd, envp);
+		exitStatus = processSingleCommand(tempCmd, envp, &lastExitStatus);
 		if (exitStatus != 0)
 			shouldExit = 1; /* Set the flag to indicate a failure */
 	}
@@ -111,7 +111,7 @@ int handleOrOperator(char *cmd, char **envp)
 {
 	char *token = "||";
 	char *nextCmd = NULL;
-	int shouldExit = 0;
+	int shouldExit = 0, lastExitStatus = 0;
 
 	nextCmd = strstr(cmd, token);
 	if (nextCmd)
@@ -129,7 +129,7 @@ int handleOrOperator(char *cmd, char **envp)
 	else
 	{
 		/* No || found, process the single command */
-		shouldExit = processSingleCommand(cmd, envp);
+		shouldExit = processSingleCommand(cmd, envp, &lastExitStatus);
 	}
 	return (shouldExit);
 }
@@ -146,7 +146,7 @@ int handleOrOperator(char *cmd, char **envp)
 int processCommandInput(char *cmd, char **envp)
 {
 	char **commands = NULL;
-	int numCommands = 0, shouldExit = 0, i;
+	int numCommands = 0, shouldExit = 0, i, lastExitStatus = 0;
 
 	commands = handleSemiColonedCommands(cmd, &numCommands);
 	if (!commands)
@@ -161,7 +161,7 @@ int processCommandInput(char *cmd, char **envp)
 			else if (strstr(commands[i], "||"))
 				shouldExit = handleOrOperator(commands[i], envp);
 			else
-				shouldExit = processSingleCommand(commands[i], envp);
+				shouldExit = processSingleCommand(commands[i], envp, &lastExitStatus);
 		}
 		free(commands[i]);
 	}
@@ -176,12 +176,15 @@ int processCommandInput(char *cmd, char **envp)
  *
  * @envp: The environment variables
  *
+ * @lastExitStatusPtr: Pointer to an integer to store the exit status
+ * of the last command
+ *
  * Return: 1 if the program should exit, 0 otherwise.
  */
-int processSingleCommand(char *cmd, char **envp)
+int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 {
 	char **args, *executable;
-	int shouldExit = 0, i;
+	int shouldExit = 0, i, status;
 
 	/* Replace variables before processing the command */
 	cmd = replaceVariables(cmd);
@@ -208,7 +211,8 @@ int processSingleCommand(char *cmd, char **envp)
 				{
 					args[0] = executable;
 					executeCommand(args, envp);
-					lastExitStatus = WEXITSTATUS(lastExitStatus);
+					wait(&status);
+					*lastExitStatusPtr = WEXITSTATUS(status);
 				}
 			}
 			for (i = 0; args[i]; i++)
