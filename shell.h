@@ -47,6 +47,7 @@ int handleOrOperator(char *cmd, char **envp);
 int processCommandInput(char *cmd, char **envp);
 int processSingleCommand(char *cmd, char **envp);
 char *replaceVariables(char *input);
+char *replacePathVariable(char *input);
 char **processCommand(char *cmd);
 void executeCommand(char **args, char **envp);
 int checkBuiltins(char *cmd, char **args);
