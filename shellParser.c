@@ -62,19 +62,38 @@ char **handleSemiColonCommands(const char *cmd, int *numCommands)
  */
 int handleAndOperator(char *cmd, char **envp)
 {
-	char *token = "&&", *nextCmd = NULL;
-	int shouldExit = 0;
+	char *token = "&&", *nextCmd = NULL, *originalCmd = NULL, *tempCmd = NULL;
+	int shouldExit = 0, prevCmdFailed = 0, exitStatus;
 
-	nextCmd = strstr(cmd, token);
-	if (nextCmd)
+	originalCmd = strdup(cmd);
+	tempCmd = originalCmd;
+	while ((nextCmd = strstr(tempCmd, token)))
 	{
-		*nextCmd = '\0'; /* Null-terminate the first command */
+		*nextCmd = '\0'; /* Null-terminate the current command */
 		nextCmd += strlen(token); /* Move to the start of the next command */
-		if (*nextCmd != '\0') /* Skip if there's nothing after && */
-			shouldExit = processCommandInput(nextCmd, envp);
+		if (*nextCmd)
+		{
+			if (!prevCmdFailed)
+			{
+				exitStatus = processSingleCommand(tempCmd, envp);
+				if (exitStatus)
+				{
+					shouldExit = exitStatus;
+					prevCmdFailed = 1;
+					break;
+				}
+			}
+		}
+		tempCmd = nextCmd; /* Move to the next command using tempCmd */
 	}
-	shouldExit = processSingleCommand(cmd, envp) || shouldExit;
-
+	/* Process the last command (or only command if no "&&" found) */
+	if (*tempCmd && !prevCmdFailed)
+	{
+		exitStatus = processSingleCommand(tempCmd, envp);
+		if (exitStatus != 0)
+			shouldExit = exitStatus;
+	}
+	free(originalCmd); /* Free the copy of the original command */
 	return (shouldExit);
 }
 
@@ -103,7 +122,7 @@ int handleOrOperator(char *cmd, char **envp)
 		if (*nextCmd != '\0') /* Skip if there's nothing after || */
 		{
 			shouldExit = processCommandInput(cmd, envp);
-			if (!shouldExit) /* Only execute the next command if the previous one fails */
+			if (!shouldExit) /* Only execute next command if the previous fails */
 				shouldExit = handleOrOperator(nextCmd, envp);
 		}
 	}
