@@ -35,6 +35,7 @@ typedef struct BuiltinCmd
 	void (*action)(char **args);
 } BuiltinCmd;
 
+/* Define global variables */
 extern int lastExitStatus;
 
 /* Prototype functions */
