@@ -45,6 +45,8 @@ int processCommandInput(char *cmd, char **envp);
 int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr);
 char *replaceVariables(char *input);
 char *replacePathVariable(char *input);
+char *intToString(int num, char *str);
+char *concatStrings(const char *str1, const char *str2);
 char **processCommand(char *cmd);
 void executeCommand(char **args, char **envp);
 int checkBuiltins(char *cmd, char **args);

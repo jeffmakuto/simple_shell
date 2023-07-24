@@ -46,39 +46,140 @@ char *replacePathVariable(char *input)
 }
 
 /**
- * replaceVariables - Replace variables in a string
+ * intToString - Converts an integer to its string representation.
  *
- * @input: The input string
+ * @num: The integer to convert.
  *
- * Return: A new string with variables replaced.
- * Note: The returned string should be freed by the caller.
+ * @str: The buffer to store the resulting string.
+ *
+ * Return: A pointer to the buffer containing the string representation.
+ */
+char *intToString(int num, char *str)
+{
+	int i = 0, isNegative = 0, rem, j, len;
+	char temp;
+
+	/* Handle 0 explicitly, otherwise, it'll be considered as empty string. */
+	if (!num)
+	{
+		str[i++] = '0';
+		str[i] = '\0';
+		return (str);
+	}
+
+	/* Handle negative numbers */
+	if (num < 0)
+	{
+		isNegative = 1;
+		num = -num;
+	}
+
+	/* Convert individual digits to characters, add them to string in rev order */
+	while (num)
+	{
+		rem = num % 10;
+		str[i++] = rem + '0';
+		num = num / 10;
+	}
+	/* Append '-' if the number is negative */
+	if (isNegative)
+		str[i++] = '-';
+	str[i] = '\0';
+	/* Reverse the string to get the correct representation */
+	j = 0, len = i - 1;
+	while (j < len)
+	{
+		temp = str[j];
+		str[j] = str[len];
+		str[len] = temp;
+		j++;
+		len--;
+	}
+	return (str);
+}
+
+/**
+ * concatStrings - Concatenates two strings and returns a new dynamically
+ * allocated string.
+ *
+ * @str1: The first string.
+ *
+ * @str2: The second string.
+ *
+ * Return: A pointer to the dynamically allocated concatenated string.
+ */
+char *concatStrings(const char *str1, const char *str2)
+{
+	int len1 = 0, len2 = 0, i;
+	char *result;
+
+	/* Find the lengths of the input strings */
+	while (str1[len1])
+		len1++;
+	while (str2[len2])
+		len2++;
+
+	/* Allocate memory for the new concatenated string */
+	result = (char *)malloc((len1 + len2 + 1) * sizeof(char));
+
+	/* Copy the contents of the first string */
+	for (i = 0; i < len1; i++)
+		result[i] = str1[i];
+
+	/* Copy the contents of the second string */
+	for (i = 0; i < len2; i++)
+		result[len1 + i] = str2[i];
+
+	/* Null-terminate the result string */
+	result[len1 + len2] = '\0';
+
+	return (result);
+}
+
+/**
+ * replaceVariables - Replaces specific variables in the input string with
+ * their values.
+ *
+ * @input: The input string to process.
+ *
+ * Return: A pointer to the new dynamically allocated string with replaced
+ * variables.
  */
 char *replaceVariables(char *input)
 {
-	char *replacedStr = strdup(input), *ptr = replacedStr;
+	char *replacedStr = strdup(input), *ptr = replacedStr, *temp;
 	char pidStr[20]; /* Buffer to hold the process ID string */
 	int lastExitStatus = 0;
 
 	/* Replace $? with the exit status of the last command */
 	if (strstr(replacedStr, "$?"))
 	{
-		snprintf(pidStr, sizeof(pidStr), "%d", lastExitStatus);
+		intToString(lastExitStatus, pidStr);
 		ptr = strstr(replacedStr, "$?");
 		*ptr = '\0';
-		strcat(replacedStr, pidStr);
+		temp = concatStrings(replacedStr, pidStr);
+		free(replacedStr);
+		replacedStr = temp;
+		ptr = replacedStr + strlen(replacedStr); /* Update pointer to end of str */
 		strcat(replacedStr, ptr + 2);
 	}
+
 	/* Replace $$ with the shell's process ID */
 	if (strstr(replacedStr, "$$"))
 	{
-		snprintf(pidStr, sizeof(pidStr), "%d", getpid());
+		intToString(getpid(), pidStr);
 		ptr = strstr(replacedStr, "$$");
 		*ptr = '\0';
-		strcat(replacedStr, pidStr);
+		temp = concatStrings(replacedStr, pidStr);
+		free(replacedStr);
+		replacedStr = temp;
+		ptr = replacedStr + strlen(replacedStr); /* Update pointer to end of str */
 		strcat(replacedStr, ptr + 2);
 	}
-	/* Replace $PATH using the separate function */
+
+	/* Replace $PATH using the separate function (replacePathVariable) */
 	replacedStr = replacePathVariable(replacedStr);
+
 	return (replacedStr);
 }
 
