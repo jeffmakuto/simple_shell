@@ -57,4 +57,11 @@ int processCommandLineArguments(int ac, char **av, char **envp);
 void cdAction(char **args);
 int changeDirectory(const char *targetDir);
 
+/*auxilliaries*/
+int _strlen(char *s);
+int _strcmp(char *s1, char *s2);
+int _atoi(char *s);
+char *_strchr(char *s, char c);
+char *_strdup(char *str);
+char *_memcpy(char *dest, char *src, unsigned int n);
 #endif /* SHELL_H */
