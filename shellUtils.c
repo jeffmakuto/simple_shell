@@ -9,8 +9,7 @@
  */
 char **processCommand(char *cmd)
 {
-	char **args = malloc(sizeof(char *) * MAX_ARGS);
-	char *token;
+	char **args = malloc(sizeof(char *) * MAX_ARGS), *token;
 	int argCount = 0, i;
 
 	if (!args)
@@ -18,9 +17,14 @@ char **processCommand(char *cmd)
 		perror("./hsh: malloc error");
 		return (NULL);
 	}
-
+	/* Ignore anything after the '#' character (comment handling) */
+	token = strtok(cmd, "#");
+	if (!token)
+	{
+		free(args);
+		return (NULL);
+	}
 	token = strtok(cmd, " ");
-
 	while (token && argCount < MAX_ARGS)
 	{
 		args[argCount] = strdup(token);
@@ -28,7 +32,6 @@ char **processCommand(char *cmd)
 		if (!args[argCount])
 		{
 			perror("./hsh: strdup error");
-
 			/* Free previously allocated strings */
 			for (i = 0; i < argCount; i++)
 				free(args[i]);
@@ -42,10 +45,8 @@ char **processCommand(char *cmd)
 			args[argCount] = NULL;
 			break; /* Exit the loop after setting NULL terminator */
 		}
-
 		token = strtok(NULL, " ");
 	}
-
 	args[argCount] = NULL;
 	return (args);
 }
