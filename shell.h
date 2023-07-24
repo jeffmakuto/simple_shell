@@ -38,7 +38,7 @@ typedef struct BuiltinCmd
 /* Prototype functions */
 void runInteractiveMode(char **envp);
 void runNonInteractiveMode(char **envp);
-char **handleSemiColonedCommands(const char *cmd, int *numCommands);
+char **handleSemiColonedCommands(char *cmd, int *numCommands);
 int handleAndOperator(char *cmd, char **envp);
 int handleOrOperator(char *cmd, char **envp);
 int processCommandInput(char *cmd, char **envp);
@@ -46,16 +46,16 @@ int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr);
 char *replaceVariables(char *input);
 char *replacePathVariable(char *input);
 char *intToString(int num, char *str);
-char *concatStrings(const char *str1, const char *str2);
+char *concatStrings(char *str1, char *str2);
 char **processCommand(char *cmd);
 void executeCommand(char **args, char **envp);
 int checkBuiltins(char *cmd, char **args);
-bool isAbsolutePath(const char *path);
-int isExecutable(const char *path);
-char *findExecutable(const char *cmd);
+bool isAbsolutePath(char *path);
+int isExecutable(char *path);
+char *findExecutable(char *cmd);
 int processCommandLineArguments(int ac, char **av, char **envp);
 void cdAction(char **args);
-int changeDirectory(const char *targetDir);
+int changeDirectory(char *targetDir);
 
 /*auxilliaries*/
 int _strlen(char *s);

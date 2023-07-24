@@ -14,12 +14,12 @@ char *replacePathVariable(char *input)
 	size_t pathLen, replaceLen, newLen;
 
 	/* Handle $PATH */
-	if (strstr(replacedStr, "$PATH"))
+	if (_strstr(replacedStr, "$PATH"))
 	{
 		pathEnv = getenv("PATH");
 		if (pathEnv)
 		{
-			ptr = strstr(replacedStr, "$PATH");
+			ptr = _strstr(replacedStr, "$PATH");
 			pathLen = _strlen(pathEnv);
 			replaceLen = _strlen("$PATH");
 			newLen = _strlen(replacedStr) - replaceLen + pathLen;
@@ -108,7 +108,7 @@ char *intToString(int num, char *str)
  *
  * Return: A pointer to the dynamically allocated concatenated string.
  */
-char *concatStrings(const char *str1, const char *str2)
+char *concatStrings(char *str1, char *str2)
 {
 	int len1 = 0, len2 = 0, i;
 	char *result;
@@ -152,10 +152,10 @@ char *replaceVariables(char *input)
 	int lastExitStatus = 0;
 
 	/* Replace $? with the exit status of the last command */
-	if (strstr(replacedStr, "$?"))
+	if (_strstr(replacedStr, "$?"))
 	{
 		intToString(lastExitStatus, pidStr);
-		ptr = strstr(replacedStr, "$?");
+		ptr = _strstr(replacedStr, "$?");
 		*ptr = '\0';
 		temp = concatStrings(replacedStr, pidStr);
 		free(replacedStr);
@@ -165,10 +165,10 @@ char *replaceVariables(char *input)
 	}
 
 	/* Replace $$ with the shell's process ID */
-	if (strstr(replacedStr, "$$"))
+	if (_strstr(replacedStr, "$$"))
 	{
 		intToString(getpid(), pidStr);
-		ptr = strstr(replacedStr, "$$");
+		ptr = _strstr(replacedStr, "$$");
 		*ptr = '\0';
 		temp = concatStrings(replacedStr, pidStr);
 		free(replacedStr);

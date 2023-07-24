@@ -27,7 +27,7 @@ char **processCommand(char *cmd)
 	token = strtok(cmd, " ");
 	while (token && argCount < MAX_ARGS)
 	{
-		args[argCount] = strdup(token);
+		args[argCount] = _strdup(token);
 
 		if (!args[argCount])
 		{
@@ -40,7 +40,7 @@ char **processCommand(char *cmd)
 		}
 		argCount++;
 
-		if (strchr(token, '\n'))
+		if (_strchr(token, '\n'))
 		{
 			args[argCount] = NULL;
 			break; /* Exit the loop after setting NULL terminator */
@@ -91,7 +91,7 @@ void executeCommand(char **args, char **envp)
  * Return: true if the path is an absolute path and executable,
  * false otherwise.
  */
-bool isAbsolutePath(const char *path)
+bool isAbsolutePath(char *path)
 {
 	if (path[0] == '/')
 	{
@@ -110,7 +110,7 @@ bool isAbsolutePath(const char *path)
  *
  * Return: 1 if the path is executable, 0 otherwise.
  */
-int isExecutable(const char *path)
+int isExecutable(char *path)
 {
 	/* Check if the given path is executable */
 	return (access(path, X_OK) == 0);
@@ -124,25 +124,25 @@ int isExecutable(const char *path)
  *
  * Return: A pointer to the executable path if found, NULL otherwise.
  */
-char *findExecutable(const char *cmd)
+char *findExecutable(char *cmd)
 {
 	char *path = getenv("PATH"), *pathEnv, *dir, *executablePath;
 	size_t dirLen, cmdLen;
 	char *foundExecutable = NULL;
 
 	if (isAbsolutePath(cmd))
-		return (strdup(cmd));
+		return (_strdup(cmd));
 	if (!path)
 	{
 		perror("./hsh: PATH environment variable not found");
 		return (NULL);
 	}
-	pathEnv = strdup(path);
+	pathEnv = _strdup(path);
 	dir = strtok(pathEnv, ":");
 	while (dir)
 	{
-		dirLen = strlen(dir);
-		cmdLen = strlen(cmd);
+		dirLen = _strlen(dir);
+		cmdLen = _strlen(cmd);
 		executablePath = malloc(dirLen + cmdLen + 2);
 		if (!executablePath)
 		{
@@ -150,9 +150,9 @@ char *findExecutable(const char *cmd)
 			free(pathEnv);
 			return (NULL);
 		}
-		memcpy(executablePath, dir, dirLen);
+		_memcpy(executablePath, dir, dirLen);
 		executablePath[dirLen] = '/';
-		memcpy(executablePath + dirLen + 1, cmd, cmdLen + 1);
+		_memcpy(executablePath + dirLen + 1, cmd, cmdLen + 1);
 		if (isExecutable(executablePath))
 		{
 			foundExecutable = executablePath;

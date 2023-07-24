@@ -93,7 +93,7 @@ void cdAction(char **args)
  *
  * Return: On success, returns 0. On failure, returns -1.
  */
-int changeDirectory(const char *targetDir)
+int changeDirectory(char *targetDir)
 {
 	char cwd[PATH_MAX];
 

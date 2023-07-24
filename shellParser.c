@@ -12,7 +12,7 @@
  * Return: An array of strings, each representing an individual command.
  * The last element will be NULL. NULL will be returned in case of an error.
  */
-char **handleSemiColonedCommands(const char *cmd, int *numCommands)
+char **handleSemiColonedCommands(char *cmd, int *numCommands)
 {
 	char **commands = NULL, *token, *commandCopy = _strdup((char *)cmd);
 	int i;
@@ -131,9 +131,9 @@ int processCommandInput(char *cmd, char **envp)
 		if (commands[i][0] != '\0') /* Skip empty commands */
 		{
 			/* Handle chaining with && and || */
-			if (strstr(commands[i], "&&"))
+			if (_strstr(commands[i], "&&"))
 				shouldExit = handleAndOperator(commands[i], envp);
-			else if (strstr(commands[i], "||"))
+			else if (_strstr(commands[i], "||"))
 				shouldExit = handleOrOperator(commands[i], envp);
 			else
 				shouldExit = processSingleCommand(commands[i], envp, &lastExitStatus);
@@ -167,7 +167,7 @@ int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 	args = processCommand(cmd);
 	if (args)
 	{
-		if (strcmp("exit", args[0]) == 0)
+		if (_strcmp("exit", args[0]) == 0)
 		{
 			free(args[0]);
 			shouldExit = 1;
