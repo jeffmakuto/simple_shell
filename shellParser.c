@@ -173,7 +173,7 @@ int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 			shouldExit = 1;
 			/* If an argument is provided to the exit command */
 			if (args[1])
-				exit(atoi(args[1]));
+				exit(_atoi(args[1]));
 			else
 				exit(0);
 		}
