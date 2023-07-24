@@ -178,7 +178,9 @@ char *replaceVariables(char *input)
 	}
 
 	/* Replace $PATH using the separate function (replacePathVariable) */
-	replacedStr = replacePathVariable(replacedStr);
+	temp = replacePathVariable(replacedStr);
+	free(replacedStr); /* Free the previous replacedStr before reassigning the pointer */
+	replacedStr = temp;
 
 	return (replacedStr);
 }
