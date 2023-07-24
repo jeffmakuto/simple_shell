@@ -63,14 +63,16 @@ char **handleSemiColonedCommands(const char *cmd, int *numCommands)
 int handleAndOperator(char *cmd, char **envp)
 {
 	char *token, *saveptr;
-	int shouldExit = 0;
+	int shouldExit = 0, lastExitStatus = 0;
 
 	token = strtok_r(cmd, "&&", &saveptr);
-	while (token != NULL && !shouldExit)
+	while (token && !shouldExit)
 	{
 		if (token[0]) /* Skip empty commands */
 		{
 			shouldExit = processCommandInput(token, envp);
+			if (lastExitStatus)
+				break; /* Stop executing if a command fails */
 		}
 		token = strtok_r(NULL, "&&", &saveptr);
 	}
@@ -90,14 +92,16 @@ int handleAndOperator(char *cmd, char **envp)
 int handleOrOperator(char *cmd, char **envp)
 {
 	char *token, *saveptr;
-	int shouldExit = 0;
+	int shouldExit = 0, lastExitStatus = 0;
 
 	token = strtok_r(cmd, "||", &saveptr);
-	while (token != NULL && !shouldExit)
+	while (token && !shouldExit)
 	{
 		if (token[0]) /* Skip empty commands */
 		{
 			shouldExit = processCommandInput(token, envp);
+			if (!lastExitStatus)
+				break; /* Stop executing if a command fails */
 		}
 		token = strtok_r(NULL, "||", &saveptr);
 	}
