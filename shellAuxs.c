@@ -39,33 +39,35 @@ int _strcmp(char *s1, char *s2)
 	return (*s1 - *s2);
 }
 /**
- * _strspn - gets length of a prefix substring
+ * _strstr - Finds the first occurence of the
+ *	     substring @needle in string @haystack.
  *
- * @s: segment where the bytes are gotten from
- * @accept: source of bytes used in s
+ * @needle: Substring to be located.
+ * @haystack: Location of substring @needle.
  *
- * Return: number of bytes in s consisting of only those
- *         from accept
+ * Return: Pointer to the beginning of located substring.
+ *	   NULL if substring is not found.
  */
-unsigned int _strspn(char *s, char *accept)
+char *_strstr(char *haystack, char *needle)
 {
-	unsigned int i, j, x;
+	char *cow;
+	char *tayler;
 
-	for (i = 0; *(s + i) != '\0'; i++)
+	while (*haystack != '\0')
 	{
-		x = 1;
-		for (j = 0; *(accept + j) != '\0'; j++)
+		cow = haystack;
+		tayler = needle;
+
+		while (*haystack != '\0' && *tayler != '\0' && *haystack == *tayler)
 		{
-			if (*(s + i) == *(accept + j))
-			{
-				x = 0;
-				break;
-			}
+			haystack++;
+			tayler++;
 		}
-		if (x == 1)
-			break;
+		if (!*tayler)
+			return (cow);
+		haystack = cow + 1;
 	}
-	return (i);
+	return (0);
 }
 /**
  * _atoi - Convert a string to an integer.
