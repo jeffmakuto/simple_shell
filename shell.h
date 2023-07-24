@@ -64,4 +64,5 @@ int _atoi(char *s);
 char *_strchr(char *s, char c);
 char *_strdup(char *str);
 char *_memcpy(char *dest, char *src, unsigned int n);
+char *_strstr(char *haystack, char *needle);
 #endif /* SHELL_H */
