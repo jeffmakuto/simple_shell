@@ -23,7 +23,7 @@ int checkBuiltins(char *cmd, char **args)
 
 	while (builtins[i].cmd)
 	{
-		if (strcmp(cmd, builtins[i].cmd) == 0)
+		if (_strcmp(cmd, builtins[i].cmd) == 0)
 		{
 			if (builtins[i].action)
 				builtins[i].action(args);
@@ -57,8 +57,8 @@ void cdAction(char **args)
 {
 	char *targetDir;
 
-	if (args[1] == NULL || strcmp(args[1], "") == 0 ||
-			strcmp(args[1], "~") == 0 || strcmp(args[1], "$HOME") == 0)
+	if (args[1] == NULL || _strcmp(args[1], "") == 0 ||
+			_strcmp(args[1], "~") == 0 || _strcmp(args[1], "$HOME") == 0)
 	{
 		targetDir = getenv("HOME");
 		if (!targetDir)
@@ -67,7 +67,7 @@ void cdAction(char **args)
 			return;
 		}
 	}
-	else if (strcmp(args[1], "-") == 0)
+	else if (_strcmp(args[1], "-") == 0)
 	{
 		targetDir = getenv("OLDPWD");
 		if (!targetDir)
@@ -75,7 +75,7 @@ void cdAction(char **args)
 			perror("./hsh: cd error");
 			return;
 		}
-		write(STDOUT_FILENO, targetDir, strlen(targetDir));
+		write(STDOUT_FILENO, targetDir, _strlen(targetDir));
 		write(STDOUT_FILENO, "\n", 1);
 	}
 	else

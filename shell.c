@@ -48,7 +48,7 @@ void runInteractiveMode(char **envp)
 
 	while (!shouldExit)
 	{
-		write(STDOUT_FILENO, PROMPT, strlen(PROMPT));
+		write(STDOUT_FILENO, PROMPT, _strlen(PROMPT));
 		bytesRead = getline(&cmd, &n, stdin);
 
 		if (bytesRead == -1)

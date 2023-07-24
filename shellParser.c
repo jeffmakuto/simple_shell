@@ -14,7 +14,7 @@
  */
 char **handleSemiColonedCommands(const char *cmd, int *numCommands)
 {
-	char **commands = NULL, *token, *commandCopy = strdup(cmd);
+	char **commands = NULL, *token, *commandCopy = _strdup((char *)cmd);
 	int i;
 
 	if (!commandCopy)
@@ -33,7 +33,7 @@ char **handleSemiColonedCommands(const char *cmd, int *numCommands)
 			free(commandCopy);
 			return (NULL);
 		}
-		commands[*numCommands] = strdup(token);
+		commands[*numCommands] = _strdup(token);
 		if (!commands[*numCommands])
 		{
 			perror("./hsh: strdup error");
@@ -77,7 +77,7 @@ int handleAndOperator(char *cmd, char **envp)
 		token = strtok_r(NULL, "&&", &saveptr);
 	}
 
-	return shouldExit;
+	return (shouldExiti);
 }
 
 /**
@@ -100,13 +100,13 @@ int handleOrOperator(char *cmd, char **envp)
 		if (token[0]) /* Skip empty commands */
 		{
 			shouldExit = processCommandInput(token, envp);
-			if (!lastExitStatus)
+			if (!shouldExit)
 				break; /* Stop executing if a command succeeds */
 		}
 		token = strtok_r(NULL, "||", &saveptr);
 	}
 
-	return shouldExit;
+	return (shouldExit);
 }
 
 /**

@@ -10,7 +10,7 @@
  */
 char *replacePathVariable(char *input)
 {
-	char *replacedStr = strdup(input), *ptr = replacedStr, *pathEnv, *newStr;
+	char *replacedStr = _strdup(input), *ptr = replacedStr, *pathEnv, *newStr;
 	size_t pathLen, replaceLen, newLen;
 
 	/* Handle $PATH */
@@ -20,9 +20,9 @@ char *replacePathVariable(char *input)
 		if (pathEnv)
 		{
 			ptr = strstr(replacedStr, "$PATH");
-			pathLen = strlen(pathEnv);
-			replaceLen = strlen("$PATH");
-			newLen = strlen(replacedStr) - replaceLen + pathLen;
+			pathLen = _strlen(pathEnv);
+			replaceLen = _strlen("$PATH");
+			newLen = _strlen(replacedStr) - replaceLen + pathLen;
 			newStr = malloc(newLen + 1);
 			if (!newStr)
 			{
@@ -147,7 +147,7 @@ char *concatStrings(const char *str1, const char *str2)
  */
 char *replaceVariables(char *input)
 {
-	char *replacedStr = strdup(input), *ptr = replacedStr, *temp;
+	char *replacedStr = _strdup(input), *ptr = replacedStr, *temp;
 	char pidStr[20]; /* Buffer to hold the process ID string */
 	int lastExitStatus = 0;
 
@@ -160,7 +160,7 @@ char *replaceVariables(char *input)
 		temp = concatStrings(replacedStr, pidStr);
 		free(replacedStr);
 		replacedStr = temp;
-		ptr = replacedStr + strlen(replacedStr); /* Update pointer to end of str */
+		ptr = replacedStr + _strlen(replacedStr); /* Update pointer to end of str */
 		strcat(replacedStr, ptr + 2);
 	}
 
@@ -173,7 +173,7 @@ char *replaceVariables(char *input)
 		temp = concatStrings(replacedStr, pidStr);
 		free(replacedStr);
 		replacedStr = temp;
-		ptr = replacedStr + strlen(replacedStr); /* Update pointer to end of str */
+		ptr = replacedStr + _strlen(replacedStr); /* Update pointer to end of str */
 		strcat(replacedStr, ptr + 2);
 	}
 
