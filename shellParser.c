@@ -101,7 +101,7 @@ int handleOrOperator(char *cmd, char **envp)
 		{
 			shouldExit = processCommandInput(token, envp);
 			if (!lastExitStatus)
-				break; /* Stop executing if a command fails */
+				break; /* Stop executing if a command succeeds */
 		}
 		token = strtok_r(NULL, "||", &saveptr);
 	}
