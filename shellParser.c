@@ -91,7 +91,7 @@ int handleAndOperator(char *cmd, char **envp)
 	if (*tempCmd && !shouldExit)
 	{
 		exitStatus = processSingleCommand(tempCmd, envp, &lastExitStatus);
-		if (exitStatus != 0)
+		if (exitStatus)
 			shouldExit = 1; /* Set the flag to indicate a failure */
 	}
 	free(originalCmd);
