@@ -77,7 +77,7 @@ int handleAndOperator(char *cmd, char **envp)
 		token = strtok_r(NULL, "&&", &saveptr);
 	}
 
-	return (shouldExiti);
+	return (shouldExit);
 }
 
 /**
@@ -99,7 +99,7 @@ int handleOrOperator(char *cmd, char **envp)
 	{
 		if (token[0]) /* Skip empty commands */
 		{
-			shouldExit = processCommandInput(token, envp);
+			shouldExit = processSingleCommand(token, envp, &lastExitStatus);
 			if (!shouldExit)
 				break; /* Stop executing if a command succeeds */
 		}
