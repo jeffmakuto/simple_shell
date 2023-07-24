@@ -50,88 +50,59 @@ char **handleSemiColonedCommands(const char *cmd, int *numCommands)
 	free(commandCopy);
 	return (commands);
 }
+
 /**
- * handleAndOperator - Handles the "&&" operator and executes the next command
- * only if the previous one succeeds (returns 0).
+ * handleAndOperator - Handle command execution with the && operator.
  *
- * @cmd: The command string
+ * @cmd: The command string with && operator.
  *
- * @envp: The environment variables
+ * @envp: The environment variables.
  *
  * Return: 1 if the program should exit, 0 otherwise.
  */
 int handleAndOperator(char *cmd, char **envp)
 {
-	char *token = "&&", *nextCmd = NULL, *originalCmd = NULL, *tempCmd = NULL;
-	int shouldExit = 0, exitStatus, lastExitStatus = 0;
+	char *token, *saveptr;
+	int shouldExit = 0;
 
-	originalCmd = strdup(cmd);
-	tempCmd = originalCmd;
-	while ((nextCmd = strstr(tempCmd, token)))
+	token = strtok_r(cmd, "&&", &saveptr);
+	while (token != NULL && !shouldExit)
 	{
-		*nextCmd = '\0'; /* Null-terminate the current command */
-		nextCmd += strlen(token); /* Move to the start of the next command */
-		if (*nextCmd)
+		if (token[0]) /* Skip empty commands */
 		{
-			if (!shouldExit) /* Only execute next command if previous didn't fail */
-			{
-				exitStatus = processSingleCommand(tempCmd, envp, &lastExitStatus);
-				if (exitStatus)
-					shouldExit = 1; /* Set the flag to indicate a failure */
-			}
+			shouldExit = processCommandInput(token, envp);
 		}
-		else
-		{
-			/* If the current command is empty (e.g., "command1 && "), break the loop */
-			break;
-		}
-		tempCmd = nextCmd; /* Move to the next command using tempCmd */
+		token = strtok_r(NULL, "&&", &saveptr);
 	}
-	/* Process the last command (or only command if no "&&" found) */
-	if (*tempCmd && !shouldExit)
-	{
-		exitStatus = processSingleCommand(tempCmd, envp, &lastExitStatus);
-		if (exitStatus)
-			shouldExit = 1; /* Set the flag to indicate a failure */
-	}
-	free(originalCmd);
-	return (shouldExit);
+
+	return shouldExit;
 }
+
 /**
- * handleOrOperator - Handles the "||" operator and executes the next command
- * only if the previous one fails (returns non-zero).
+ * handleOrOperator - Handle command execution with the || operator.
  *
- * @cmd: The command string
+ * @cmd: The command string with || operator.
  *
- * @envp: The environment variables
+ * @envp: The environment variables.
  *
  * Return: 1 if the program should exit, 0 otherwise.
  */
 int handleOrOperator(char *cmd, char **envp)
 {
-	char *token = "||";
-	char *nextCmd = NULL;
-	int shouldExit = 0, lastExitStatus = 0;
+	char *token, *saveptr;
+	int shouldExit = 0;
 
-	nextCmd = strstr(cmd, token);
-	if (nextCmd)
+	token = strtok_r(cmd, "||", &saveptr);
+	while (token != NULL && !shouldExit)
 	{
-		*nextCmd = '\0'; /* Null-terminate the first command */
-		nextCmd += strlen(token); /* Move to the start of the next command */
-
-		if (*nextCmd != '\0') /* Skip if there's nothing after || */
+		if (token[0]) /* Skip empty commands */
 		{
-			shouldExit = processCommandInput(cmd, envp);
-			if (shouldExit) /* Only execute next command if the previous fails */
-				shouldExit = handleOrOperator(nextCmd, envp);
+			shouldExit = processCommandInput(token, envp);
 		}
+		token = strtok_r(NULL, "||", &saveptr);
 	}
-	else
-	{
-		/* No || found, process the single command */
-		shouldExit = processSingleCommand(cmd, envp, &lastExitStatus);
-	}
-	return (shouldExit);
+
+	return shouldExit;
 }
 
 /**
