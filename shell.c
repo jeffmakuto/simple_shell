@@ -71,18 +71,27 @@ void runInteractiveMode(char **envp)
  *
  * Return: Void
  */
-void runNonInteractiveMode(char **envp)
+void runNonInteractiveMode(char **envp, char *filename)
 {
 	char *cmd = NULL;
 	size_t n = 0;
 	ssize_t bytesRead;
 	int shouldExit = 0;
+	FILE *file;
 
-	while (!shouldExit && (bytesRead = getline(&cmd, &n, stdin)) != -1)
+	file = fopen(filename, "r");
+	if (!file)
+	{
+        perror("./hsh: Error opening file");
+	exit(EXIT_FAILURE);
+	}
+
+	while (!shouldExit && (bytesRead = getline(&cmd, &n, file)) != -1)
 	{
 		if (*cmd != '\n')
 			shouldExit = processCommandInput(cmd, envp);
 	}
+	fclose(file);
 	free(cmd);
 }
 
@@ -103,12 +112,14 @@ int main(int ac, char **av, char **envp)
 	{
 		if (processCommandLineArguments(ac, av, envp) == 0)
 			return (0);
+		runNonInteractiveMode(envp, av[1]);
+		return (0);
 	}
 
 	if (isatty(STDIN_FILENO))
 		runInteractiveMode(envp);
 	else
-		runNonInteractiveMode(envp);
+		runNonInteractiveMode(envp, "/dev/stdin/");
 
 	return (0);
 }
