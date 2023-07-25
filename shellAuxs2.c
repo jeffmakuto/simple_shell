@@ -53,10 +53,11 @@ void *_realloc(void *ptr, size_t new_size)
  *
  * @name: The name of the environment variable to retrieve.
  *
- * @Return: If the environment variable 'name' is found, the function returns
+ * Return: If the environment variable 'name' is found, the function returns
  * a pointer to its value. If the variable is not found or an error
  * occurs, it returns NULL.
  */
+
 char *_getenv(char *name)
 {
 	extern char **environ;
@@ -85,12 +86,13 @@ char *_getenv(char *name)
 }
 
 /**
- * custom_strncmp - Compare two strings up to a maximum number of characters.
+ * _strncmp - Compare two strings up to a maximum number of characters.
  * @str1: Pointer to the first string.
  * @str2: Pointer to the second string.
  * @n: Number of characters to compare.
  *
- * This function compares the first @n characters of two strings @str1 and @str2.
+ * This function compares the first @n characters of two strings
+ * @str1 and @str2.
  *
  * Return: An integer less than, equal to, or greater than 0 if @str1 is found,
  * respectively, to be less than, to match, or be greater than @str2.
@@ -121,7 +123,8 @@ int _strncmp(const char *str1, const char *str2, size_t n)
 }
 
 /**
- * _strcspn - Calculate the length of the initial substring without reject characters.
+ * _strcspn - Calculate the length of the initial substring without reject
+ * characters.
  * @str: The input string.
  * @reject: The string containing characters to reject.
  *
@@ -152,22 +155,24 @@ size_t _strcspn(const char *str, const char *reject)
 		}
 		count++; /* Move to the next character in the string */
 	}
-	return (count); /* If no character from reject is found, return the length of the string */
+	return (count); /* If no char from reject is found, return length of string */
 }
 
 /**
  * _strtok_r - Custom reentrant string tokenizer function.
- * @str: The string to be tokenized. If NULL, continue from the previous save_ptr.
+ * @str: The string to be tokenized. If NULL, continue from previous save_ptr.
  * @delimiters: A string containing delimiter characters.
- * @save_ptr: A pointer to a char* variable that holds the position in the original string
- * between successive calls to _strtok_r. Should be set to NULL on the first call.
+ * @save_ptr: A pointer to a char* variable that holds the position in
+ * original string between successive calls to _strtok_r. Should be set to
+ * NULL on 1st call.
  *
- * This function works like strtok_r from the standard library, tokenizing the input string
- * based on the given delimiters.
+ * This function works like strtok_r from the standard library, tokenizing the
+ * input string based on the given delimiters.
  *
- * Return: A pointer to the next token found, or NULL if no more tokens are present.
+ * Return: A pointer to next token found, or NULL if no more tokens are
+ * present.
  */
-char* _strtok_r(char* str, const char* delimiters, char** save_ptr)
+char *_strtok_r(char *str, const char *delimiters, char **save_ptr)
 {
 	char *token_end;
 
