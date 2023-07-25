@@ -120,7 +120,8 @@ int changeDirectory(char *targetDir)
 }
 
 /**
- * setenvAction - Initialize a new environment variable or modify an existing one.
+ * setenvAction - Initialize a new environment variable or modify an
+ * existing one.
  *
  * @args: An array of command arguments where args[1] is the variable name and
  * args[2] is the value.
@@ -147,8 +148,8 @@ void setenvAction(char **args)
 /**
  * unsetenvAction - Remove an environment variable.
  *
- * @args: An array of command arguments where args[1] is the variable name to be
- * removed.
+ * @args: An array of command arguments where args[1] is the variable name to
+ * be removed.
  *
  * This function removes the specified environment variable.
  *
