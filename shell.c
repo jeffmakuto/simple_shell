@@ -81,7 +81,11 @@ void runNonInteractiveMode(char **envp)
 	while (!shouldExit && (bytesRead = getline(&cmd, &n, stdin)) != -1)
 	{
 		if (*cmd != '\n')
+		{
+			/* Null-terminate the command by replacing the newline character */
+			cmd[bytesRead - 1] = '\0';
 			shouldExit = processCommandInput(cmd, envp);
+		}
 	}
 	free(cmd);
 }
