@@ -120,3 +120,24 @@ int _strncmp(const char *str1, const char *str2, size_t n)
 	return (0);
 }
 
+size_t _strcspn(const char *str, const char *reject)
+{
+	size_t count = 0;
+	char ch;
+	const char *ptr;
+
+	/* Loop through the string until a null terminator is encountered */
+	while ((ch = str[count]) != '\0')
+	{
+		/* Check if the current character is present in the reject string */
+		ptr = reject;
+		while (*ptr != '\0')
+		{
+			if (*ptr == ch)
+				return (count); /* Return the count if any character is found in reject */
+			ptr++;
+		}
+		count++; /* Move to the next character in the string */
+	}
+	return (count); /* If no character from reject is found, return the length of the string */
+}

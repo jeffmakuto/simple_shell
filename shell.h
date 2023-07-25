@@ -73,5 +73,6 @@ char *_strcat(char *dest, char *src);
 void *_realloc(void *ptr, size_t new_size);
 char *_getenv(char *name);
 int _strncmp(const char *str1, const char *str2, size_t n);
+size_t _strcspn(const char *str, const char *reject);
 
 #endif /* SHELL_H */
