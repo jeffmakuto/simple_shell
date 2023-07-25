@@ -56,6 +56,8 @@ char *findExecutable(char *cmd);
 int processCommandLineArguments(int ac, char **av, char **envp);
 void cdAction(char **args);
 int changeDirectory(char *targetDir);
+void setenvAction(char **args);
+void unsetenvAction(char **args);
 
 /*auxilliaries*/
 int _strlen(char *s);
