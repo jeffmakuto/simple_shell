@@ -37,7 +37,7 @@ typedef struct BuiltinCmd
 
 /* Prototype functions */
 void runInteractiveMode(char **envp);
-void runNonInteractiveMode(char **envp, char *filename);
+void runNonInteractiveMode(char **envp);
 char **handleSemiColonedCommands(char *cmd, int *numCommands);
 int handleAndOperator(char *cmd, char **envp);
 int handleOrOperator(char *cmd, char **envp);
