@@ -75,5 +75,6 @@ char *_getenv(char *name);
 int _strncmp(const char *str1, const char *str2, size_t n);
 size_t _strcspn(const char *str, const char *reject);
 char* _strtok_r(char* str, const char* delimiters, char** save_ptr);
+unsigned int _strspn(char *s, const char *accept);
 
 #endif /* SHELL_H */
