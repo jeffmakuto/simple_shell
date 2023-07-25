@@ -158,11 +158,11 @@ int processCommandInput(char *cmd, char **envp)
  */
 int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 {
-	char **args, *executable;
+	char **args, *executable, *replacedCmd;
 	int shouldExit = 0, i, status;
 
 	/* Replace variables before processing the command */
-	cmd = replaceVariables(cmd, envp);
+	replacedCmd = replaceVariables(cmd, envp);
 
 	args = processCommand(cmd);
 	if (args)
@@ -195,6 +195,7 @@ int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 			free(args);
 		}
 	}
+	free(replacedCmd);
 	return (shouldExit);
 }
 
