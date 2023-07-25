@@ -120,6 +120,19 @@ int _strncmp(const char *str1, const char *str2, size_t n)
 	return (0);
 }
 
+/**
+ * _strcspn - Calculate the length of the initial substring without reject characters.
+ * @str: The input string.
+ * @reject: The string containing characters to reject.
+ *
+ * This function calculates the length of the initial substring of 'str'
+ * that does not contain any characters present in 'reject'. It searches
+ * for the first occurrence of any character from 'reject' in 'str', and
+ * returns the number of characters from the beginning of 'str' until that
+ * occurrence is found.
+ *
+ * Return: The length of the initial substring without any reject characters.
+ */
 size_t _strcspn(const char *str, const char *reject)
 {
 	size_t count = 0;
@@ -140,4 +153,49 @@ size_t _strcspn(const char *str, const char *reject)
 		count++; /* Move to the next character in the string */
 	}
 	return (count); /* If no character from reject is found, return the length of the string */
+}
+
+/**
+ * _strtok_r - Custom reentrant string tokenizer function.
+ * @str: The string to be tokenized. If NULL, continue from the previous save_ptr.
+ * @delimiters: A string containing delimiter characters.
+ * @save_ptr: A pointer to a char* variable that holds the position in the original string
+ * between successive calls to _strtok_r. Should be set to NULL on the first call.
+ *
+ * This function works like strtok_r from the standard library, tokenizing the input string
+ * based on the given delimiters.
+ *
+ * Return: A pointer to the next token found, or NULL if no more tokens are present.
+ */
+char* _strtok_r(char* str, const char* delimiters, char** save_ptr)
+{
+	char *token_end;
+
+	/* If str is NULL, continue from the previous save_ptr */
+	if (str == NULL)
+		str = *save_ptr;
+
+	/* Skip leading delimiters */
+	str += _strspn(str, delimiters);
+
+	/* If we are at the end of the string, return NULL */
+	if (*str == '\0')
+	{
+		*save_ptr = str;
+		return (NULL);
+	}
+
+	/* Find the end of the token */
+	token_end = str + _strcspn(str, delimiters);
+
+	/* If the token is not empty, terminate it and update save_ptr */
+	if (*token_end != '\0')
+	{
+		*token_end = '\0';
+		*save_ptr = token_end + 1;
+	}
+	else
+		*save_ptr = token_end;
+
+	return (str);
 }
