@@ -22,11 +22,11 @@ char **handleSemiColonedCommands(char *cmd, int *numCommands)
 		perror("./hsh: strdup error");
 		return (NULL);
 	}
-	commandCopy[strcspn(commandCopy, "\n")] = '\0'; /*Remove trailing newline */
+	commandCopy[_strcspn(commandCopy, "\n")] = '\0'; /*Remove trailing newline */
 	token = _strtok(commandCopy, ";");
 	while (token && *numCommands < MAX_ARGS)
 	{
-		commands = realloc(commands, sizeof(char *) * (*numCommands + 1));
+		commands = _realloc(commands, sizeof(char *) * (*numCommands + 1));
 		if (!commands)
 		{
 			perror("./hsh: realloc error");
@@ -65,7 +65,7 @@ int handleAndOperator(char *cmd, char **envp)
 	char *token, *saveptr;
 	int shouldExit = 0, lastExitStatus = 0;
 
-	token = strtok_r(cmd, "&&", &saveptr);
+	token = _strtok_r(cmd, "&&", &saveptr);
 	while (token && !shouldExit)
 	{
 		if (token[0]) /* Skip empty commands */
@@ -74,7 +74,7 @@ int handleAndOperator(char *cmd, char **envp)
 			if (shouldExit)
 				break; /* Stop executing if a command fails */
 		}
-		token = strtok_r(NULL, "&&", &saveptr);
+		token = _strtok_r(NULL, "&&", &saveptr);
 	}
 
 	return (shouldExit);
@@ -94,7 +94,7 @@ int handleOrOperator(char *cmd, char **envp)
 	char *token, *saveptr;
 	int shouldExit = 0, lastExitStatus = 0;
 
-	token = strtok_r(cmd, "||", &saveptr);
+	token = _strtok_r(cmd, "||", &saveptr);
 	while (token && !shouldExit)
 	{
 		if (token[0]) /* Skip empty commands */
@@ -103,7 +103,7 @@ int handleOrOperator(char *cmd, char **envp)
 			if (!shouldExit)
 				break; /* Stop executing if a command succeeds */
 		}
-		token = strtok_r(NULL, "||", &saveptr);
+		token = _strtok_r(NULL, "||", &saveptr);
 	}
 
 	return (shouldExit);

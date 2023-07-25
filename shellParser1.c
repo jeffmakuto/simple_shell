@@ -16,7 +16,7 @@ char *replacePathVariable(char *input)
 	/* Handle $PATH */
 	if (_strstr(replacedStr, "$PATH"))
 	{
-		pathEnv = getenv("PATH");
+		pathEnv = _getenv("PATH");
 		if (pathEnv)
 		{
 			ptr = _strstr(replacedStr, "$PATH");
@@ -31,12 +31,12 @@ char *replacePathVariable(char *input)
 				return (NULL);
 			}
 			/* Copy the part before $PATH */
-			strncpy(newStr, replacedStr, ptr - replacedStr);
+			_strncpy(newStr, replacedStr, ptr - replacedStr);
 			newStr[ptr - replacedStr] = '\0';
 			/* Concatenate the actual PATH value */
-			strcat(newStr, pathEnv);
+			_strcat(newStr, pathEnv);
 			/* Concatenate the part after $PATH */
-			strcat(newStr, ptr + replaceLen);
+			_strcat(newStr, ptr + replaceLen);
 			/* Free the old replacedStr and use the new string */
 			free(replacedStr);
 			replacedStr = newStr;
@@ -161,7 +161,7 @@ char *replaceVariables(char *input)
 		free(replacedStr);
 		replacedStr = temp;
 		ptr = replacedStr + _strlen(replacedStr); /* Update pointer to end of str */
-		strcat(replacedStr, ptr + 2);
+		_strcat(replacedStr, ptr + 2);
 	}
 
 	/* Replace $$ with the shell's process ID */
@@ -174,7 +174,7 @@ char *replaceVariables(char *input)
 		free(replacedStr);
 		replacedStr = temp;
 		ptr = replacedStr + _strlen(replacedStr); /* Update pointer to end of str */
-		strcat(replacedStr, ptr + 2);
+		_strcat(replacedStr, ptr + 2);
 	}
 
 	/* Replace $PATH using the separate function (replacePathVariable) */

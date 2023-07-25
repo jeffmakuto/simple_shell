@@ -126,7 +126,7 @@ int isExecutable(char *path)
  */
 char *findExecutable(char *cmd)
 {
-	char *path = getenv("PATH"), *pathEnv, *dir, *executablePath;
+	char *path = _getenv("PATH"), *pathEnv, *dir, *executablePath;
 	size_t dirLen, cmdLen;
 	char *foundExecutable = NULL;
 
@@ -138,7 +138,7 @@ char *findExecutable(char *cmd)
 		return (NULL);
 	}
 	pathEnv = _strdup(path);
-	dir = strtok(pathEnv, ":");
+	dir = _strtok(pathEnv, ":");
 	while (dir)
 	{
 		dirLen = _strlen(dir);
@@ -159,7 +159,7 @@ char *findExecutable(char *cmd)
 			break;
 		}
 		free(executablePath);
-		dir = strtok(NULL, ":");
+		dir = _strtok(NULL, ":");
 	}
 	free(pathEnv);
 	if (foundExecutable)

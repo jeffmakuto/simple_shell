@@ -62,7 +62,7 @@ void cdAction(char **args)
 	if (args[1] == NULL || _strcmp(args[1], "") == 0 ||
 			_strcmp(args[1], "~") == 0 || _strcmp(args[1], "$HOME") == 0)
 	{
-		targetDir = getenv("HOME");
+		targetDir = _getenv("HOME");
 		if (!targetDir)
 		{
 			perror("./hsh: cd error");
@@ -71,7 +71,7 @@ void cdAction(char **args)
 	}
 	else if (_strcmp(args[1], "-") == 0)
 	{
-		targetDir = getenv("OLDPWD");
+		targetDir = _getenv("OLDPWD");
 		if (!targetDir)
 		{
 			perror("./hsh: cd error");

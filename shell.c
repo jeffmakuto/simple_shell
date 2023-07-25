@@ -49,7 +49,7 @@ void runInteractiveMode(char **envp)
 	while (!shouldExit)
 	{
 		write(STDOUT_FILENO, PROMPT, _strlen(PROMPT));
-		bytesRead = getline(&cmd, &n, stdin);
+		bytesRead = _getline(&cmd, &n, stdin);
 
 		if (bytesRead == -1)
 		{
@@ -78,7 +78,7 @@ void runNonInteractiveMode(char **envp)
 	ssize_t bytesRead;
 	int shouldExit = 0;
 
-	while (!shouldExit && (bytesRead = getline(&cmd, &n, stdin)) != -1)
+	while (!shouldExit && (bytesRead = _getline(&cmd, &n, stdin)) != -1)
 	{
 		if (*cmd != '\n')
 		{
