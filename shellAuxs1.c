@@ -29,15 +29,15 @@ char *_strchr(char *s, char c)
 
 char *_strdup(char *str)
 {
-	int a = 0, b = 0;
-	char *new_s = NULL;
+	int a, b;
+	char *new_s;
 
 	if (str == NULL)
 		return (NULL);
 
-	a = strlen(str);
+	a = _strlen(str) + 1;
 
-	new_s = malloc(sizeof(char) * (a + 1));
+	new_s = malloc(sizeof(char) * (a));
 
 	if (new_s == NULL)
 	{
@@ -45,14 +45,8 @@ char *_strdup(char *str)
 		return (NULL);
 	}
 
-	if (a == 0 || new_s == 0)
-		return (NULL);
-
-	while (b < (a + 1))
-	{
+	for (b = 0; b < a; b++)
 		new_s[b] = str[b];
-		b++;
-	}
 
 	return (new_s);
 }
