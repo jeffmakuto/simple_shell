@@ -23,7 +23,7 @@ char **handleSemiColonedCommands(char *cmd, int *numCommands)
 		return (NULL);
 	}
 	commandCopy[strcspn(commandCopy, "\n")] = '\0'; /*Remove trailing newline */
-	token = strtok(commandCopy, ";");
+	token = _strtok(commandCopy, ";");
 	while (token && *numCommands < MAX_ARGS)
 	{
 		commands = realloc(commands, sizeof(char *) * (*numCommands + 1));
@@ -45,7 +45,7 @@ char **handleSemiColonedCommands(char *cmd, int *numCommands)
 			return (NULL);
 		}
 		(*numCommands)++;
-		token = strtok(NULL, ";");
+		token = _strtok(NULL, ";");
 	}
 	free(commandCopy);
 	return (commands);

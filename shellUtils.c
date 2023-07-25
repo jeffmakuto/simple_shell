@@ -18,13 +18,13 @@ char **processCommand(char *cmd)
 		return (NULL);
 	}
 	/* Ignore anything after the '#' character (comment handling) */
-	token = strtok(cmd, "#");
+	token = _strtok(cmd, "#");
 	if (!token)
 	{
 		free(args);
 		return (NULL);
 	}
-	token = strtok(cmd, " ");
+	token = _strtok(cmd, " ");
 	while (token && argCount < MAX_ARGS)
 	{
 		args[argCount] = _strdup(token);
@@ -45,7 +45,7 @@ char **processCommand(char *cmd)
 			args[argCount] = NULL;
 			break; /* Exit the loop after setting NULL terminator */
 		}
-		token = strtok(NULL, " ");
+		token = _strtok(NULL, " ");
 	}
 	args[argCount] = NULL;
 	return (args);
