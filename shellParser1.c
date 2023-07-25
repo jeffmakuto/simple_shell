@@ -5,10 +5,12 @@
  *
  * @input: The input string
  *
+ * @envp: The environment variables
+ *
  * Return: A new string with the $PATH variable replaced.
  * Note: The returned string should be freed by the caller.
  */
-char *replacePathVariable(char *input)
+char *replacePathVariable(char *input, char **envp)
 {
 	char *replacedStr = _strdup(input), *ptr = replacedStr, *pathEnv, *newStr;
 	size_t pathLen, replaceLen, newLen;
@@ -16,7 +18,7 @@ char *replacePathVariable(char *input)
 	/* Handle $PATH */
 	if (_strstr(replacedStr, "$PATH"))
 	{
-		pathEnv = _getenv("PATH");
+		pathEnv = _getenv("PATH", envp);
 		if (pathEnv)
 		{
 			ptr = _strstr(replacedStr, "$PATH");
@@ -142,10 +144,12 @@ char *concatStrings(char *str1, char *str2)
  *
  * @input: The input string to process.
  *
+ * @envp: The environment variables
+ *
  * Return: A pointer to the new dynamically allocated string with replaced
  * variables.
  */
-char *replaceVariables(char *input)
+char *replaceVariables(char *input, char **envp)
 {
 	char *replacedStr = _strdup(input), *ptr = replacedStr, *temp;
 	char pidStr[20]; /* Buffer to hold the process ID string */
@@ -178,7 +182,7 @@ char *replaceVariables(char *input)
 	}
 
 	/* Replace $PATH using the separate function (replacePathVariable) */
-	temp = replacePathVariable(replacedStr);
+	temp = replacePathVariable(replacedStr, envp);
 	free(replacedStr); /* Free previous replacedStr before reassigning pointer */
 	replacedStr = temp;
 

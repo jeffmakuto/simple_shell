@@ -32,7 +32,7 @@
 typedef struct BuiltinCmd
 {
 	char *cmd;
-	void (*action)(char **args);
+	void (*action)(char **args, char **envp);
 } BuiltinCmd;
 
 /* Prototype functions */
@@ -43,21 +43,21 @@ int handleAndOperator(char *cmd, char **envp);
 int handleOrOperator(char *cmd, char **envp);
 int processCommandInput(char *cmd, char **envp);
 int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr);
-char *replaceVariables(char *input);
-char *replacePathVariable(char *input);
+char *replaceVariables(char *input, char **envp);
+char *replacePathVariable(char *input, char **envp);
 char *intToString(int num, char *str);
 char *concatStrings(char *str1, char *str2);
 char **processCommand(char *cmd);
 void executeCommand(char **args, char **envp);
-int checkBuiltins(char *cmd, char **args);
+int checkBuiltins(char *cmd, char **args, char **envp);
 bool isAbsolutePath(char *path);
 int isExecutable(char *path);
-char *findExecutable(char *cmd);
+char *findExecutable(char *cmd, char **envp);
 int processCommandLineArguments(int ac, char **av, char **envp);
-void cdAction(char **args);
+void cdAction(char **args, char **envp);
 int changeDirectory(char *targetDir);
-void setenvAction(char **args);
-void unsetenvAction(char **args);
+void setenvAction(char **args, char **envp);
+void unsetenvAction(char **args, char **envp);
 
 /*auxilliaries*/
 int _strlen(char *s);
@@ -71,10 +71,10 @@ char *_strtok(char *line, char *delim);
 char *_strncpy(char *dest, char *src, int n);
 char *_strcat(char *dest, char *src);
 void *_realloc(void *ptr, size_t new_size);
-char *_getenv(char *name);
+char *_getenv(char *name, char **envp);
 int _strncmp(const char *str1, const char *str2, size_t n);
 size_t _strcspn(const char *str, const char *reject);
-char* _strtok_r(char* str, const char* delimiters, char** save_ptr);
+char *_strtok_r(char *str, const char *delimiters, char **save_ptr);
 unsigned int _strspn(char *s, const char *accept);
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
 

@@ -8,9 +8,11 @@
  *
  * @args: the arguments passed to the command
  *
+ * @envp: The environment variables
+ *
  * Return: 1 if the command is a built-in one else 0
  */
-int checkBuiltins(char *cmd, char **args)
+int checkBuiltins(char *cmd, char **args, char **envp)
 {
 	int i;
 
@@ -28,7 +30,7 @@ int checkBuiltins(char *cmd, char **args)
 		if (_strcmp(cmd, builtins[i].cmd) == 0)
 		{
 			if (builtins[i].action)
-				builtins[i].action(args);
+				builtins[i].action(args, envp);
 			return (1); /* it's a built-in command */
 		}
 		i++;
@@ -41,6 +43,8 @@ int checkBuiltins(char *cmd, char **args)
  *
  * @args: An array of command arguments where args[1]
  * contains the target directory path.
+ *
+ * @envp: The environment variables
  *
  * This function changes the current working directory
  * to the specified path.
@@ -55,14 +59,14 @@ int checkBuiltins(char *cmd, char **args)
  *
  * Return: Void
  */
-void cdAction(char **args)
+void cdAction(char **args, char **envp)
 {
 	char *targetDir;
 
 	if (args[1] == NULL || _strcmp(args[1], "") == 0 ||
 			_strcmp(args[1], "~") == 0 || _strcmp(args[1], "$HOME") == 0)
 	{
-		targetDir = _getenv("HOME");
+		targetDir = _getenv("HOME", envp);
 		if (!targetDir)
 		{
 			perror("./hsh: cd error");
@@ -71,7 +75,7 @@ void cdAction(char **args)
 	}
 	else if (_strcmp(args[1], "-") == 0)
 	{
-		targetDir = _getenv("OLDPWD");
+		targetDir = _getenv("OLDPWD", envp);
 		if (!targetDir)
 		{
 			perror("./hsh: cd error");
@@ -126,12 +130,16 @@ int changeDirectory(char *targetDir)
  * @args: An array of command arguments where args[1] is the variable name and
  * args[2] is the value.
  *
+ * @envp: The environment variables
+ *
  * This function sets or modifies the value of an environment variable.
  *
  * Return: Void
  */
-void setenvAction(char **args)
+void setenvAction(char **args, char **envp)
 {
+	(void)envp;
+
 	if (!args[1] || !args[2])
 	{
 		perror("./hsh: setenv: invalid arguments");
@@ -151,12 +159,16 @@ void setenvAction(char **args)
  * @args: An array of command arguments where args[1] is the variable name to
  * be removed.
  *
+ * @envp: The environment variables
+ *
  * This function removes the specified environment variable.
  *
  * Return: Void
  */
-void unsetenvAction(char **args)
+void unsetenvAction(char **args, char **envp)
 {
+	(void)envp;
+
 	if (!args[1])
 	{
 		perror("./hsh: unsetenv: missing variable name");

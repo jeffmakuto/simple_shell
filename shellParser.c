@@ -162,7 +162,7 @@ int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 	int shouldExit = 0, i, status;
 
 	/* Replace variables before processing the command */
-	cmd = replaceVariables(cmd);
+	cmd = replaceVariables(cmd, envp);
 
 	args = processCommand(cmd);
 	if (args)
@@ -179,9 +179,9 @@ int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 		}
 		else
 		{
-			if (!checkBuiltins(args[0], args))
+			if (!checkBuiltins(args[0], args, envp))
 			{
-				executable = findExecutable(args[0]);
+				executable = findExecutable(args[0], envp);
 				if (executable)
 				{
 					args[0] = executable;

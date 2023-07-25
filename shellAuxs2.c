@@ -53,14 +53,15 @@ void *_realloc(void *ptr, size_t new_size)
  *
  * @name: The name of the environment variable to retrieve.
  *
+ * @envp: The environment variables
+ *
  * Return: If the environment variable 'name' is found, the function returns
  * a pointer to its value. If the variable is not found or an error
  * occurs, it returns NULL.
  */
 
-char *_getenv(char *name)
+char *_getenv(char *name, char **envp)
 {
-	extern char **environ;
 	size_t name_len;
 	char **env_var;
 
@@ -72,7 +73,7 @@ char *_getenv(char *name)
 
 	name_len = _strlen(name);
 
-	for (env_var = environ; *env_var != NULL; env_var++)
+	for (env_var = envp; *env_var != NULL; env_var++)
 	{
 		if (_strncmp(*env_var, name, name_len) == 0 && (*env_var)[name_len] == '=')
 		{

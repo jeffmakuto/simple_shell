@@ -122,11 +122,13 @@ int isExecutable(char *path)
  *
  * @cmd: The command to find.
  *
+ * @envp: The environment variables
+ *
  * Return: A pointer to the executable path if found, NULL otherwise.
  */
-char *findExecutable(char *cmd)
+char *findExecutable(char *cmd, char **envp)
 {
-	char *path = _getenv("PATH"), *pathEnv, *dir, *executablePath;
+	char *path = _getenv("PATH", envp), *pathEnv, *dir, *executablePath;
 	size_t dirLen, cmdLen;
 	char *foundExecutable = NULL;
 
