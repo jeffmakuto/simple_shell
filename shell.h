@@ -68,4 +68,8 @@ char *_strdup(char *str);
 char *_memcpy(char *dest, char *src, unsigned int n);
 char *_strstr(char *haystack, char *needle);
 char *_strtok(char *line, char *delim);
+char *_strncpy(char *dest, char *src, int n);
+char *_strcat(char *dest, char *src);
+void *_realloc(void *ptr, size_t new_size);
+
 #endif /* SHELL_H */
