@@ -71,5 +71,7 @@ char *_strtok(char *line, char *delim);
 char *_strncpy(char *dest, char *src, int n);
 char *_strcat(char *dest, char *src);
 void *_realloc(void *ptr, size_t new_size);
+char *_getenv(char *name);
+int _strncmp(const char *str1, const char *str2, size_t n);
 
 #endif /* SHELL_H */

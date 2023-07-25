@@ -46,3 +46,77 @@ void *_realloc(void *ptr, size_t new_size)
 	free(ptr);
 	return (new_ptr);
 }
+
+/**
+ * _getenv - retrieves the value of the environment variable specified by
+ * the 'name' argument.
+ *
+ * @name: The name of the environment variable to retrieve.
+ *
+ * @Return: If the environment variable 'name' is found, the function returns
+ * a pointer to its value. If the variable is not found or an error
+ * occurs, it returns NULL.
+ */
+char *_getenv(char *name)
+{
+	extern char **environ;
+	size_t name_len;
+	char **env_var;
+
+	if (name == NULL || *name == '\0' || _strchr(name, '=') != NULL)
+	{
+		/* Invalid environment variable name or contains '='. */
+		return (NULL);
+	}
+
+	name_len = _strlen(name);
+
+	for (env_var = environ; *env_var != NULL; env_var++)
+	{
+		if (_strncmp(*env_var, name, name_len) == 0 && (*env_var)[name_len] == '=')
+		{
+			/* Found the matching environment variable. */
+			return (*env_var + name_len + 1);
+		}
+	}
+
+	/* The environment variable 'name' was not found. */
+	return (NULL);
+}
+
+/**
+ * custom_strncmp - Compare two strings up to a maximum number of characters.
+ * @str1: Pointer to the first string.
+ * @str2: Pointer to the second string.
+ * @n: Number of characters to compare.
+ *
+ * This function compares the first @n characters of two strings @str1 and @str2.
+ *
+ * Return: An integer less than, equal to, or greater than 0 if @str1 is found,
+ * respectively, to be less than, to match, or be greater than @str2.
+ */
+int _strncmp(const char *str1, const char *str2, size_t n)
+{
+	size_t i;
+
+	for (i = 0; i < n; i++)
+	{
+		/* Check if we reached the end of either string */
+		if (str1[i] == '\0' || str2[i] == '\0')
+		{
+			/* If one of the strings ended early, we compare their lengths */
+			if (i == n - 1)
+				return (0); /* Both strings have the same first n characters */
+			else
+				return (str1[i] - str2[i]);
+		}
+
+		/* Compare the characters */
+		if (str1[i] != str2[i])
+			return (str1[i] - str2[i]);
+	}
+
+	/* If we reach this point, the first n characters are the same */
+	return (0);
+}
+
