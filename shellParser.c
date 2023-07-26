@@ -169,7 +169,6 @@ int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 	{
 		if (_strcmp("exit", args[0]) == 0)
 		{
-			free(args[0]);
 			shouldExit = 1;
 			/* If an argument is provided to the exit command */
 			if (args[1])
