@@ -45,7 +45,6 @@ char **processCommand(char *cmd)
 		}
 		token = _strtok(NULL, " ");
 	}
-	free(token);
 
 	args[argCount] = NULL;
 	return (args);
