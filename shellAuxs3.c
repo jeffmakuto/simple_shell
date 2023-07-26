@@ -90,3 +90,22 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 	(*lineptr)[pos] = '\0';
 	return (pos);
 }
+
+/**
+ * freeArgs - Frees memory allocated for an array of strings.
+ *
+ * This function takes an array of strings and frees the memory
+ * allocated for each individual string and the array itself.
+ *
+ * @args: The array of strings to be freed.
+ *
+ * Return: Void
+ */
+void freeArgs(char **args)
+{
+	int i;
+
+	for (i = 0; args[i]; i++)
+		free(args[i]);
+	free(args);
+}

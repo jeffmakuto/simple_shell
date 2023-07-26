@@ -77,5 +77,6 @@ size_t _strcspn(const char *str, const char *reject);
 char *_strtok_r(char *str, const char *delimiters, char **save_ptr);
 unsigned int _strspn(char *s, const char *accept);
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
+void freeArgs(char **args);
 
 #endif /* SHELL_H */

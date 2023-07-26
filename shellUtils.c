@@ -10,7 +10,7 @@
 char **processCommand(char *cmd)
 {
 	char **args = malloc(sizeof(char *) * MAX_ARGS), *token;
-	int argCount = 0, i;
+	int argCount = 0;
 
 	if (!args)
 	{
@@ -33,9 +33,7 @@ char **processCommand(char *cmd)
 		{
 			perror("./hsh: strdup error");
 			/* Free previously allocated strings */
-			for (i = 0; i < argCount; i++)
-				free(args[i]);
-			free(args);
+			freeArgs(args);
 			return (NULL);
 		}
 		argCount++;

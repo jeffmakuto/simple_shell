@@ -159,12 +159,12 @@ int processCommandInput(char *cmd, char **envp)
 int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 {
 	char **args, *executable, *replacedCmd;
-	int shouldExit = 0, i, status;
+	int shouldExit = 0, status;
 
 	/* Replace variables before processing the command */
 	replacedCmd = replaceVariables(cmd, envp);
+	args = processCommand(replacedCmd);
 
-	args = processCommand(cmd);
 	if (args)
 	{
 		if (_strcmp("exit", args[0]) == 0)
@@ -173,7 +173,9 @@ int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 			shouldExit = 1;
 			/* If an argument is provided to the exit command */
 			if (args[1])
+			{
 				exit(_atoi(args[1]));
+			}
 			else
 				exit(0);
 		}
@@ -190,9 +192,7 @@ int processSingleCommand(char *cmd, char **envp, int *lastExitStatusPtr)
 					*lastExitStatusPtr = WEXITSTATUS(status);
 				}
 			}
-			for (i = 0; args[i]; i++)
-				free(args[i]);
-			free(args);
+			freeArgs(args);
 		}
 	}
 	free(replacedCmd);
