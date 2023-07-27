@@ -97,9 +97,9 @@ int changeDirectory(PROGARGS *args, char *newDir)
 			perror("./hsh: chdir error");
 			return (1);
 		}
-		setenvAction("PWD", newDir, args);
+		_setenv("PWD", newDir, args);
 	}
-	setenvAction("OLDPWD", prevDir, args);
+	_setenv("OLDPWD", prevDir, args);
 	return (0);
 }
 
