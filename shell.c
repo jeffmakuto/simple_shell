@@ -127,7 +127,7 @@ void runShell(char *prompt, PROGARGS *args)
 			splitCommands(args);
 			if (args->tokens[0])
 			{
-				execRes = execute(args);
+				execRes = executeCommand(args);
 				if (execRes)
 					perror("./hsh: Execution error");
 			}
