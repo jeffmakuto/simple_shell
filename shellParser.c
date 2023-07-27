@@ -21,14 +21,14 @@ void replaceVariables(PROGARGS *args)
 		else if (line[i] == '$' && line[i + 1] == '?')
 		{
 			line[i] = '\0';
-			long_to_string(errno, expansion, 10);
+			longToStr(errno, expansion, 10);
 			buffcat(line, expansion);
 			buffcat(line, args->buffer + i + 2);
 		}
 		else if (line[i] == '$' && line[i + 1] == '$')
 		{
 			line[i] = '\0';
-			long_to_string(getpid(), expansion, 10);
+			longToStr(getpid(), expansion, 10);
 			buffcat(line, expansion);
 			buffcat(line, args->buffer + i + 2);
 		}

@@ -49,3 +49,118 @@ char *_strcat(char *dest, char *src)
 
 	return (p);
 }
+
+/**
+ * _strncmp - Compares 2 strings
+ *
+ * @str1: 1st string
+ *
+ * @str2: 2nd string
+ *
+ * @n: num of chars to be compared, 0 if infinite
+ *
+ * Return: 1 if the strings are similar, 0 if the strings not
+ */
+int _strncmp(char *str1, char *str2, int n)
+{
+	int i;
+
+	if (!str1 && !str2)
+		return (1);
+
+	if (!str1 || !str2)
+		return (0);
+
+	if (n == 0)
+	{
+		if (_strlen(str1) != _strlen(str2))
+			return (0);
+		for (i = 0; str1[i]; i++)
+		{
+			if (str1[i] != str[i])
+				return (0);
+		}
+		return (1);
+	}
+	else
+	{
+		for (i = 0; i < n ; i++)
+		{
+			if (str1[i] != str[i])
+			return (0);
+		}
+		return (1);
+	}
+}
+
+/**
+ * rev_str - reverses a string
+ *
+ * @s: the reference to the string
+ */
+void rev_str(char *s)
+{
+	int len = 0, i, mid, a;
+	char c = *s, temp;
+
+	/* get string lenth */
+	while (c != '\0')
+	{
+		c = *(s + ++len);
+	}
+
+	/* end if string lenth is zero */
+	if (len == 0)
+	{
+		return;
+	}
+
+	mid = len / 2;
+
+
+	/* reverse string */
+	for (i = 0; i < mid; i++)
+	{
+		tmp;
+		a = len - i - 1;
+
+		tmp = *(s + i);
+		*(s + i) = *(s + a);
+		*(s + a) = tmp;
+	}
+}
+
+/**
+ * long_to_string - convert number to a string.
+ * @number: number to concert
+ * @string: buffer to save the num as string.
+ * @base: base for concersion
+ *
+ * Return: Nothing.
+ */
+void longToString(long num, char *str, int base)
+{
+	int i = 0, isNegative = 0;
+	long quotient = num;
+	char letters[] = "0123456789abcdefghijklmnopqrstuvwxyz";
+
+	if (!quotient)
+		str[i++] = '0';
+
+	if (str[0] == '-')
+		isNegative = 1;
+
+	while (quotient)
+	{
+		if (quotient < 0)
+			str[i++] = letters[-(quotient % base)];
+		else
+			str[i++] = letters[quotient % base];
+		quotient /= base;
+	}
+	if (isNegative)
+		str[i++] = '-';
+
+	str[i] = '\0';
+	rev_str(str);
+}
