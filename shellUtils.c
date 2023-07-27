@@ -1,10 +1,74 @@
 #include "shell.h"
 
+/**
+ * executeCommand - Executes string of arguments
+ *
+ * @args: Pointer to program arguments struct
+ *
+ * @exitStatus: Pointer to an integer to store the exit status of
+ * the child process
+ *
+ * @termSig: Pointer to an integer to indicate
+ * if the child process was terminated by a signal
+ *
+ * Return: 0 on success, -1 on fail
+ */
+int executeCommand(PROGARGS *args, int *exitStatus, int *termSig)
+{
+	int result = 0, status;
+	pid_t pid;
+
+	result = checkBuiltins(args);
+	if (result != -1)
+	{
+		*exitStatus = result;
+		*termSig = 0;
+		return (0);
+	}
+	result = findExecutable(args);
+	if (result)
+	{
+		return (result);
+	}
+	else
+	{
+		pid = fork();
+		if (pid < 0)
+		{
+			perror("./hsh: fork error");
+			exit(EXIT_FAILURE);
+		}
+		if (pid == 0)
+		{
+			result = execve(args->tokens[0], args->tokens, args->envp);
+			if (result == -1)
+			{
+				perror("./hsh: execve error");
+				exit(EXIT_FAILURE);
+			}
+		}
+		else
+		{
+			waitpid(pid, &status, 0);
+			if (WIFEXITED(status))
+			{
+				*exitStatus = WEXITSTATUS(status);
+				*termSig = 0;
+			}
+			else if (WIFSIGNALED(status))
+			{
+				*exitStatus = WTERMSIG(status);
+				*termSig = 1;
+			}
+		}
+	}
+	return (0);
+}
 
 /**
  * findExecutable - look for a program in path
  *
- * @args: Ptr to program data
+ * @args: Ptr to program arguments
  *
  * Return: 0 success, error code on fail
  */
@@ -56,7 +120,7 @@ int findExecutable(PROGARGS *args)
 /**
  * getPath - Tokenize path in dirs
  *
- * @args: Ptr to program data
+ * @args: Ptr to program arguments
  *
  * Return: An array of path dirs
  */
@@ -119,4 +183,47 @@ int checkFile(char *filePath)
 	}
 	perror("./hsh: Error: File not found");
 	return (-1);
+}
+
+/**
+ * splitCommands - this function separates the string using a designed delimiter
+ *
+ * @args: Pointer to the program's arguments
+ *
+ * Return: Array of strings
+ */
+void splitCommands(PROGARGS *args)
+{
+	char *delims = " \t";
+	int i, j, count = 2, len;
+
+	len = _strlen(args->buffer);
+	if (len)
+	{
+		if (args->buffer[len - 1] == '\n')
+			data->buffer[len - 1] = '\0';
+	}
+
+	for (i = 0; data->buffer[i]; i++)
+	{
+		for (j = 0; delims[j]; j++)
+		{
+			if (args->buffer[i] == delims[j])
+				count++;
+		}
+	}
+
+	args->tokens = malloc(count * sizeof(char *));
+	if (args->tokens == NULL)
+	{
+		perror("./hsh: Memory Allocation failure");
+		exit(EXIT_FAILURE);
+	}
+	i = 0;
+	args->tokens[i] = _strdup(_strtok(args->buffer, delims));
+	args->cmd = _strdup(args->tokens[0]);
+	while (args->tokens[i++])
+	{
+		args->tokens[i] = _strdup(_strtok(NULL, delims));
+	}
 }
