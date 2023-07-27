@@ -54,10 +54,11 @@ typedef struct PROGARGS
 /* Prototype functions */
 void startShell(PROGARGS *args, int ac, char *av[], char *envp[]);
 void runShell(char *prompt, PROGARGS *args);
-void handleCtrlCSignal(int signal UNUSED);
+void handleCtrlCSignal(int signal);
 int checkFile(char *filePath);
 char **getPath(PROGARGS *args);
 char *findExecutable(PROGARGS *args);
+int executeCommand(PROGARGS *args, int *exitStatus, int *termSig);
 int processCommandLineArguments(int ac, char **av, char **envp);
 
 
