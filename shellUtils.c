@@ -13,29 +13,23 @@
  *
  * Return: 0 on success, -1 on fail
  */
-int executeCommand(PROGARGS *args, int *exitStatus, int *termSig)
+int executeCommand(PROGARGS *args)
 {
 	int result = 0, status;
 	pid_t pid;
 
 	result = checkBuiltins(args);
 	if (result != -1)
-	{
-		*exitStatus = result;
-		*termSig = 0;
-		return (0);
-	}
+		return(result);
 	result = findExecutable(args);
 	if (result)
-	{
 		return (result);
-	}
 	else
 	{
 		pid = fork();
 		if (pid < 0)
 		{
-			perror("./hsh: fork error");
+			perror(args->cmd);
 			exit(EXIT_FAILURE);
 		}
 		if (pid == 0)
@@ -43,7 +37,7 @@ int executeCommand(PROGARGS *args, int *exitStatus, int *termSig)
 			result = execve(args->tokens[0], args->tokens, args->envp);
 			if (result == -1)
 			{
-				perror("./hsh: execve error");
+				perror(args->cmd);
 				exit(EXIT_FAILURE);
 			}
 		}
@@ -51,15 +45,9 @@ int executeCommand(PROGARGS *args, int *exitStatus, int *termSig)
 		{
 			waitpid(pid, &status, 0);
 			if (WIFEXITED(status))
-			{
-				*exitStatus = WEXITSTATUS(status);
-				*termSig = 0;
-			}
+				errno = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
-			{
-				*exitStatus = WTERMSIG(status);
-				*termSig = 1;
-			}
+				errno = 128 + WTERMSIG(status);
 		}
 	}
 	return (0);

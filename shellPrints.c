@@ -1,74 +1,74 @@
 #include "shell.h"
 
 /**
- * _print - print array of char in stdout
+ * _print - Print array of char in stdout
  *
- * @string: ptr to array printed
+ * @str: Pointer to array printed
  *
  * Return: num of printed bytes,-1 on error
  */
-int _print(char *string)
+int _print(char *str)
 {
-	return (write(STDOUT_FILENO, string, str_length(string)));
+	return (write(STDOUT_FILENO, str, _strlen(str)));
 }
 
 /**
- * _printe - print array of chaar in stdo
+ * _printe - Print array of chaar in stdout
  *
- * @string: ptr to the array
+ * @str: Pointer to the array
  *
  * Return: num of bytes printed, -1 on error
  */
-int _printe(char *string)
+int _printe(char *str)
 {
-	return (write(STDERR_FILENO, string, str_length(string)));
+	return (write(STDERR_FILENO, str, _strlen(str)));
 }
 
 /**
- * _print_error - print array of char in stdo
+ * printErr - print array of char in stdout
  *
- * @data: program struct ptr
+ * @str: Pointer to the array
  *
- * @errorcode: error code
+ * @errCode: error code
  *
  * Return: num of bytes printed, -1 on error.
  */
-int _print_error(int errorcode, data_of_program *data)
+int printErr(int errCode, PROGARGS *args)
 {
-	char n_as_string[10] = {'\0'};
+	char n_as_string[INITIAL_ENVP_SIZE] = {'\0'};
 
-	long_to_string((long) data->exec_counter, n_as_string, 10);
+	longToStr((long) args->execCount, n_as_string, INITIAL_ENVP_SIZE);
 
-	if (errorcode == 2 || errorcode == 3)
+	if (errCode == 2 || errCode == 3)
 	{
-		_printe(data->program_name);
+		_printe(args->programName);
 		_printe(": ");
 		_printe(n_as_string);
 		_printe(": ");
-		_printe(data->tokens[0]);
-		if (errorcode == 2)
+		_printe(args->tokens[0]);
+		if (errCode == 2)
 			_printe(": Illegal number: ");
 		else
 			_printe(": can't cd to ");
-		_printe(data->tokens[1]);
+		_printe(args->tokens[1]);
 		_printe("\n");
 	}
-	else if (errorcode == 127)
+	else if (errCode == 127)
 	{
-		_printe(data->program_name);
+		_printe(args->programName);
 		_printe(": ");
 		_printe(n_as_string);
 		_printe(": ");
-		_printe(data->command_name);
+		_printe(args->cmd);
 		_printe(": not found\n");
 	}
-	else if (errorcode == 126)
+	else if (errCode == 126)
 	{
-		_printe(data->program_name);
+		_printe(args->programName);
 		_printe(": ");
 		_printe(n_as_string);
 		_printe(": ");
-		_printe(data->command_name);
+		_printe(args->cmd);
 		_printe(": Permission denied\n");
 	}
 	return (0);
