@@ -7,10 +7,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
+#include <sys/stat.h>
 #include <sys/wait.h>
 #include <dirent.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 /* Define macros */
@@ -74,7 +76,7 @@ void runShell(char *prompt, PROGARGS *args);
 void handleCtrlCSignal(int signal);
 int checkFile(char *filePath);
 char **getPath(PROGARGS *args);
-char *findExecutable(PROGARGS *args);
+int findExecutable(PROGARGS *args);
 int executeCommand(PROGARGS *args, int *exitStatus, int *termSig);
 void splitCommands(PROGARGS *args);
 void replaceVariables(PROGARGS *args);
@@ -86,8 +88,8 @@ int checkBuiltins(PROGARGS *args);
 int cdAction(PROGARGS *args);
 int changeDirectory(PROGARGS *args, char *newDir);
 int _envp(PROGARGS *args);
-int _setenvAction(PROGARGS *args);
-int _unsetenvAction(PROGARGS *args);
+int setenvAction(PROGARGS *args);
+int unsetenvAction(PROGARGS *args);
 int exitAction(PROGARGS *args);
 
 /*auxilliaries*/

@@ -201,10 +201,10 @@ void splitCommands(PROGARGS *args)
 	if (len)
 	{
 		if (args->buffer[len - 1] == '\n')
-			data->buffer[len - 1] = '\0';
+			args->buffer[len - 1] = '\0';
 	}
 
-	for (i = 0; data->buffer[i]; i++)
+	for (i = 0; args->buffer[i]; i++)
 	{
 		for (j = 0; delims[j]; j++)
 		{

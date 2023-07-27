@@ -23,7 +23,7 @@ int _setenv(char *name, char *value, PROGARGS *args)
 
 	for (i = 0; args->envp[i]; i++)
 	{
-		if (_strcmp(name, args->envp[i], nameLen) &&
+		if (_strncmp(name, args->envp[i], nameLen) &&
 		 args->envp[i][nameLen] == '=')
 		{
 			newKey = 0;
@@ -32,8 +32,8 @@ int _setenv(char *name, char *value, PROGARGS *args)
 			break;
 		}
 	}
-	args->envp[i] = _strncat(_strdup(name), "=");
-	args->envp[i] = _strncat(args->envp[i], value);
+	args->envp[i] = _strcat(_strdup(name), "=");
+	args->envp[i] = _strcat(args->envp[i], value);
 
 	if (newKey)
 	{
@@ -62,7 +62,7 @@ int _unsetenv(char *name, PROGARGS *args)
 
 	for (i = 0; args->envp[i]; i++)
 	{
-		if (_strcmp(name, args->envp[i], nameLen) &&
+		if (_strncmp(name, args->envp[i], nameLen) &&
 		 args->envp[i][nameLen] == '=')
 		{
 			free(args->envp[i]);

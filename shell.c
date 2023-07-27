@@ -15,19 +15,19 @@
 int main(int ac, char *av[], char *envp[])
 {
 	PROGARGS ShellArgs = {NULL}, *args = &ShellArgs;
-	char *prompt = NULL;
-	bool hasError = false;
+	char *prompt = NULL;;
 
 	startShell(args, ac, av, envp);
 
-	signal(SIGINT, handleCtrlC);
+	signal(SIGINT, handleCtrlCSignal);
 
 	if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO) && ac == 1)
 	{
-		hasError = true;
+		errno = 2;
 		prompt = PROMPT;
 	}
-	hasError = false;
+	errno = 0;
+
 	runShell(prompt, args);
 
 	return (0);
@@ -63,16 +63,16 @@ void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
 {
 	int i = 0, envpCap = INITIAL_ENVP_SIZE;
 
-	args->programName = argv[0];
+	args->programName = av[0];
 	args->buffer = NULL;
 	args->cmd = NULL;
 	args->execCount = 0;
 
-	if (argc == 1)
+	if (ac == 1)
 		args->fd = STDIN_FILENO;
 	else
 	{
-		args->fd = open(argv[1], O_RDONLY);
+		args->fd = open(av[1], O_RDONLY);
 		if (args->fd == -1)
 		{
 			perror("./hsh: Error opening file");
@@ -88,7 +88,7 @@ void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
 			if (i >= envpCap)
 			{
 				envpCap *= 2;
-				args->envp = _realloc(args->envp, sizeof(char *) * envCap);
+				args->envp = _realloc(args->envp, sizeof(char *) * envpCap);
 			}
 		}
 	}
@@ -107,14 +107,14 @@ void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
  */
 void runShell(char *prompt, PROGARGS *args)
 {
-	int len = 0, execRes, exitStatus = 0, termSig = 0;
+	int len = 0, execRes, *exitStatus = 0, *termSig = 0;
 
 	while (1)
 	{
 		args->execCount++;
 
 		/* Primpt prompt to the user */
-		write(STDOUT_FILENO, PROMPT, _strlen(PROMPT));
+		write(STDOUT_FILENO, prompt, _strlen(prompt));
 		len = _getline(args);
 
 		if (len == EOF)

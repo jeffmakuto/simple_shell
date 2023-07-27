@@ -25,10 +25,8 @@ int checkBuiltins(PROGARGS *args)
 
 	while (builtins[i].command)
 	{
-		if (_strcmp(builtins[i].command), args->cmd, 0)
-		{
+		if (_strncmp(builtins[i].command, args->cmd, 0))
 			return (builtins[i].action(args));
-		}
 		i++;
 	}
 	return (-1);
@@ -49,7 +47,7 @@ int cdAction(PROGARGS *args)
 
 	if (args->tokens[1])
 	{
-		if (_strcmp(args->tokens[1], "-", 0))
+		if (_strncmp(args->tokens[1], "-", 0))
 		{
 			oldDir = _getenv("OLDPWD", args);
 			if (oldDir)
@@ -89,7 +87,7 @@ int changeDirectory(PROGARGS *args, char *newDir)
 
 	getcwd(prevDir, MAX_PATH_LEN);
 
-	if (!_strcmp(prevDir, newDir, 0))
+	if (!_strncmp(prevDir, newDir, 0))
 	{
 		result = chdir(newDir);
 		if (result == -1)
@@ -157,7 +155,7 @@ int _envp(PROGARGS *args)
  */
 int exitAction(PROGARGS *args)
 {
-	int i, exitStatus;
+	int i;
 
 	if (args->tokens[1] != NULL)
 	{
@@ -168,8 +166,8 @@ int exitAction(PROGARGS *args)
 				perror("./hsh: Invalid argument: Not a number");
 				return (1);
 			}
-		exitStatus = _atoi(args->tokens[1]);
+		errno = _atoi(args->tokens[1]);
 	}
 	freeArgs(args);
-	exit(EXIT_FAILURE);
+	exit(errno);
 }
