@@ -15,7 +15,7 @@
 int main(int ac, char *av[], char *envp[])
 {
 	PROGARGS ShellArgs = {NULL}, *args = &ShellArgs;
-	char *prompt = NULL;;
+	char *prompt = NULL;
 
 	startShell(args, ac, av, envp);
 
@@ -42,8 +42,8 @@ int main(int ac, char *av[], char *envp[])
 void handleCtrlCSignal(int signal)
 {
 	(void)signal;
-	write(STDOUT_FILENO, "\n", 1);
-	write(STDOUT_FILENO, PROMPT, _strlen(PROMPT));
+	_print("\n");
+	_print(PROMPT);
 }
 
 /**
@@ -75,8 +75,11 @@ void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
 		args->fd = open(av[1], O_RDONLY);
 		if (args->fd == -1)
 		{
-			perror("./hsh: Error opening file");
-			exit(EXIT_FAILURE);
+			_printe(data->program_name);
+			_printe(": 0: Can't open ");
+			_printe(argv[1]);
+			_printe("\n");
+			exit(127);
 		}
 	}
 	args->tokens = NULL;
@@ -106,7 +109,7 @@ void runShell(char *prompt, PROGARGS *args)
 	while (++(args->execCount))
 	{
 		/* Primpt prompt to the user */
-		write(STDOUT_FILENO, prompt, _strlen(prompt));
+		_print(prompt);
 		errCode = len = _getline(args);
 
 		if (errCode == EOF)

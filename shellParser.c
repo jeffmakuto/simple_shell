@@ -113,7 +113,7 @@ void freeArgs(PROGARGS *args)
 	if (args->fd != 0)
 	{
 		if (close(args->fd))
-			perror("./hsh: ");
+			perror(args->programName);
 	}
 	cleanupAfterExecution(args);
 	freePtrs(args->envp);

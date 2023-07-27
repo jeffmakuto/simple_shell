@@ -43,7 +43,7 @@ int cdAction(PROGARGS *args)
 {
 	char *homeDir = _getenv("HOME", args), *oldDir = NULL;
 	char prevDir[MAX_PATH_LEN] = {0};
-	int result = 0;
+	int errCode = 0;
 
 	if (args->tokens[1])
 	{
@@ -51,10 +51,11 @@ int cdAction(PROGARGS *args)
 		{
 			oldDir = _getenv("OLDPWD", args);
 			if (oldDir)
-				result = changeDirectory(args, oldDir);
-			write(STDOUT_FILENO, _getenv("PWD", args), _strlen(_getenv("PWD", args)));
-			write(STDOUT_FILENO, "\n", 1);
-			return (result);
+				errCode = changeDirectory(args, oldDir);
+			_print(_getenv("PWD", args));
+			_print("\n");
+
+			return (errCode);
 		}
 		else
 		{
@@ -83,17 +84,17 @@ int cdAction(PROGARGS *args)
 int changeDirectory(PROGARGS *args, char *newDir)
 {
 	char prevDir[MAX_PATH_LEN] = {0};
-	int result = 0;
+	int errCode = 0;
 
 	getcwd(prevDir, MAX_PATH_LEN);
 
 	if (!_strncmp(prevDir, newDir, 0))
 	{
-		result = chdir(newDir);
-		if (result == -1)
+		errCode = chdir(newDir);
+		if (errCode == -1)
 		{
-			perror("./hsh: chdir error");
-			return (1);
+			errno = 2;
+			return (3);
 		}
 		_setenv("PWD", newDir, args);
 	}
@@ -129,8 +130,8 @@ int _envp(PROGARGS *args)
 				_printenv(args);
 				if (_getenv(varName, args) == NULL)
 				{
-					write(STDOUT_FILENO, args->tokens[1], _strlen(args->tokens[1]));
-					write(STDOUT_FILENO, "\n", 1);
+					_print(data->tokens[1]);
+					_print("\n");
 				}
 				else
 				{
@@ -141,7 +142,9 @@ int _envp(PROGARGS *args)
 			}
 			varName[i] = args->tokens[1][i];
 		}
-		perror("./hsh:");
+		errno = 2;
+		perror(args->cmd);
+		errno = 127;
 	}
 	return (0);
 }
@@ -163,8 +166,8 @@ int exitAction(PROGARGS *args)
 			if ((args->tokens[1][i] < '0' || args->tokens[1][i] > '9')
 				&& args->tokens[1][i] != '+')
 			{
-				perror("./hsh: Invalid argument: Not a number");
-				return (1);
+				errno = 2;
+				return (2);
 			}
 		errno = _atoi(args->tokens[1]);
 	}

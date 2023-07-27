@@ -78,7 +78,7 @@ int findExecutable(PROGARGS *args)
 	char **dirs;
 
 	if (!args->cmd)
-		return (-1);
+		return (2);
 	if (args->cmd[0] == '/' || args->cmd[0] == '.')
 		return (checkFile(args->cmd));
 	free(args->tokens[0]);
@@ -88,27 +88,20 @@ int findExecutable(PROGARGS *args)
 	dirs = getPath(args);
 	if (!dirs || !dirs[0])
 	{
-		perror("./hsh: Dir Error");
-		return (-1);
+		errno = 127;
+		return (127);
 	}
 	for (i = 0; dirs[i]; i++)
 	{
 		dirs[i] = _strcat(dirs[i], args->tokens[0]);
 		result = checkFile(dirs[i]);
-		if (!result)/* If file's found and executable.*/
+		if (result == 0 || result == 126)
 		{
+			errno = 0;
 			free(args->tokens[0]);
 			args->tokens[0] = _strdup(dirs[i]);
 			freePtrs(dirs);
-			return (0);
-		}
-		else if (result == -1 && errno == EACCES)/*If file's non-executable*/
-		{
-			perror("./hsh: Permission denied");
-			free(args->tokens[0]);
-			args->tokens[0] = NULL;
-			freePtrs(dirs);
-			return (-1);
+			return (result);
 		}
 	}
 	free(args->tokens[0]);
@@ -176,13 +169,13 @@ int checkFile(char *filePath)
 	{
 		if (S_ISDIR(fileStat.st_mode) ||  access(filePath, X_OK))
 		{
-			perror("./hsh: Error: Not an executable file");
-			return (-1);
+			errno = 126;
+			return (126);
 		}
 		return (0);
 	}
-	perror("./hsh: Error: File not found");
-	return (-1);
+	errno = 127;
+	return (127);
 }
 
 /**
@@ -216,8 +209,8 @@ void splitCommands(PROGARGS *args)
 	args->tokens = malloc(count * sizeof(char *));
 	if (args->tokens == NULL)
 	{
-		perror("./hsh: Memory Allocation failure");
-		exit(EXIT_FAILURE);
+		perror(args->programName);
+		exit(errno);
 	}
 	i = 0;
 	args->tokens[i] = _strdup(_strtok(args->buffer, delims));

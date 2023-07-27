@@ -111,8 +111,9 @@ int setenvAction(PROGARGS *args)
 		return (0);
 	if (args->tokens[3] != NULL)
 	{
-		perror("./hsh: Error: Too many arguments");
-		return (1);
+		errno = E2BIG;
+		perror(args->cmd);
+		return (5);
 	}
 
 	_setenv(args->tokens[1], args->tokens[2], args);
@@ -133,8 +134,9 @@ int unsetenvAction(PROGARGS *args)
 		return (0);
 	if (args->tokens[2] != NULL)
 	{
-		perror("./hsh: Error: Too many arguments");
-		return (1);
+		errno = E2BIG;
+		perror(args->cmd);
+		return (5);
 	}
 	_unsetenv(args->tokens[1], args);
 
