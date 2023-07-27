@@ -1,96 +1,6 @@
 #include "shell.h"
 
 /**
- * processCommandLineArguments - processes command line arguments
- *
- * @ac: number of commandline arguments
- *
- * @av: array of command-line arguments
- *
- * @envp: array of environment variables
- *
- * Return: 0 on sucess, else 1 on failure
- */
-int processCommandLineArguments(int ac, char **av, char **envp)
-{
-	char **args;
-
-	if (ac > 1)
-	{
-		args = processCommand(av[1]);
-
-		if (args)
-		{
-			executeCommand(args, envp);
-			free(args);
-
-			return (0);
-		}
-		else
-			return (1);
-	}
-	return (1);
-}
-
-/**
- * runInteractiveMode - Runs the shell in interactive mode.
- *
- * @envp: The environment variables.
- *
- * Return: Void
- */
-void runInteractiveMode(char **envp)
-{
-	char *cmd = NULL;
-	size_t n = 0;
-	ssize_t bytesRead;
-	int shouldExit = 0;
-
-	while (!shouldExit)
-	{
-		write(STDOUT_FILENO, PROMPT, _strlen(PROMPT));
-		bytesRead = getline(&cmd, &n, stdin);
-
-		if (bytesRead == -1)
-		{
-			free(cmd);
-			perror("getline error");
-			exit(EXIT_FAILURE);
-		}
-
-		if (*cmd != '\n')
-			shouldExit = processCommandInput(cmd, envp);
-	}
-	free(cmd);
-}
-
-/**
- * runNonInteractiveMode - Runs the shell in non-interactive mode.
- *
- * @envp: The environment variables.
- *
- * Return: Void
- */
-void runNonInteractiveMode(char **envp)
-{
-	char *cmd = NULL;
-	size_t n = 0;
-	ssize_t bytesRead;
-	int shouldExit = 0;
-
-	while (!shouldExit && (bytesRead = getline(&cmd, &n, stdin)) != -1)
-	{
-		if (*cmd != '\n')
-		{
-			/* Null-terminate the command by replacing the newline character */
-			cmd[bytesRead - 1] = '\0';
-			shouldExit = processCommandInput(cmd, envp);
-		}
-	}
-	free(cmd);
-}
-
-/**
  * main - entry point
  *
  * @ac: number of commandline arguments
@@ -101,18 +11,127 @@ void runNonInteractiveMode(char **envp)
  *
  * Return: 0 on success
  */
-int main(int ac, char **av, char **envp)
-{
-	if (ac > 1)
-	{
-		if (processCommandLineArguments(ac, av, envp) == 0)
-			return (0);
-	}
 
-	if (isatty(STDIN_FILENO))
-		runInteractiveMode(envp);
-	else
-		runNonInteractiveMode(envp);
+int main(int ac, char *av[], char *envp[])
+{
+	PROGARGS ShellArgs = {NULL}, *args = &ShellArgs;
+	char *prompt = NULL;
+
+	runShell(args, ac, av, envp);
+
+	signal(SIGINT, handleCtrlC);
+
+	if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO) && ac == 1)
+	{
+		errno = 2;
+		prompt = PROMPT;
+	}
+	errno = 0;
+	runShell(prompt, args);
 
 	return (0);
+}
+
+/**
+ * handleCtrlC - print the prompt
+ *
+ * @UNUSED: option of the prototype
+ *
+ * Return: Void
+ */
+void handleCtrlC(int opr UNUSED)
+{
+	write(STDOUT_FILENO, "\n", 1);
+	write(STDOUT_FILENO, PROMPT, _strlen(PROMPT));
+}
+
+/**
+ * startShell - Initialize struct with the data for the program
+ *
+ * @args: Ptr to data structure
+ *
+ * @ac: Number of arguments
+ *
+ * @av: Array of arguments
+ *
+ * @envp: The environemnt variables
+ *
+ * Return: Void
+ */
+void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
+{
+	int i = 0, envpCap = INITIAL_ENVP_SIZE;
+
+	args->programName = argv[0];
+	args->buffer = NULL;
+	args->cmd = NULL;
+	args->execCount = 0;
+
+	if (argc == 1)
+		args->fd = STDIN_FILENO;
+	else
+	{
+		args->fd = open(argv[1], O_RDONLY);
+		if (args->fd == -1)
+		{
+			perror("./hsh: Error opening file");
+			exit(EXIT_FAILURE);
+		}
+	}
+	args->tokens = NULL;
+	args->envp = malloc(sizeof(char *) * 10);
+	if (envp)
+	{
+		for (; envp[i]; i++)
+		{
+			if (i >= envpCap)
+			{
+				envpCap *= 2;
+				args->envp = realloc(args->envp, sizeof(char *) * envCap);
+			}
+		}
+	}
+	args->envp[i] = NULL;
+	envp = args->envp;
+}
+
+/**
+ * runShell - loops the prompt
+ *
+ * @prompt: prompt
+ *
+ * @args: infinite loop for prompt
+ *
+ * Return: Void
+ */
+void runShell(char *prompt, PROGARGS *args)
+{
+	int len = 0, execRes;
+
+	while (1)
+	{
+		args->execCount++;
+
+		/* Primpt prompt to the user */
+		write(STDOUT_FILENO, PROMPT, _strlen(PROMPT));
+		len = _getline(args);
+
+		if (len == EOF)
+		{
+			freeArgs(args);
+			exit(EXIT_FAILURE);
+		}
+		if (len >= 1)
+		{
+			replaceVariables(args);
+			tokenize(args);
+			if (args->tokens[0])
+			{
+				execRes = execute(args);
+				if (execRes)
+					perror("./hsh: Execution error");
+			}
+			cleanupAfterExecution(args);
+		}
+	}
 }

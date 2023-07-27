@@ -1,170 +1,129 @@
 #include "shell.h"
 
-/**
- * processCommand - processes an array of string commands
- *
- * @cmd: the commands to be processed
- *
- * Return: array of string commands
- */
-char **processCommand(char *cmd)
-{
-	char **args = malloc(sizeof(char *) * MAX_ARGS), *token;
-	int argCount = 0;
 
-	if (!args)
+/**
+ * findExecutable - look for a program in path
+ *
+ * @args: Ptr to program data
+ *
+ * Return: 0 success, error code on fail
+ */
+
+int findExecutable(PROGARGS *args)
+{
+	int i = 0, result = 0;
+	char **dirs;
+
+	if (!args->cmd)
+		return (-1);
+
+	if (args->cmd[0] == '/' || args->cmd[0] == '.')
+		return (checkFile(args->cmd));
+
+	free(args->tokens[0]);
+	args->tokens[0] = _strcat(_strdup("/"), args->cmd);
+	if (!args->tokens[0])
+		return (-1);
+
+	dirs = tokenizePath(args);
+
+	if (!dirs || !dirs[0])
 	{
-		perror("./hsh: malloc error");
+		perror("./hsh: Dir Errror");
+		return (-1);
+	}
+	for (i = 0; dirs[i]; i++)
+	{
+		dirs[i] = _strcat(dirs[i], args->tokens[0]);
+		result = checkFile(dirs[i]);
+		 /* If the file is found and is executable, update data->tokens[0] and return 0 (success).*/
+		if (!result)
+		{
+			free(args->tokens[0]);
+			args->tokens[0] = _strdup(dirs[i]);
+			freePtrs(dirs);
+			return (0);
+		}
+		/* If the file is non-executable, print the permission denied message and return 1 (failure). */
+		else if (result == -1 && errno == EACCES)
+		{
+			perror("./hsh: Permission denied");
+			free(args->tokens[0]);
+			args->tokens[0] = NULL;
+			freePtrs(dirs);
+			return (-1);
+		}
+	}
+	free(args->tokens[0]);
+	args->tokens[0] = NULL;
+	freePtrs(dirs);
+	return (result);
+}
+
+/**
+ * tokenizePath - Tokenize path in dirs
+ *
+ * @args: Ptr to program data
+ *
+ * Return: An array of path dirs
+ */
+
+char **tokenizePath(PROGARGS *args)
+{
+	int i = 0;
+	int countDirs = 2;
+	char **tokens = NULL;
+	char *PATH;
+
+	PATH = _getenv("PATH", args);
+	if ((PATH) == 0 || PATH[0] == '\0')
 		return (NULL);
-	}
-	/* Ignore anything after the '#' character (comment handling) */
-	token = _strtok(cmd, "#");
-	if (!token)
+
+	PATH = _strdup(PATH);
+
+	for (i = 0; PATH[i]; i++)
 	{
-		free(args);
-		return (NULL);
+		if (PATH[i] == ':')
+			countDirs++;
 	}
-	token = _strtok(cmd, " ");
-	while (token && argCount < MAX_ARGS)
+
+	tokens = malloc(sizeof(char *) * countDirs);
+
+	i = 0;
+	tokens[i] = _strdup(_strtok(PATH, ":"));
+	while (tokens[i++])
 	{
-		args[argCount] = _strdup(token);
-
-		if (!args[argCount])
-		{
-			perror("./hsh: strdup error");
-			/* Free previously allocated strings */
-			freeArgs(args);
-			return (NULL);
-		}
-		argCount++;
-
-		if (_strchr(token, '\n'))
-		{
-			args[argCount] = NULL;
-			break; /* Exit the loop after setting NULL terminator */
-		}
-		token = _strtok(NULL, " ");
+		tokens[i] = _strdup(_strtok(NULL, ":"));
 	}
 
-	args[argCount] = NULL;
-	return (args);
+	free(PATH);
+	PATH = NULL;
+	return (tokens);
+
 }
 
 /**
- * executeCommand - execute string of arguments
+ * checkFile - Checks if a file exists, it's not a dir and
+ * has excecution permisions for permisions.
  *
- * @args: string of arguments to be executed
+ * @filePath: Ptr to full file name
  *
- * @envp: environment variable arguments
- *
- * Return: Void
+ * Return: 0 success, error code on fail
  */
-void executeCommand(char **args, char **envp)
-{
-	pid_t pid;
-	int status;
 
-	pid = fork();
-	if (pid < 0)
+int checkFile(char *filePath)
+{
+	struct stat fileStat;
+
+	if (stat(filePath, &fileStat) != -1)
 	{
-		perror("./hsh: fork error");
-		return;
-	}
-	if (pid == 0)
-	{
-		if (execve(args[0], args, envp) == -1)
+		if (S_ISDIR(fileStat.st_mode) ||  access(filePath, X_OK))
 		{
-			perror("./hsh: execve error");
-			exit(EXIT_FAILURE);
+			perror("./hsh: Error: Not an executable file");
+			return (-1);
 		}
+		return (0);
 	}
-	else
-		waitpid(pid, &status, 0);
-}
-
-/**
- * isAbsolutePath - Checks if the given path is an absolute path.
- *
- * @path: The path to check.
- *
- * Return: true if the path is an absolute path and executable,
- * false otherwise.
- */
-bool isAbsolutePath(char *path)
-{
-	if (path[0] == '/')
-	{
-		if (isExecutable(path))
-			return (true);
-		perror("./hsh: ");
-		return (false);
-	}
-	return (false);
-}
-
-/**
- * isExecutable - Checks if the given path is executable.
- *
- * @path: The path to check.
- *
- * Return: 1 if the path is executable, 0 otherwise.
- */
-int isExecutable(char *path)
-{
-	/* Check if the given path is executable */
-	return (access(path, X_OK) == 0);
-}
-
-/**
- * findExecutable - Searches for the executable in the system's
- * PATH environment variable.
- *
- * @cmd: The command to find.
- *
- * @envp: The environment variables
- *
- * Return: A pointer to the executable path if found, NULL otherwise.
- */
-char *findExecutable(char *cmd, char **envp)
-{
-	char *path = _getenv("PATH", envp), *pathEnv, *dir, *executablePath;
-	size_t dirLen, cmdLen;
-	char *foundExecutable = NULL;
-
-	if (isAbsolutePath(cmd))
-		return (_strdup(cmd));
-	if (!path)
-	{
-		perror("./hsh: PATH environment variable not found");
-		return (NULL);
-	}
-	pathEnv = _strdup(path);
-	dir = _strtok(pathEnv, ":");
-	while (dir)
-	{
-		dirLen = _strlen(dir);
-		cmdLen = _strlen(cmd);
-		executablePath = malloc(dirLen + cmdLen + 2);
-		if (!executablePath)
-		{
-			perror("./hsh: Memory allocation failed");
-			free(pathEnv);
-			return (NULL);
-		}
-		_memcpy(executablePath, dir, dirLen);
-		executablePath[dirLen] = '/';
-		_memcpy(executablePath + dirLen + 1, cmd, cmdLen + 1);
-		if (isExecutable(executablePath))
-		{
-			foundExecutable = executablePath;
-			break;
-		}
-		free(executablePath);
-		dir = _strtok(NULL, ":");
-	}
-	free(pathEnv);
-	if (foundExecutable)
-		return (foundExecutable);
-	perror("./hsh: ");
-	return (NULL);
+	perror("./hsh: Error: File not found");
+	return (-1);
 }
