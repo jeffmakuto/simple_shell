@@ -33,131 +33,70 @@ int checkBuiltins(PROGARGS *args)
 }
 
 /**
- * cdAction - change directory to the specified path.
+ * cdAction - Change directory to the specified path.
  *
  * @args: An array of command arguments
  *
  * Return: 0 on sucess
  */
-int cdAction(char **args, char **envp)
+int cdAction(PROGARGS *args)
 {
-	char *targetDir;
+	char *homeDir = _getenv("HOME", args), *oldDir = NULL;
+	char prevDir[MAX_PATH_LEN] = {0};
+	int result = 0;
 
-	if (args[1] == NULL || _strcmp(args[1], "") == 0 ||
-			_strcmp(args[1], "~") == 0 || _strcmp(args[1], "$HOME") == 0)
+	if (args->tokens[1])
 	{
-		targetDir = _getenv("HOME", envp);
-		if (!targetDir)
+		if (_strcomp(args->tokens[1], "-", 0))
 		{
-			perror("./hsh: cd error");
-			return;
+			oldDir = _getenv("OLDPWD", args);
+			if (oldDir)
+				result = changeDirectory(args, oldDir);
+			write(STDOUT_FILENO, _getenv("PWD", args), _strlen(_getenv("PWD", args)));
+			write(STDOUT_FILENO, "\n", 1);
+			return (result);
 		}
-	}
-	else if (_strcmp(args[1], "-") == 0)
-	{
-		targetDir = _getenv("OLDPWD", envp);
-		if (!targetDir)
+		else
 		{
-			perror("./hsh: cd error");
-			return;
+			return (changeDirectory(args, args->tokens[1]));
 		}
-		write(STDOUT_FILENO, targetDir, _strlen(targetDir));
-		write(STDOUT_FILENO, "\n", 1);
 	}
 	else
-		targetDir = args[1];
-
-	if (changeDirectory(targetDir))
-		return;
-}
-
-/**
- * changeDirectory - Change the current working directory to the
- * target directory.
- *
- * @targetDir: The target directory to change to.
- *
- * Return: On success, returns 0. On failure, returns -1.
- */
-int changeDirectory(char *targetDir)
-{
-	char cwd[PATH_MAX];
-
-	if (getcwd(cwd, sizeof(cwd)) == NULL)
 	{
-		perror("./hsh: cd error");
-		return (-1);
-	}
+		if (!homeDir)
+			homeDir = getcwd(prevDir, MAX_PATH_LEN);
 
-	if (chdir(targetDir))
-	{
-		perror("./hsh: cd error");
-		return (-1);
-	}
-
-	if (setenv("OLDPWD", cwd, 1))
-	{
-		perror("./hsh: cd error");
-		return (-1);
+		return (changeDirectory(args, homeDir));
 	}
 	return (0);
 }
 
 /**
- * setenvAction - Initialize a new environment variable or modify an
- * existing one.
+ * changeDirectory - Set working directory
  *
- * @args: An array of command arguments where args[1] is the variable name and
- * args[2] is the value.
+ * @args: An array of arguments
  *
- * @envp: The environment variables
+ * @newDir: Path to be set as working directory
  *
- * This function sets or modifies the value of an environment variable.
- *
- * Return: Void
+ * Return: 0 on success, number declared in args
  */
-void setenvAction(char **args, char **envp)
+int changeDirectory(PROGARGS *args, char *newDir)
 {
-	(void)envp;
+	char prevDir[MAX_PATH_LEN] = {0};
+	int result = 0;
 
-	if (!args[1] || !args[2])
+	getcwd(prevDir, MAX_PATH_LEN);
+
+	if (!_strcomp(prevDir, newDir, 0))
 	{
-		perror("./hsh: setenv: invalid arguments");
-		return;
+		result = chdir(newDir);
+		if (result == -1)
+		{
+			perror("./hsh: chdir error");
+			return (1);
+		}
+		setenvAction("PWD", newDir, args);
 	}
-
-	if (setenv(args[1], args[2], 1))
-	{
-		perror("./hsh: setenv error");
-		return;
-	}
-}
-
-/**
- * unsetenvAction - Remove an environment variable.
- *
- * @args: An array of command arguments where args[1] is the variable name to
- * be removed.
- *
- * @envp: The environment variables
- *
- * This function removes the specified environment variable.
- *
- * Return: Void
- */
-void unsetenvAction(char **args, char **envp)
-{
-	(void)envp;
-
-	if (!args[1])
-	{
-		perror("./hsh: unsetenv: missing variable name");
-		return;
-	}
-
-	if (unsetenv(args[1]))
-	{
-		perror("./hsh: unsetenv error");
-		return;
-	}
+	setenvAction("OLDPWD", prevDir, args);
+	return (0);
 }
