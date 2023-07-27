@@ -87,6 +87,7 @@ int changeDirectory(PROGARGS *args, char *newDir);
 int _envp(PROGARGS *args);
 int _setenv(PROGARGS *args);
 int _unsetenv(PROGARGS *args);
+int exitAction(PROGARGS *args);
 
 /*auxilliaries*/
 int _strlen(char *s);
@@ -102,5 +103,7 @@ char *_strcat(char *dest, char *src);
 void *_realloc(void *ptr, size_t new_size);
 char *_getenv(char *name, PROGARGS *args);
 int _setenv(char *name, char *value, PROGARGS *args);
+int _unsetenv(char *name, PROGARGS *args);
+void _printenv(PROGARGS *args);
 
 #endif /* SHELL_H */
