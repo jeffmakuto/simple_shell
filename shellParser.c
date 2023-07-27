@@ -54,7 +54,7 @@ void replaceVariables(PROGARGS *args)
 /**
  * _getenv - get value of environment variable
  *
- * @key: environment variable
+ * @name: environment variable
  *
  * @args: Arguments passed
  *
@@ -71,7 +71,7 @@ char *_getenv(char *name, PROGARGS *args)
 
 	for (i = 0; args->envp[i]; i++)
 	{
-		if (_strcmp(name, args->envp[i], nameLen) &&
+		if (_strncmp(name, args->envp[i], nameLen) &&
 				args->envp[i][nameLen] == '=')
 		{
 			return (args->envp[i] + nameLen + 1);

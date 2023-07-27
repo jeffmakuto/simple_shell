@@ -51,7 +51,7 @@ int _setenv(char *name, char *value, PROGARGS *args)
  *
  * Return: 1 if the env removed, 0 if the env  does not exist;
  */
-int _unsetenv(char *name, PROGARGS *data)
+int _unsetenv(char *name, PROGARGS *args)
 {
 	int i, nameLen = 0;
 
@@ -122,7 +122,7 @@ int setenvAction(PROGARGS *args)
 
 /**
  * unsetenvAction - Unset environment
- * 
+ *
  * @args: Arguments passed
  *
  * Return: 0 on success

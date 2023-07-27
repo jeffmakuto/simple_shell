@@ -52,7 +52,7 @@ void *_realloc(void *ptr, size_t newSize)
 /**
  * _atoi - Convert a string to an integer.
  *
- * @s: The pointer to convert
+ * @str: The pointer to convert
  *
  * Return: A integer
  */
@@ -129,7 +129,6 @@ int _getline(PROGARGS *args)
 			i = handleLogicalOperators(commands, i, operators);
 		} while (commands[i++]);
 	}
-
 	/*obtains the next command (command 0) and remove it from the array*/
 	args->buffer = commands[0];
 	for (i = 0; commands[i]; i++)

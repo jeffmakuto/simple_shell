@@ -2,7 +2,8 @@
 
 /**
  * _strlen - returns length of a string
- * @s: string to get length of
+ *
+ * @str: string to get length of
  *
  * Return: length of @s
  */
@@ -96,7 +97,7 @@ int _strncmp(char *str1, char *str2, int n)
 /**
  * rev_str - reverses a string
  *
- * @s: the reference to the string
+ * @str: the reference to the string
  */
 void rev_str(char *str)
 {
@@ -131,14 +132,17 @@ void rev_str(char *str)
 }
 
 /**
- * long_to_string - convert number to a string.
- * @number: number to concert
- * @string: buffer to save the num as string.
+ * longToStr - convert number to a string.
+ *
+ * @num: number to concert
+ *
+ * @str: buffer to save the num as string.
+ *
  * @base: base for concersion
  *
  * Return: Nothing.
  */
-void longToString(long num, char *str, int base)
+void longToStr(long num, char *str, int base)
 {
 	int i = 0, isNegative = 0;
 	long quotient = num;

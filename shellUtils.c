@@ -186,7 +186,7 @@ int checkFile(char *filePath)
 }
 
 /**
- * splitCommands - this function separates the string using a designed delimiter
+ * splitCommands - this function separates string using a designed delimiter
  *
  * @args: Pointer to the program's arguments
  *

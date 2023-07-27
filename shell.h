@@ -79,7 +79,7 @@ int executeCommand(PROGARGS *args, int *exitStatus, int *termSig);
 void splitCommands(PROGARGS *args);
 void replaceVariables(PROGARGS *args);
 void freeArgs(PROGARGS *args);
-void freePtrs(char **arr)
+void freePtrs(char **arr);
 void cleanupAfterExecution(PROGARGS *args);
 int handleLogicalOperators(char *commands[], int i, char operators[]);
 int checkBuiltins(PROGARGS *args);
@@ -103,7 +103,7 @@ int _setenv(char *name, char *value, PROGARGS *args);
 int _unsetenv(char *name, PROGARGS *args);
 void _printenv(PROGARGS *args);
 int _getline(PROGARGS *args);
-void longToString(long num, char *str, int base);
+void longToStr(long num, char *str, int base);
 int buffcat(char *buffer, char *addStr);
 void rev_str(char *str);
 
