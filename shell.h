@@ -59,6 +59,7 @@ int checkFile(char *filePath);
 char **getPath(PROGARGS *args);
 char *findExecutable(PROGARGS *args);
 int executeCommand(PROGARGS *args, int *exitStatus, int *termSig);
+void splitCommands(PROGARGS *args);
 int processCommandLineArguments(int ac, char **av, char **envp);
 
 
