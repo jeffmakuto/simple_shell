@@ -85,7 +85,7 @@ int findExecutable(PROGARGS *args)
 	args->tokens[0] = _strcat(_strdup("/"), args->cmd);
 	if (!args->tokens[0])
 		return (-1);
-	dirs = tokenizePath(args);
+	dirs = getPath(args);
 	if (!dirs || !dirs[0])
 	{
 		perror("./hsh: Dir Errror");
