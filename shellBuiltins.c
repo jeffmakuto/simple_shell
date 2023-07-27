@@ -147,3 +147,29 @@ int _envp(PROGARGS *args)
 	}
 	return (0);
 }
+
+/**
+ * exitAction - Exit the shell
+ *
+ * @args: Arguments passed
+ *
+ * Return: 0 on sucess
+ */
+int exitAction(PROGARGS *args)
+{
+	int i, exitStatus;
+
+	if (args->tokens[1] != NULL)
+	{
+		for (i = 0; args->tokens[1][i]; i++)
+			if ((args->tokens[1][i] < '0' || args->tokens[1][i] > '9')
+				&& args->tokens[1][i] != '+')
+			{
+				perror("./hsh: Invalid argument: Not a number");
+				return (1);
+			}
+		exitStatus = _atoi(args->tokens[1]);
+	}
+	freeArgs(args);
+	exit(EXIT_FAILURE);
+}

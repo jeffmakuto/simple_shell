@@ -1,142 +1,91 @@
 #include "shell.h"
 
 /**
- * _strchr - Locates character in string.
+ * _realloc - Reallocates a memory block.
  *
- * @s: Pointer to string where character is located from.
- * @c: Character to be located.
+ * @ptr: Pointer to the existing memory block.
  *
- * Return: Pointer to first occurrence of @c in @s,
- *	   NULL if character is not found.
+ * @new_size: The new size to allocate.
+ *
+ * Return: On success, returns a pointer to the newly reallocated memory block.
+ * On failure, returns NULL.
  */
-char *_strchr(char *s, char c)
+void *_realloc(void *ptr, size_t new_size)
 {
-	unsigned int i = 0;
+	void *new_ptr;
+	size_t min_size, i;
 
-	for (; *(s + i) != '\0'; i++)
-		if (*(s + i) == c)
-			return (s + i);
-	if (*(s + i) == c)
-		return (s + i);
-	return ('\0');
-}
-/**
- * _strdup -  function that duplicates a string
- * in a newly allocated space in memory.
- * @str: string to be copied.
- * Return: Duplicated string in success.
- */
+	/* If ptr is NULL, the behavior of _realloc is same as malloc(new_size)*/
+	if (!ptr)
+		return (malloc(new_size));
 
-char *_strdup(char *str)
-{
-	int a, b;
-	char *new_s;
-
-	if (str == NULL)
-		return (NULL);
-
-	a = _strlen(str) + 1;
-
-	new_s = malloc(sizeof(char) * (a));
-
-	if (new_s == NULL)
+	/* If new_size is 0, the behavior of _realloc is same as free(ptr) */
+	if (!new_size)
 	{
-		perror("./hsh");
+		free(ptr);
 		return (NULL);
 	}
 
-	for (b = 0; b < a; b++)
-		new_s[b] = str[b];
-
-	return (new_s);
-}
-/**
- * _memcpy - copies n bytes from src to dest memory area
- *
- * @n: bytes to be copied
- * @src: memmory area to be copied from
- * @dest: momory area copied to
- *
- * Return: pointer to dest
- */
-char *_memcpy(char *dest, char *src, unsigned int n)
-{
-	unsigned int x;
-
-	for (x = 0; x < n; x++)
-		*(dest + x) = *(src + x);
-
-	return (dest);
-}
-/**
- * _strtok - separates strings with delimiters
- * @line: It´s pointer to array we receive in getline.
- * @delim: It´s characters we mark off string in parts.
- * Return: A pointer to the created token
-*/
-char *_strtok(char *line, char *delim)
-{
-	int j;
-	static char *str;
-	char *copystr;
-
-	if (line != NULL)
-		str = line;
-	for (; *str != '\0'; str++)
+	/* Allocate a new memory block with the new size */
+	new_ptr = malloc(new_size);
+	if (!new_ptr)
 	{
-		for (j = 0; delim[j] != '\0'; j++)
+		/* If malloc fails, return NULL indicating failure to reallocate */
+		return (NULL);
+	}
+
+	/* Determine the minimum size to copy from the old block to the new block */
+	/* It should be the smaller of the old and new sizes */
+	min_size = new_size;
+	if (min_size > sizeof(ptr))
+		min_size = sizeof(ptr);
+
+	/* Copy the data from the old block to the new block */
+	for (i = 0; i < min_size; i++)
+		*((char *)new_ptr + i) = *((char *)ptr + i);
+
+	/* Free the old block */
+	free(ptr);
+	return (new_ptr);
+}
+
+/**
+ * _atoi - Convert a string to an integer.
+ *
+ * @s: The pointer to convert
+ *
+ * Return: A integer
+ */
+int _atoi(char *s)
+{
+	int c = 0;
+	unsigned int ni = 0;
+	int min = 1;
+	int isi = 0;
+
+	while (s[c])
+	{
+		if (s[c] == 45)
 		{
-			if (*str == delim[j])
+			min *= -1;
+		}
+
+		while (s[c] >= 48 && s[c] <= 57)
+		{
+			isi = 1;
+			ni = (ni * 10) + (s[c] - '0');
+			c++;
+		}
+
+		if (isi == 1)
+		{
 			break;
 		}
-		if (delim[j] == '\0')
-			break;
-	}
-	copystr = str;
-	if (*copystr == '\0')
-		return (NULL);
-	for (; *str != '\0'; str++)
-	{
-		for (j = 0; delim[j] != '\0'; j++)
-		{
-			if (*str == delim[j])
-			{
-				*str = '\0';
-				str++;
-				return (copystr);
-			}
-		}
-	}
-	return (copystr);
-}
 
-/**
- **_strncpy - copies a string
- *@dest: the destination string to be copied to
- *@src: the source string
- *@n: the amount of characters to be copied
- *Return: the concatenated string
- */
-char *_strncpy(char *dest, char *src, int n)
-{
-	int i, j;
-	char *s = dest;
+		c++;
+	}
 
-	i = 0;
-	while (src[i] != '\0' && i < n - 1)
-	{
-		dest[i] = src[i];
-		i++;
-	}
-	if (i < n)
-	{
-		j = i;
-		while (j < n)
-		{
-			dest[j] = '\0';
-			j++;
-		}
-	}
-	return (s);
+	ni *= min;
+	return (ni);
 }
 
