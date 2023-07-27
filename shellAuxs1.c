@@ -188,3 +188,25 @@ int handleLogicalOperators(char *commands[], int i, char operators[])
 	}
 	return (i);
 }
+
+/**
+ * buffcat - append string at end of buffer
+ *
+ * @buffer: buffer to be filled
+ *
+ * @addStr: string to be put in buffer
+ *
+ * Return: length of concatenated buffer
+ */
+int buffcat(char *buffer, char *addStr)
+{
+	int len, i;
+
+	len = _strlen(buffer);
+	for (i = 0; addStr[i]; i++)
+	{
+		buffer[len + i] = addStr[i];
+	}
+	buffer[len + i] = '\0';
+	return (len + i);
+}
