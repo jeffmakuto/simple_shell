@@ -87,7 +87,7 @@ void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
 			if (i >= envpCap)
 			{
 				envpCap *= 2;
-				args->envp = realloc(args->envp, sizeof(char *) * envCap);
+				args->envp = _realloc(args->envp, sizeof(char *) * envCap);
 			}
 		}
 	}
@@ -124,7 +124,7 @@ void runShell(char *prompt, PROGARGS *args)
 		if (len >= 1)
 		{
 			replaceVariables(args);
-			tokenize(args);
+			splitCommands(args);
 			if (args->tokens[0])
 			{
 				execRes = execute(args);

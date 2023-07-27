@@ -16,17 +16,13 @@ int findExecutable(PROGARGS *args)
 
 	if (!args->cmd)
 		return (-1);
-
 	if (args->cmd[0] == '/' || args->cmd[0] == '.')
 		return (checkFile(args->cmd));
-
 	free(args->tokens[0]);
 	args->tokens[0] = _strcat(_strdup("/"), args->cmd);
 	if (!args->tokens[0])
 		return (-1);
-
 	dirs = tokenizePath(args);
-
 	if (!dirs || !dirs[0])
 	{
 		perror("./hsh: Dir Errror");
@@ -36,7 +32,7 @@ int findExecutable(PROGARGS *args)
 	{
 		dirs[i] = _strcat(dirs[i], args->tokens[0]);
 		result = checkFile(dirs[i]);
-		 /* If the file is found and is executable, update data->tokens[0] and return 0 (success).*/
+		 /* If file's found and executable, update and return 0 (success).*/
 		if (!result)
 		{
 			free(args->tokens[0]);
@@ -44,7 +40,7 @@ int findExecutable(PROGARGS *args)
 			freePtrs(dirs);
 			return (0);
 		}
-		/* If the file is non-executable, print the permission denied message and return 1 (failure). */
+		/* If file's non-executable, print error  message and return -1 (failure). */
 		else if (result == -1 && errno == EACCES)
 		{
 			perror("./hsh: Permission denied");
