@@ -20,35 +20,49 @@ int _strlen(char *str)
 	return (len);
 }
 
+
 /**
- * _strcat - concatenates strings @dest and @src to @dest
+ * _strcat - Concatenate 2 strings.
  *
- * @dest: the string to append @src to
+ * @str1: String 1
  *
- * @src: the string to be appended to @dest
+ * @str2: String 2
  *
- * Return: a pointer to @dest
+ * Return: pointer to the str
  */
-char *_strcat(char *dest, char *src)
+char *_strcat(char *str1, char *str2)
 {
-	char *p = dest;
+	char *result;
+	int len1 = 0, len2 = 0;
 
-	/* move dest pointer to end of string */
-	for (; *dest; dest++)
+	if (str1 == NULL)
+		str1 = "";
+	len1 = _strlen(str1);
+
+	if (str2 == NULL)
+		str2 = "";
+	len2 = _strlen(str2);
+
+	result = malloc(sizeof(char) * (len1 + len2 + 1));
+	if (result == NULL)
 	{
-		/* empty */
+		errno = ENOMEM;
+		perror("Error");
+		return (NULL);
 	}
 
-	/* copy from src to dest */
-	for (; *src; src++, dest++)
+	for (len1 = 0; str1[len1] != '\0'; len1++)
+		result[len1] = str1[len1];
+	free(str1);
+
+	for (len2 = 0; str2[len2] != '\0'; len2++)
 	{
-		*dest = *src;
+		result[len1] = str2[len2];
+		len1++;
 	}
 
-	/* set null char at the new end */
-	*dest = 0;
-
-	return (p);
+	result[len1] = '\0';
+	return (result);
 }
 
 /**

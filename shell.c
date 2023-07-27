@@ -61,7 +61,7 @@ void handleCtrlCSignal(int signal)
  */
 void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
 {
-	int i = 0, envpCap = INITIAL_ENVP_SIZE;
+	int i = 0;
 
 	args->programName = av[0];
 	args->buffer = NULL;
@@ -84,13 +84,7 @@ void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
 	if (envp)
 	{
 		for (; envp[i]; i++)
-		{
-			if (i >= envpCap)
-			{
-				envpCap *= 2;
-				args->envp = _realloc(args->envp, sizeof(char *) * envpCap);
-			}
-		}
+			args->envp[i] = _strdup(envp[i]);
 	}
 	args->envp[i] = NULL;
 	envp = args->envp;
@@ -107,20 +101,18 @@ void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
  */
 void runShell(char *prompt, PROGARGS *args)
 {
-	int len = 0, execRes, *exitStatus = 0, *termSig = 0;
+	int errCode = 0, len = 0;
 
-	while (1)
+	while (++(args->execCount))
 	{
-		args->execCount++;
-
 		/* Primpt prompt to the user */
 		write(STDOUT_FILENO, prompt, _strlen(prompt));
-		len = _getline(args);
+		errCode = len = _getline(args);
 
-		if (len == EOF)
+		if (errCode == EOF)
 		{
 			freeArgs(args);
-			exit(EXIT_FAILURE);
+			exit(errno);
 		}
 		if (len >= 1)
 		{
@@ -128,9 +120,9 @@ void runShell(char *prompt, PROGARGS *args)
 			splitCommands(args);
 			if (args->tokens[0])
 			{
-				execRes = executeCommand(args, exitStatus, termSig);
-				if (execRes)
-					perror("./hsh: Execution error");
+				errCode = executeCommand(args);
+				if (errCode)
+					printErr(errCode, args);
 			}
 			cleanupAfterExecution(args);
 		}
