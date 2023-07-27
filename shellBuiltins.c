@@ -101,6 +101,7 @@ int changeDirectory(PROGARGS *args, char *newDir)
 	setenvAction("OLDPWD", prevDir, args);
 	return (0);
 }
+
 /**
  * _envp - show the environment
  *
