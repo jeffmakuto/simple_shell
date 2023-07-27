@@ -44,7 +44,7 @@ void replaceVariables(PROGARGS *args)
 			temp ? _strcat(line, temp) : 1;
 			_strcat(line, expansion);
 		}
-	if (!_strcomp(args->buffer, line, 0))
+	if (!_strcmp(args->buffer, line, 0))
 	{
 		free(args->buffer);
 		args->buffer = _strdup(line);
