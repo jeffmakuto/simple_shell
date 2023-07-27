@@ -14,7 +14,7 @@ void replaceVariables(PROGARGS *args)
 
 	if (args->buffer == NULL)
 		return;
-	_strcat(line, args->buffer);
+	buffcat(line, args->buffer);
 	for (i = 0; line[i]; i++)
 		if (line[i] == '#')
 			line[i--] = '\0';
@@ -22,15 +22,15 @@ void replaceVariables(PROGARGS *args)
 		{
 			line[i] = '\0';
 			long_to_string(errno, expansion, 10);
-			_strcat(line, expansion);
-			_strcat(line, args->buffer + i + 2);
+			buffcat(line, expansion);
+			buffcat(line, args->buffer + i + 2);
 		}
 		else if (line[i] == '$' && line[i + 1] == '$')
 		{
 			line[i] = '\0';
 			long_to_string(getpid(), expansion, 10);
-			_strcat(line, expansion);
-			_strcat(line, args->buffer + i + 2);
+			buffcat(line, expansion);
+			buffcat(line, args->buffer + i + 2);
 		}
 		else if (line[i] == '$' && (line[i + 1] == ' ' || line[i + 1] == '\0'))
 			continue;
@@ -40,11 +40,11 @@ void replaceVariables(PROGARGS *args)
 				expansion[j - 1] = line[i + j];
 			temp = _getenv(expansion, args);
 			line[i] = '\0', expansion[0] = '\0';
-			_strcat(expansion, line + i + j);
-			temp ? _strcat(line, temp) : 1;
-			_strcat(line, expansion);
+			buffcat(expansion, line + i + j);
+			temp ? buffcat(line, temp) : 1;
+			buffcat(line, expansion);
 		}
-	if (!_strcmp(args->buffer, line, 0))
+	if (!_strncmp(args->buffer, line, 0))
 	{
 		free(args->buffer);
 		args->buffer = _strdup(line);
