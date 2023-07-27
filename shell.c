@@ -37,8 +37,6 @@ int main(int ac, char *av[], char *envp[])
  *
  * @signal: The signal number (unused).
  *
- * This function is called when the program receives the Ctrl+C (SIGINT) signal.
- * It writes a newline character and the "PROMPT" string to the standard output.
  *
  * Return: Void
  */
