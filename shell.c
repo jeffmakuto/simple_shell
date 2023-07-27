@@ -37,8 +37,6 @@ int main(int ac, char *av[], char *envp[])
  *
  * @signal: The signal number (unused).
  *
- *
- * Return: Void
  */
 void handleCtrlCSignal(int signal UNUSED)
 {

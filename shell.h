@@ -16,12 +16,14 @@
 /* Define macros */
 #define PROMPT "\n($) "
 #define INITIAL_ENVP_SIZE 10
+#define UNUSED __attribute__((unused))
 
 /* Struct definitions */
 
 /**
  * struct PROGARGS - Represents the arguments and information for a
  * builtin command.
+ *
  * @programName: The name of the program or command.
  *
  * @buffer: The buffer to store the input command line.
