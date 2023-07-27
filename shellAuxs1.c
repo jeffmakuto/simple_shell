@@ -12,23 +12,23 @@
  */
 void *_realloc(void *ptr, size_t newSize)
 {
-	void *new_ptr;
-	size_t min_size, i;
+	void *newPtr;
+	size_t minSize, i;
 
 	/* If ptr is NULL, the behavior of _realloc is same as malloc(new_size)*/
 	if (!ptr)
-		return (malloc(new_size));
+		return (malloc(newSize));
 
 	/* If new_size is 0, the behavior of _realloc is same as free(ptr) */
-	if (!new_size)
+	if (!newSize)
 	{
 		free(ptr);
 		return (NULL);
 	}
 
 	/* Allocate a new memory block with the new size */
-	new_ptr = malloc(new_size);
-	if (!new_ptr)
+	newPtr = malloc(newSize);
+	if (!newPtr)
 	{
 		/* If malloc fails, return NULL indicating failure to reallocate */
 		return (NULL);
@@ -36,17 +36,17 @@ void *_realloc(void *ptr, size_t newSize)
 
 	/* Determine the minimum size to copy from the old block to the new block */
 	/* It should be the smaller of the old and new sizes */
-	min_size = new_size;
-	if (min_size > sizeof(ptr))
-		min_size = sizeof(ptr);
+	minSize = newSize;
+	if (minSize > sizeof(ptr))
+		minSize = sizeof(ptr);
 
 	/* Copy the data from the old block to the new block */
-	for (i = 0; i < min_size; i++)
-		*((char *)new_ptr + i) = *((char *)ptr + i);
+	for (i = 0; i < minSize; i++)
+		*((char *)newPtr + i) = *((char *)ptr + i);
 
 	/* Free the old block */
 	free(ptr);
-	return (new_ptr);
+	return (newPtr);
 }
 
 /**
@@ -63,17 +63,17 @@ int _atoi(char *str)
 	int min = 1;
 	int isi = 0;
 
-	while (s[c])
+	while (str[c])
 	{
-		if (s[c] == 45)
+		if (str[c] == 45)
 		{
 			min *= -1;
 		}
 
-		while (s[c] >= 48 && s[c] <= 57)
+		while (str[c] >= 48 && str[c] <= 57)
 		{
 			isi = 1;
-			ni = (ni * 10) + (s[c] - '0');
+			ni = (ni * 10) + (str[c] - '0');
 			c++;
 		}
 
@@ -100,14 +100,14 @@ int _getline(PROGARGS *args)
 {
 	char buff[BUFFER_SIZE] = {'\0'};
 	static char *commands[INITIAL_ENVP_SIZE] = {NULL};
-	static char operators[INITIAL_ENVP_SIZE] = {NULL};
+	static char operators[INITIAL_ENVP_SIZE] = {'\0'};
 	ssize_t bytesRead, i = 0;
 	bool hasError = false;
 
 	/* check if there are no  more commands in the array */
 	/* and checks the logical operators */
 	if (!commands[0] || (operators[0] == '&' && hasError) ||
-		(array_operators[0] == '|' && !hasError))
+		(operators[0] == '|' && !hasError))
 	{
 		/*free the memory allocated in the array if it exists */
 		for (i = 0; commands[i]; i++)

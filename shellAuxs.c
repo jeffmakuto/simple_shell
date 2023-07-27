@@ -10,14 +10,14 @@
 
 int _strlen(char *str)
 {
-	int length = 0;
+	int len = 0;
 
-	while (*s++)
+	while (*str++)
 	{
-		length++;
+		len++;
 	}
 
-	return (length);
+	return (len);
 }
 
 /**
@@ -78,7 +78,7 @@ int _strncmp(char *str1, char *str2, int n)
 			return (0);
 		for (i = 0; str1[i]; i++)
 		{
-			if (str1[i] != str[i])
+			if (str1[i] != str2[i])
 				return (0);
 		}
 		return (1);
@@ -87,7 +87,7 @@ int _strncmp(char *str1, char *str2, int n)
 	{
 		for (i = 0; i < n ; i++)
 		{
-			if (str1[i] != str[i])
+			if (str1[i] != str2[i])
 			return (0);
 		}
 		return (1);
@@ -102,12 +102,12 @@ int _strncmp(char *str1, char *str2, int n)
 void rev_str(char *str)
 {
 	int len = 0, i, mid, a;
-	char c = *s, temp;
+	char c = *str, temp;
 
 	/* get string lenth */
 	while (c != '\0')
 	{
-		c = *(s + ++len);
+		c = *(str + ++len);
 	}
 
 	/* end if string lenth is zero */
@@ -122,12 +122,11 @@ void rev_str(char *str)
 	/* reverse string */
 	for (i = 0; i < mid; i++)
 	{
-		tmp;
 		a = len - i - 1;
 
-		tmp = *(s + i);
-		*(s + i) = *(s + a);
-		*(s + a) = tmp;
+		temp = *(str + i);
+		*(str + i) = *(str + a);
+		*(str + a) = temp;
 	}
 }
 
