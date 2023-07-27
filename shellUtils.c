@@ -3,13 +3,7 @@
 /**
  * executeCommand - Executes string of arguments
  *
- * @args: Pointer to program arguments struct
- *
- * @exitStatus: Pointer to an integer to store the exit status of
- * the child process
- *
- * @termSig: Pointer to an integer to indicate
- * if the child process was terminated by a signal
+ * @args: Pointer to program arguments
  *
  * Return: 0 on success, -1 on fail
  */
@@ -19,36 +13,35 @@ int executeCommand(PROGARGS *args)
 	pid_t pid;
 
 	result = checkBuiltins(args);
+
 	if (result != -1)
-		return(result);
+		return (result);
+
 	result = findExecutable(args);
 	if (result)
 		return (result);
-	else
+	pid = fork();
+	if (pid < 0)
 	{
-		pid = fork();
-		if (pid < 0)
+		perror(args->cmd);
+		exit(EXIT_FAILURE);
+	}
+	if (pid == 0)
+	{
+		result = execve(args->tokens[0], args->tokens, args->envp);
+		if (result == -1)
 		{
 			perror(args->cmd);
 			exit(EXIT_FAILURE);
 		}
-		if (pid == 0)
-		{
-			result = execve(args->tokens[0], args->tokens, args->envp);
-			if (result == -1)
-			{
-				perror(args->cmd);
-				exit(EXIT_FAILURE);
-			}
-		}
-		else
-		{
-			waitpid(pid, &status, 0);
-			if (WIFEXITED(status))
-				errno = WEXITSTATUS(status);
-			else if (WIFSIGNALED(status))
-				errno = 128 + WTERMSIG(status);
-		}
+	}
+	else
+	{
+		waitpid(pid, &status, 0);
+		if (WIFEXITED(status))
+			errno = WEXITSTATUS(status);
+		else if (WIFSIGNALED(status))
+			errno = 128 + WTERMSIG(status);
 	}
 	return (0);
 }

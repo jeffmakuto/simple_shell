@@ -27,9 +27,9 @@ int _printe(char *str)
 /**
  * printErr - print array of char in stdout
  *
- * @str: Pointer to the array
- *
  * @errCode: error code
+ *
+ * @args: Arguments passed
  *
  * Return: num of bytes printed, -1 on error.
  */
