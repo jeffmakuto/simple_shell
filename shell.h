@@ -16,7 +16,6 @@
 /* Define macros */
 #define PROMPT "\n($) "
 #define INITIAL_ENVP_SIZE 10
-#define UNUSED __attribute__((unused))
 
 /* Struct definitions */
 

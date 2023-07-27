@@ -38,8 +38,9 @@ int main(int ac, char *av[], char *envp[])
  * @signal: The signal number (unused).
  *
  */
-void handleCtrlCSignal(int signal UNUSED)
+void handleCtrlCSignal(int signal)
 {
+	(void)signal;
 	write(STDOUT_FILENO, "\n", 1);
 	write(STDOUT_FILENO, PROMPT, _strlen(PROMPT));
 }
