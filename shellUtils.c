@@ -61,7 +61,7 @@ int findExecutable(PROGARGS *args)
 }
 
 /**
- * tokenizePath - Tokenize path in dirs
+ * getPath - Tokenize path in dirs
  *
  * @args: Ptr to program data
  *
