@@ -89,3 +89,102 @@ int _atoi(char *s)
 	return (ni);
 }
 
+/**
+* _getline - read one line from the prompt.
+*
+* @args: Arguments passed
+*
+* Return: read bytes.
+*/
+int _getline(PROGARGS *args)
+{
+	char buff[BUFFER_SIZE] = {'\0'};
+	static char *commands[INITIAL_ENVP_SIZE] = {NULL};
+	static char operators[INITIAL_ENVP_SIZE] = {NULL};
+	ssize_t bytesRead, i = 0;
+	bool hasError = false;
+
+	/* check if there are no  more commands in the array */
+	/* and checks the logical operators */
+	if (!commands[0] || (operators[0] == '&' && hasError) ||
+		(array_operators[0] == '|' && !hasError))
+	{
+		/*free the memory allocated in the array if it exists */
+		for (i = 0; commands[i]; i++)
+		{
+			free(commands[i]);
+			commands[i] = NULL;
+		}
+
+		/* read from the file descriptor int to buff */
+		bytesRead = read(args->fd, &buff, BUFFER_SIZE - 1);
+		if (bytesRead == 0)
+			return (-1);
+
+		/* split lines for \n or ; */
+		i = 0;
+		do {
+			commands[i] = _strdup(_strtok(i ? NULL : buff, "\n;"));
+			/*checks and split for && and || operators*/
+			i = handleLogicalOperators(commands, i, operators);
+		} while (commands[i++]);
+	}
+
+	/*obtains the next command (command 0) and remove it from the array*/
+	args->buffer = commands[0];
+	for (i = 0; commands[i]; i++)
+	{
+		commands[i] = commands[i + 1];
+		operators[i] = operators[i + 1];
+	}
+
+	return (_strlen(args->buffer));
+}
+
+
+/**
+* handleLogicalOperators - Handle command execution with the && and ||
+*
+* @commands: array of the commands.
+*
+* @i: index
+*
+* @operators: array of the logical operators
+*
+* Return: index of the last command in the commands array
+*/
+int handleLogicalOperators(char *commands[], int i, char operators[])
+{
+	char *temp = NULL;
+	int j;
+
+	/* checks for the & char in the command line*/
+	for (j = 0; commands[i] != NULL  && commands[i][j]; j++)
+	{
+		if (commands[i][j] == '&' && commands[i][j + 1] == '&')
+		{
+			/* split the line when chars && was found */
+			temp = commands[i];
+			commands[i][j] = '\0';
+			commands[i] = _strdup(commands[i]);
+			commands[i + 1] = _strdup(temp + j + 2);
+			i++;
+			operators[i] = '&';
+			free(temp);
+			j = 0;
+		}
+		if (commands[i][j] == '|' && commands[i][j + 1] == '|')
+		{
+			/* split the line when chars || was found */
+			temp = commands[i];
+			commands[i][j] = '\0';
+			commands[i] = _strdup(commands[i]);
+			commands[i + 1] = _strdup(temp + j + 2);
+			i++;
+			operators[i] = '|';
+			free(temp);
+			j = 0;
+		}
+	}
+	return (i);
+}

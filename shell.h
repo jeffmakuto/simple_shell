@@ -94,17 +94,15 @@ int exitAction(PROGARGS *args);
 int _strlen(char *s);
 int _strcmp(char *s1, char *s2);
 int _atoi(char *s);
-char *_strchr(char *s, char c);
 char *_strdup(char *str);
-char *_memcpy(char *dest, char *src, unsigned int n);
-char *_strstr(char *haystack, char *needle);
 char *_strtok(char *line, char *delim);
-char *_strncpy(char *dest, char *src, int n);
 char *_strcat(char *dest, char *src);
 void *_realloc(void *ptr, size_t new_size);
 char *_getenv(char *name, PROGARGS *args);
 int _setenv(char *name, char *value, PROGARGS *args);
 int _unsetenv(char *name, PROGARGS *args);
 void _printenv(PROGARGS *args);
+int _getline(PROGARGS *args);
+int handleLogicalOperators(char *commands[], int i, char operators[])
 
 #endif /* SHELL_H */
