@@ -16,6 +16,7 @@
 /* Define macros */
 #define PROMPT "\n($) "
 #define INITIAL_ENVP_SIZE 10
+#define MAX_PATH_LEN 100
 
 /* Struct definitions */
 
@@ -54,7 +55,7 @@ typedef struct PROGARGS
 /**
  * struct BuiltinCmd - Represents a built-in command.
  *
- * @cmd: The command string.
+ * @command: The command string.
  *
  * @action: A pointer to the function that implements the command's action.
  *
@@ -76,7 +77,12 @@ char *findExecutable(PROGARGS *args);
 int executeCommand(PROGARGS *args, int *exitStatus, int *termSig);
 void splitCommands(PROGARGS *args);
 int processCommandLineArguments(int ac, char **av, char **envp);
-
+int checkBuiltins(PROGARGS *args);
+int cdAction(PROGARGS *args);
+int changeDirectory(PROGARGS *args, char *newDir);
+int _envp(PROGARGS *args);
+int _setenv(PROGARGS *args);
+int _unsetenv(PROGARGS *args);
 
 /*auxilliaries*/
 int _strlen(char *s);
@@ -90,6 +96,7 @@ char *_strtok(char *line, char *delim);
 char *_strncpy(char *dest, char *src, int n);
 char *_strcat(char *dest, char *src);
 void *_realloc(void *ptr, size_t new_size);
-char *_getenv(char *name, char **envp);
+char *_getenv(char *name, PROGARGS *args);
+int _setenv(char *name, char *value, PROGARGS *args);
 
 #endif /* SHELL_H */
