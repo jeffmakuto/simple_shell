@@ -20,15 +20,26 @@
 /* Struct definitions */
 
 /**
- * struct BuiltinCmd - Represents a built-in command.
+ * struct PROGARGS - Represents the arguments and information for a
+ * builtin command.
+ * @programName: The name of the program or command.
+ *
+ * @buffer: The buffer to store the input command line.
  *
  * @cmd: The command string.
  *
- * @action: A pointer to the function that implements the command's action.
+ * @execCount: The number of times the command has been executed.
  *
- * The BuiltinCmd struct defines a built-in command and its associated action.
+ * @fd: The file descriptor used for I/O redirection.
+ *
+ * @tokens: An array of strings representing the tokenized command arguments.
+ *
+ * @envp: An array of strings representing the environment variables.
+ *
+ * This struct holds various information related to a builtin command.
+ * It is used to pass and store command-specific arguments and data.
  */
-typedef struct BuiltinCmd
+typedef struct PROGARGS
 {
 	char *programName;
 	char *buffer;

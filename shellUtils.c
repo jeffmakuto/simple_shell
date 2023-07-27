@@ -68,7 +68,7 @@ int findExecutable(PROGARGS *args)
  * Return: An array of path dirs
  */
 
-char **tokenizePath(PROGARGS *args)
+char **getPath(PROGARGS *args)
 {
 	int i = 0;
 	int countDirs = 2;
