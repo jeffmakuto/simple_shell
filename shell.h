@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stddef.h>
 
 /* Define macros */
