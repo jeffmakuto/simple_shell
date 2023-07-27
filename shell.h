@@ -77,7 +77,7 @@ void handleCtrlCSignal(int signal);
 int checkFile(char *filePath);
 char **getPath(PROGARGS *args);
 int findExecutable(PROGARGS *args);
-int executeCommand(PROGARGS *args, int *exitStatus, int *termSig);
+int executeCommand(PROGARGS *args);
 void splitCommands(PROGARGS *args);
 void replaceVariables(PROGARGS *args);
 void freeArgs(PROGARGS *args);
@@ -99,7 +99,6 @@ int _atoi(char *str);
 char *_strdup(char *str);
 char *_strtok(char *line, char *delim);
 char *_strcat(char *dest, char *src);
-void *_realloc(void *ptr, size_t newSize);
 char *_getenv(char *name, PROGARGS *args);
 int _setenv(char *name, char *value, PROGARGS *args);
 int _unsetenv(char *name, PROGARGS *args);
@@ -108,5 +107,8 @@ int _getline(PROGARGS *args);
 void longToStr(long num, char *str, int base);
 int buffcat(char *buffer, char *addStr);
 void rev_str(char *str);
+int _print(char *str);
+int _printe(char *str);
+int printErr(int errCode, PROGARGS *args);
 
 #endif /* SHELL_H */

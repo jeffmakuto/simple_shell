@@ -130,7 +130,7 @@ int _envp(PROGARGS *args)
 				_printenv(args);
 				if (_getenv(varName, args) == NULL)
 				{
-					_print(data->tokens[1]);
+					_print(args->tokens[1]);
 					_print("\n");
 				}
 				else

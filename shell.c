@@ -75,15 +75,15 @@ void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
 		args->fd = open(av[1], O_RDONLY);
 		if (args->fd == -1)
 		{
-			_printe(data->program_name);
+			_printe(args->programName);
 			_printe(": 0: Can't open ");
-			_printe(argv[1]);
+			_printe(av[1]);
 			_printe("\n");
 			exit(127);
 		}
 	}
 	args->tokens = NULL;
-	args->envp = malloc(sizeof(char *) * 10);
+	args->envp = malloc(sizeof(char *) * MAX_PATH_LEN);
 	if (envp)
 	{
 		for (; envp[i]; i++)
