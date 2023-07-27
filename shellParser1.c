@@ -1,191 +1,53 @@
 #include "shell.h"
 
 /**
- * replacePathVariable - Replace the $PATH variable in the string
+ * replaceVariables - Expands the variable
  *
- * @input: The input string
+ * @args: Arguments passed
  *
- * @envp: The environment variables
- *
- * Return: A new string with the $PATH variable replaced.
- * Note: The returned string should be freed by the caller.
+ * Return: Void
  */
-char *replacePathVariable(char *input, char **envp)
+void replaceVariables(PROGARGS *args)
 {
-	char *replacedStr = _strdup(input), *ptr = replacedStr, *pathEnv, *newStr;
-	size_t pathLen, replaceLen, newLen;
+	int i, j;
+	char line[BUFFER_SIZE] = {0}, expansion[BUFFER_SIZE] = {'\0'}, *temp;
 
-	/* Handle $PATH */
-	if (_strstr(replacedStr, "$PATH"))
-	{
-		pathEnv = _getenv("PATH", envp);
-		if (pathEnv)
+	if (args->buffer == NULL)
+		return;
+	_strcat(line, args->buffer);
+	for (i = 0; line[i]; i++)
+		if (line[i] == '#')
+			line[i--] = '\0';
+		else if (line[i] == '$' && line[i + 1] == '?')
 		{
-			ptr = _strstr(replacedStr, "$PATH");
-			pathLen = _strlen(pathEnv);
-			replaceLen = _strlen("$PATH");
-			newLen = _strlen(replacedStr) - replaceLen + pathLen;
-			newStr = malloc(newLen + 1);
-			if (!newStr)
-			{
-				perror("./hsh: malloc error");
-				free(replacedStr);
-				return (NULL);
-			}
-			/* Copy the part before $PATH */
-			_strncpy(newStr, replacedStr, ptr - replacedStr);
-			newStr[ptr - replacedStr] = '\0';
-			/* Concatenate the actual PATH value */
-			_strcat(newStr, pathEnv);
-			/* Concatenate the part after $PATH */
-			_strcat(newStr, ptr + replaceLen);
-			/* Free the old replacedStr and use the new string */
-			free(replacedStr);
-			replacedStr = newStr;
+			line[i] = '\0';
+			long_to_string(errno, expansion, 10);
+			_strcat(line, expansion);
+			_strcat(line, args->buffer + i + 2);
 		}
-	}
-	return (replacedStr);
-}
-
-/**
- * intToString - Converts an integer to its string representation.
- *
- * @num: The integer to convert.
- *
- * @str: The buffer to store the resulting string.
- *
- * Return: A pointer to the buffer containing the string representation.
- */
-char *intToString(int num, char *str)
-{
-	int i = 0, isNegative = 0, rem, j, len;
-	char temp;
-
-	/* Handle 0 explicitly, otherwise, it'll be considered as empty string. */
-	if (!num)
+		else if (line[i] == '$' && line[i + 1] == '$')
+		{
+			line[i] = '\0';
+			long_to_string(getpid(), expansion, 10);
+			_strcat(line, expansion);
+			_strcat(line, args->buffer + i + 2);
+		}
+		else if (line[i] == '$' && (line[i + 1] == ' ' || line[i + 1] == '\0'))
+			continue;
+		else if (line[i] == '$')
+		{
+			for (j = 1; line[i + j] && line[i + j] != ' '; j++)
+				expansion[j - 1] = line[i + j];
+			temp = _getenv(expansion, args);
+			line[i] = '\0', expansion[0] = '\0';
+			_strcat(expansion, line + i + j);
+			temp ? _strcat(line, temp) : 1;
+			_strcat(line, expansion);
+		}
+	if (!_strcomp(args->buffer, line, 0))
 	{
-		str[i++] = '0';
-		str[i] = '\0';
-		return (str);
+		free(args->buffer);
+		args->buffer = _strdup(line);
 	}
-
-	/* Handle negative numbers */
-	if (num < 0)
-	{
-		isNegative = 1;
-		num = -num;
-	}
-
-	/* Convert individual digits to characters, add them to string in rev order */
-	while (num)
-	{
-		rem = num % 10;
-		str[i++] = rem + '0';
-		num = num / 10;
-	}
-	/* Append '-' if the number is negative */
-	if (isNegative)
-		str[i++] = '-';
-	str[i] = '\0';
-	/* Reverse the string to get the correct representation */
-	j = 0, len = i - 1;
-	while (j < len)
-	{
-		temp = str[j];
-		str[j] = str[len];
-		str[len] = temp;
-		j++;
-		len--;
-	}
-	return (str);
-}
-
-/**
- * concatStrings - Concatenates two strings and returns a new dynamically
- * allocated string.
- *
- * @str1: The first string.
- *
- * @str2: The second string.
- *
- * Return: A pointer to the dynamically allocated concatenated string.
- */
-char *concatStrings(char *str1, char *str2)
-{
-	int len1 = 0, len2 = 0, i;
-	char *result;
-
-	/* Find the lengths of the input strings */
-	while (str1[len1])
-		len1++;
-	while (str2[len2])
-		len2++;
-
-	/* Allocate memory for the new concatenated string */
-	result = (char *)malloc((len1 + len2 + 1) * sizeof(char));
-
-	/* Copy the contents of the first string */
-	for (i = 0; i < len1; i++)
-		result[i] = str1[i];
-
-	/* Copy the contents of the second string */
-	for (i = 0; i < len2; i++)
-		result[len1 + i] = str2[i];
-
-	/* Null-terminate the result string */
-	result[len1 + len2] = '\0';
-
-	return (result);
-}
-
-/**
- * replaceVariables - Replaces specific variables in the input string with
- * their values.
- *
- * @input: The input string to process.
- *
- * @envp: The environment variables
- *
- * Return: A pointer to the new dynamically allocated string with replaced
- * variables.
- */
-char *replaceVariables(char *input, char **envp)
-{
-	char *replacedStr = _strdup(input), *ptr = replacedStr, *temp;
-	char pidStr[20]; /* Buffer to hold the process ID string */
-	int lastExitStatus = 0;
-
-	/* Replace $? with the exit status of the last command */
-	if (_strstr(replacedStr, "$?"))
-	{
-		intToString(lastExitStatus, pidStr);
-		ptr = _strstr(replacedStr, "$?");
-		*ptr = '\0';
-		temp = concatStrings(replacedStr, pidStr);
-		free(replacedStr);
-		replacedStr = temp;
-		ptr = replacedStr + _strlen(replacedStr); /* Update pointer to end of str */
-		_strcat(replacedStr, ptr + 2);
-	}
-
-	/* Replace $$ with the shell's process ID */
-	if (_strstr(replacedStr, "$$"))
-	{
-		intToString(getpid(), pidStr);
-		ptr = _strstr(replacedStr, "$$");
-		*ptr = '\0';
-		temp = concatStrings(replacedStr, pidStr);
-		free(replacedStr);
-		replacedStr = temp;
-		ptr = replacedStr + _strlen(replacedStr); /* Update pointer to end of str */
-		_strcat(replacedStr, ptr + 2);
-	}
-
-	/* Replace $PATH using the separate function (replacePathVariable) */
-	temp = replacePathVariable(replacedStr, envp);
-	free(replacedStr); /* Free previous replacedStr before reassigning pointer */
-	replacedStr = temp;
-
-	return (replacedStr);
 }
 

@@ -17,6 +17,7 @@
 #define PROMPT "\n($) "
 #define INITIAL_ENVP_SIZE 10
 #define MAX_PATH_LEN 100
+#define BUFFER_SIZE 1024
 
 /* Struct definitions */
 
