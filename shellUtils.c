@@ -88,7 +88,7 @@ int findExecutable(PROGARGS *args)
 	dirs = getPath(args);
 	if (!dirs || !dirs[0])
 	{
-		perror("./hsh: Dir Errror");
+		perror("./hsh: Dir Error");
 		return (-1);
 	}
 	for (i = 0; dirs[i]; i++)
