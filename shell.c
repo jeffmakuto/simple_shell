@@ -16,6 +16,7 @@ int main(int ac, char *av[], char *envp[])
 {
 	PROGARGS ShellArgs = {NULL}, *args = &ShellArgs;
 	char *prompt = NULL;
+	bool hasError = false;
 
 	startShell(args, ac, av, envp);
 
@@ -23,10 +24,10 @@ int main(int ac, char *av[], char *envp[])
 
 	if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO) && ac == 1)
 	{
-		errno = 2;
+		hasError = true;
 		prompt = PROMPT;
 	}
-	errno = 0;
+	hasError = false;
 	runShell(prompt, args);
 
 	return (0);

@@ -81,7 +81,7 @@ void replaceVariables(PROGARGS *args);
 void freeArgs(PROGARGS *args);
 void freePtrs(char **arr)
 void cleanupAfterExecution(PROGARGS *args);
-int processCommandLineArguments(int ac, char **av, char **envp);
+int handleLogicalOperators(char *commands[], int i, char operators[]);
 int checkBuiltins(PROGARGS *args);
 int cdAction(PROGARGS *args);
 int changeDirectory(PROGARGS *args, char *newDir);
@@ -103,6 +103,5 @@ int _setenv(char *name, char *value, PROGARGS *args);
 int _unsetenv(char *name, PROGARGS *args);
 void _printenv(PROGARGS *args);
 int _getline(PROGARGS *args);
-int handleLogicalOperators(char *commands[], int i, char operators[])
 
 #endif /* SHELL_H */
