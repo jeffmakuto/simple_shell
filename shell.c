@@ -17,7 +17,7 @@ int main(int ac, char *av[], char *envp[])
 	PROGARGS ShellArgs = {NULL}, *args = &ShellArgs;
 	char *prompt = NULL;
 
-	runShell(args, ac, av, envp);
+	startShell(args, ac, av, envp);
 
 	signal(SIGINT, handleCtrlC);
 
