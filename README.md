@@ -1,2 +1,2 @@
-Group Project  
-0x16. C - Simple Shell
+# Simple_Shell
+Simple Shell by fredrick mbanga and jerry juma
