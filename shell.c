@@ -33,13 +33,16 @@ int main(int ac, char *av[], char *envp[])
 }
 
 /**
- * handleCtrlC - print the prompt
+ * handleCtrlCSignal - Handles the Ctrl+C (SIGINT) signal.
  *
- * @UNUSED: option of the prototype
+ * @signal: The signal number (unused).
+ *
+ * This function is called when the program receives the Ctrl+C (SIGINT) signal.
+ * It writes a newline character and the "PROMPT" string to the standard output.
  *
  * Return: Void
  */
-void handleCtrlC(int opr UNUSED)
+void handleCtrlCSignal(int signal UNUSED)
 {
 	write(STDOUT_FILENO, "\n", 1);
 	write(STDOUT_FILENO, PROMPT, _strlen(PROMPT));
