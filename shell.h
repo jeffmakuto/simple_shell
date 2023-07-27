@@ -70,7 +70,7 @@ typedef struct BuiltinCmd
 
 /* Prototype functions */
 void startShell(PROGARGS *args, int ac, char *av[], char *envp[]);
-void runShell(char *prompt, PROGARGS *args, int *exitStatus, int *termSig);
+void runShell(char *prompt, PROGARGS *args);
 void handleCtrlCSignal(int signal);
 int checkFile(char *filePath);
 char **getPath(PROGARGS *args);

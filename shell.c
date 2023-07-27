@@ -105,9 +105,9 @@ void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
  *
  * Return: Void
  */
-void runShell(char *prompt, PROGARGS *args, int *exitStatus, int *termSig)
+void runShell(char *prompt, PROGARGS *args)
 {
-	int len = 0, execRes;
+	int len = 0, execRes, exitStatus = 0, termSig = 0;
 
 	while (1)
 	{
