@@ -17,6 +17,7 @@ int checkBuiltins(PROGARGS *args)
 		{"setenv", setenvAction},
 		{"unsetenv", unsetenvAction},
 		{"env", _envp},
+		{"exit", exitAction},
 		{NULL, NULL}
 	};
 
@@ -48,7 +49,7 @@ int cdAction(PROGARGS *args)
 
 	if (args->tokens[1])
 	{
-		if (_strcomp(args->tokens[1], "-", 0))
+		if (_strcmp(args->tokens[1], "-", 0))
 		{
 			oldDir = _getenv("OLDPWD", args);
 			if (oldDir)
@@ -88,7 +89,7 @@ int changeDirectory(PROGARGS *args, char *newDir)
 
 	getcwd(prevDir, MAX_PATH_LEN);
 
-	if (!_strcomp(prevDir, newDir, 0))
+	if (!_strcmp(prevDir, newDir, 0))
 	{
 		result = chdir(newDir);
 		if (result == -1)
@@ -116,7 +117,7 @@ int _envp(PROGARGS *args)
 	char *varCopy = NULL;
 
 	if (args->tokens[1] == NULL)
-		printEnv(args);
+		_printenv(args);
 	else
 	{
 		for (i = 0; args->tokens[1][i]; i++)
@@ -127,7 +128,7 @@ int _envp(PROGARGS *args)
 				if (varCopy != NULL)
 					_setenv(varName, args->tokens[1] + i + 1, args);
 
-				print_env(args);
+				_printenv(args);
 				if (_getenv(varName, args) == NULL)
 				{
 					write(STDOUT_FILENO, args->tokens[1], _strlen(args->tokens[1]));
