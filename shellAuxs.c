@@ -7,7 +7,7 @@
  * Return: length of @s
  */
 
-int _strlen(char *s)
+int _strlen(char *str)
 {
 	int length = 0;
 
@@ -98,7 +98,7 @@ int _strncmp(char *str1, char *str2, int n)
  *
  * @s: the reference to the string
  */
-void rev_str(char *s)
+void rev_str(char *str)
 {
 	int len = 0, i, mid, a;
 	char c = *s, temp;

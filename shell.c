@@ -105,7 +105,7 @@ void startShell(PROGARGS *args, int ac, char *av[], char *envp[])
  *
  * Return: Void
  */
-void runShell(char *prompt, PROGARGS *args)
+void runShell(char *prompt, PROGARGS *args, int *exitStatus, int *termSig)
 {
 	int len = 0, execRes;
 
@@ -128,7 +128,7 @@ void runShell(char *prompt, PROGARGS *args)
 			splitCommands(args);
 			if (args->tokens[0])
 			{
-				execRes = executeCommand(args);
+				execRes = executeCommand(args, exitStatus, termSig);
 				if (execRes)
 					perror("./hsh: Execution error");
 			}

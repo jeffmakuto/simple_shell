@@ -5,12 +5,12 @@
  *
  * @ptr: Pointer to the existing memory block.
  *
- * @new_size: The new size to allocate.
+ * @newSize: The new size to allocate.
  *
  * Return: On success, returns a pointer to the newly reallocated memory block.
  * On failure, returns NULL.
  */
-void *_realloc(void *ptr, size_t new_size)
+void *_realloc(void *ptr, size_t newSize)
 {
 	void *new_ptr;
 	size_t min_size, i;
@@ -56,7 +56,7 @@ void *_realloc(void *ptr, size_t new_size)
  *
  * Return: A integer
  */
-int _atoi(char *s)
+int _atoi(char *str)
 {
 	int c = 0;
 	unsigned int ni = 0;

@@ -65,12 +65,12 @@ typedef struct PROGARGS
 typedef struct BuiltinCmd
 {
 	char *command;
-	int (*action)(PROGARGS *data);
+	int (*action)(PROGARGS *args);
 } BuiltinCmd;
 
 /* Prototype functions */
 void startShell(PROGARGS *args, int ac, char *av[], char *envp[]);
-void runShell(char *prompt, PROGARGS *args);
+void runShell(char *prompt, PROGARGS *args, int *exitStatus, int *termSig);
 void handleCtrlCSignal(int signal);
 int checkFile(char *filePath);
 char **getPath(PROGARGS *args);
@@ -91,17 +91,20 @@ int _unsetenvAction(PROGARGS *args);
 int exitAction(PROGARGS *args);
 
 /*auxilliaries*/
-int _strlen(char *s);
-int _strcmp(char *s1, char *s2);
-int _atoi(char *s);
+int _strlen(char *str);
+int _strncmp(char *str1, char *str2, int n);
+int _atoi(char *str);
 char *_strdup(char *str);
 char *_strtok(char *line, char *delim);
 char *_strcat(char *dest, char *src);
-void *_realloc(void *ptr, size_t new_size);
+void *_realloc(void *ptr, size_t newSize);
 char *_getenv(char *name, PROGARGS *args);
 int _setenv(char *name, char *value, PROGARGS *args);
 int _unsetenv(char *name, PROGARGS *args);
 void _printenv(PROGARGS *args);
 int _getline(PROGARGS *args);
+void longToString(long num, char *str, int base);
+int buffcat(char *buffer, char *addStr);
+void rev_str(char *str);
 
 #endif /* SHELL_H */
