@@ -79,14 +79,15 @@ int executeCommand(PROGARGS *args, int *exitStatus, int *termSig);
 void splitCommands(PROGARGS *args);
 void replaceVariables(PROGARGS *args);
 void freeArgs(PROGARGS *args);
+void freePtrs(char **arr)
 void cleanupAfterExecution(PROGARGS *args);
 int processCommandLineArguments(int ac, char **av, char **envp);
 int checkBuiltins(PROGARGS *args);
 int cdAction(PROGARGS *args);
 int changeDirectory(PROGARGS *args, char *newDir);
 int _envp(PROGARGS *args);
-int _setenv(PROGARGS *args);
-int _unsetenv(PROGARGS *args);
+int _setenvAction(PROGARGS *args);
+int _unsetenvAction(PROGARGS *args);
 int exitAction(PROGARGS *args);
 
 /*auxilliaries*/

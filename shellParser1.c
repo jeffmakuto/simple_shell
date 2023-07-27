@@ -51,3 +51,91 @@ void replaceVariables(PROGARGS *args)
 	}
 }
 
+/**
+ * _getenv - get value of environment variable
+ *
+ * @key: environment variable
+ *
+ * @args: Arguments passed
+ *
+ * Return: ptr to value of var or NULL
+ */
+char *_getenv(char *name, PROGARGS *args)
+{
+	int i, nameLen = 0;
+
+	if (name == NULL || args->envp == NULL)
+		return (NULL);
+
+	nameLen = _strlen(name);
+
+	for (i = 0; args->envp[i]; i++)
+	{
+		if (_strcmp(name, args->envp[i], nameLen) &&
+				args->envp[i][nameLen] == '=')
+		{
+			return (args->envp[i] + nameLen + 1);
+		}
+	}
+	return (NULL);
+}
+
+/**
+ * cleanupAfterExecution - Free required memory
+ *
+ * @args: Arguments passed
+ *
+ * Return: Void
+ */
+void cleanupAfterExecution(PROGARGS *args)
+{
+	if (args->tokens)
+		freePtrs(args->tokens);
+	if (args->buffer)
+		free(args->buffer);
+	if (args->cmd)
+		free(args->cmd);
+
+	args->buffer = NULL;
+	args->cmd = NULL;
+	args->tokens = NULL;
+}
+
+/**
+ * freeArgs - Free all memory
+ *
+ * @args: Arguments passed
+ *
+ * Return: Void
+ */
+void freeArgs(PROGARGS *args)
+{
+	if (args->fd != 0)
+	{
+		if (close(args->fd))
+			perror("./hsh: ");
+	}
+	cleanupAfterExecution(args);
+	freePtrs(args->envp);
+}
+
+/**
+ * freePtrs - Free memory allocated to pointers
+ *
+ * @arr: Array of pointers
+ *
+ * Return: Void
+ */
+void freePtrs(char **arr)
+{
+	int i;
+
+	if (arr)
+	{
+		for (i = 0; arr[i]; i++)
+			free(arr[i]);
+
+		free(arr);
+		arr = NULL;
+	}
+}
