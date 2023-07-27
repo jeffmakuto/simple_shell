@@ -4,15 +4,11 @@
  * checkBuiltins - checks if a command is a built-in one and
  * performs associated action
  *
- * @cmd: the command to be checked
+ * @args: The arguments passed to the checked
  *
- * @args: the arguments passed to the command
- *
- * @envp: The environment variables
- *
- * Return: 1 if the command is a built-in one else 0
+ * Return: 1 return executed cmd  else -1
  */
-int checkBuiltins(char *cmd, char **args, char **envp)
+int checkBuiltins(PROGARGS *args)
 {
 	int i;
 
@@ -25,41 +21,25 @@ int checkBuiltins(char *cmd, char **args, char **envp)
 
 	i = 0;
 
-	while (builtins[i].cmd)
+	while (builtins[i].command)
 	{
-		if (_strcmp(cmd, builtins[i].cmd) == 0)
+		if (_strcmp(builtins[i].command), args->cmd, 0)
 		{
-			if (builtins[i].action)
-				builtins[i].action(args, envp);
-			return (1); /* it's a built-in command */
+			return (builtins[i].action(args));
 		}
 		i++;
 	}
-	return (0); /* not a built-in command */
+	return (-1);
 }
 
 /**
  * cdAction - change directory to the specified path.
  *
- * @args: An array of command arguments where args[1]
- * contains the target directory path.
+ * @args: An array of command arguments
  *
- * @envp: The environment variables
- *
- * This function changes the current working directory
- * to the specified path.
- *
- * If no argument is provided, it displays an error message.
- * If the argument is "~", it changes the directory to the
- * home directory.
- * If the argument is "-", it changes the directory to the
- * previous directory.
- * The function also updates the OLDPWD environment variable
- *and displays the new path.
- *
- * Return: Void
+ * Return: 0 on sucess
  */
-void cdAction(char **args, char **envp)
+int cdAction(char **args, char **envp)
 {
 	char *targetDir;
 

@@ -51,6 +51,21 @@ typedef struct PROGARGS
 	char **envp;
 } PROGARGS;
 
+/**
+ * struct BuiltinCmd - Represents a built-in command.
+ *
+ * @cmd: The command string.
+ *
+ * @action: A pointer to the function that implements the command's action.
+ *
+ * The BuiltinCmd struct defines a built-in command and its associated action.
+ */
+typedef struct BuiltinCmd
+{
+	char *command;
+	int (*action)(PROGARGS *data);
+} BuiltinCmd;
+
 /* Prototype functions */
 void startShell(PROGARGS *args, int ac, char *av[], char *envp[]);
 void runShell(char *prompt, PROGARGS *args);
