@@ -8,7 +8,6 @@
  *
  * Return: 0 success, error code on fail
  */
-
 int findExecutable(PROGARGS *args)
 {
 	int i = 0, result = 0;
@@ -32,16 +31,14 @@ int findExecutable(PROGARGS *args)
 	{
 		dirs[i] = _strcat(dirs[i], args->tokens[0]);
 		result = checkFile(dirs[i]);
-		 /* If file's found and executable, update and return 0 (success).*/
-		if (!result)
+		if (!result)/* If file's found and executable.*/
 		{
 			free(args->tokens[0]);
 			args->tokens[0] = _strdup(dirs[i]);
 			freePtrs(dirs);
 			return (0);
 		}
-		/* If file's non-executable, print error  message and return -1 (failure). */
-		else if (result == -1 && errno == EACCES)
+		else if (result == -1 && errno == EACCES)/*If file's non-executable*/
 		{
 			perror("./hsh: Permission denied");
 			free(args->tokens[0]);
