@@ -101,4 +101,47 @@ int changeDirectory(PROGARGS *args, char *newDir)
 	setenvAction("OLDPWD", prevDir, args);
 	return (0);
 }
+/**
+ * _envp - show the environment
+ *
+ * @args: The arguments passed
+ *
+ * Return: 0 on success
+ */
+int _envp(PROGARGS *args)
+{
+	int i;
+	char varName[MAX_PATH_LEN] = {'\0'};
+	char *varCopy = NULL;
 
+	if (args->tokens[1] == NULL)
+		printEnv(args);
+	else
+	{
+		for (i = 0; args->tokens[1][i]; i++)
+		{
+			if (args->tokens[1][i] == '=')
+			{
+				varCopy = _strdup(_getenv(varName, args));
+				if (varCopy != NULL)
+					_setenv(varName, args->tokens[1] + i + 1, args);
+
+				print_env(args);
+				if (_getenv(varName, args) == NULL)
+				{
+					write(STDOUT_FILENO, args->tokens[1], _strlen(args->tokens[1]));
+					write(STDOUT_FILENO, "\n", 1);
+				}
+				else
+				{
+					_setenv(varName, varCopy, args);
+					free(varCopy);
+				}
+				return (0);
+			}
+			varName[i] = args->tokens[1][i];
+		}
+		perror("./hsh:");
+	}
+	return (0);
+}
