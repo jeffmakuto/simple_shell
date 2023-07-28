@@ -7,59 +7,23 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 #include <dirent.h>
+#include <limits.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <stdbool.h>
-#include <stddef.h>
 
 /* Define macros */
 #define PROMPT "\n($) "
-#define INITIAL_ENVP_SIZE 10
-#define MAX_PATH_LEN 100
-#define BUFFER_SIZE 1024
+#define MAX_ARGS 100
 
 /* Struct definitions */
 
 /**
- * struct prog_args - Represents the arguments and information for a
- * builtin command.
- *
- * @progName: The name of the program or command.
- *
- * @buffer: The buffer to store the input command line.
- *
- * @cmd: The command string.
- *
- * @count: The number of times the command has been executed.
- *
- * @fd: The file descriptor used for I/O redirection.
- *
- * @tokens: An array of strings representing the tokenized command arguments.
- *
- * @envp: An array of strings representing the environment variables.
- *
- * This struct holds various information related to a builtin command.
- * It is used to pass and store command-specific arguments and data.
- */
-typedef struct prog_args
-{
-	char *prog_name;
-	char *buffer;
-	char *cmd;
-	int count;
-	int fd;
-	char **tokens;
-	char **envp;
-	char **alias_list;
-} prog_args;
-
-/**
  * struct builtin_cmd - Represents a built-in command.
  *
- * @command: The command string.
+ * @cmd: The command string.
  *
  * @action: A pointer to the function that implements the command's action.
  *
@@ -67,55 +31,53 @@ typedef struct prog_args
  */
 typedef struct builtin_cmd
 {
-	char *command;
-	int (*action)(prog_args *args);
+	char *cmd;
+	void (*action)(char **args, char **envp);
 } builtin_cmd;
 
 /* Prototype functions */
-void start_shell(prog_args *args, int ac, char *av[], char *envp[]);
-void run_shell(char *prompt, prog_args *args);
-void handle_ctrl_c_signal(int signal);
-int find_executable(prog_args *args);
-int check_file(char *file_path);
-char **get_path(prog_args *args);
-int execute_command(prog_args *args);
-void process_command(prog_args *args);
-void replace_variables(prog_args *args);
-void free_args(prog_args *args);
-void free_ptrs(char **arr);
-void cleanup_after_execution(prog_args *args);
-int handle_logical_operators(char *commands[], int i, char operators[]);
-int check_builtins(prog_args *args);
-int cd_action(prog_args *args);
-int change_directory(prog_args *args, char *new_dir);
-int env_action(prog_args *args);
-int setenv_action(prog_args *args);
-int unsetenv_action(prog_args *args);
-int exit_action(prog_args *args);
-void expand_alias(prog_args *args);
-int alias_action(prog_args *args);
-int print_alias(prog_args *args, char *alias);
-char *get_alias(prog_args *args, char *alias);
-int set_alias(char *alias_str, prog_args *args);
+void run_interactive_mode(char **envp);
+void run_non_interactive_mode(char **envp);
+char **handle_semi_coloned_commands(char *cmd, int *num_commands);
+int handle_and_operator(char *cmd, char **envp);
+int handle_or_operator(char *cmd, char **envp);
+int process_command_input(char *cmd, char **envp);
+int process_single_command(char *cmd, char **envp, int *last_exit_status_ptr);
+char *replace_variables(char *input, char **envp);
+char *replace_path_variable(char *input, char **envp);
+char *int_to_string(int num, char *str);
+char *concat_strings(char *str1, char *str2);
+char **process_command(char *cmd);
+void execute_command(char **args, char **envp);
+int check_builtins(char *cmd, char **args, char **envp);
+bool is_absolutePath(char *path);
+int is_executable(char *path);
+char *find_executable(char *cmd, char **envp);
+int process_commandLine_arguments(int ac, char **av, char **envp);
+void cd_action(char **args, char **envp);
+int change_directory(char *target_dir);
+void setenv_action(char **args, char **envp);
+void unsetenv_action(char **args, char **envp);
 
 /*auxilliaries*/
-int _strlen(char *str);
-int _strncmp(char *str1, char *str2, int n);
-int _atoi(char *str);
+int _strlen(char *s);
+int _strcmp(char *s1, char *s2);
+int _atoi(char *s);
+char *_strchr(char *s, char c);
 char *_strdup(char *str);
+char *_memcpy(char *dest, char *src, unsigned int n);
+char *_strstr(char *haystack, char *needle);
 char *_strtok(char *line, char *delim);
+char *_strncpy(char *dest, char *src, int n);
 char *_strcat(char *dest, char *src);
-char *_getenv(char *name, prog_args *args);
-int _setenv(char *name, char *value, prog_args *args);
-int _unsetenv(char *name, prog_args *args);
-void _printenv(prog_args *args);
-int _getline(prog_args *args);
-void long_to_str(long num, char *str, int base);
-int buffcat(char *buffer, char *add_str);
-void rev_str(char *str);
-int _print(char *str);
-int _printe(char *str);
-int print_err(int err, prog_args *args);
-int count_chars(char *str, char *chars);
+void *_realloc(void *ptr, size_t new_size);
+char *_getenv(char *name, char **envp);
+int _strncmp(const char *str1, const char *str2, size_t n);
+size_t _strcspn(const char *str, const char *reject);
+char *_strtok_r(char *str, const char *delimiters, char **save_ptr);
+unsigned int _strspn(char *s, const char *accept);
+ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
+void free_args(char **args);
 
 #endif /* SHELL_H */
+

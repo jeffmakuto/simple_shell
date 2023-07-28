@@ -1,132 +1,77 @@
 #include "shell.h"
 
 /**
- * _strdup - it duplicates the string
+ * _strchr - Locates character in string.
  *
- * @str: string to be duplicated
+ * @s: Pointer to string where character is located from.
+ * @c: Character to be located.
  *
- * Return: pointer to @str
+ * Return: Pointer to first occurrence of @c in @s,
+ *	   NULL if character is not found.
  */
+char *_strchr(char *s, char c)
+{
+	unsigned int i = 0;
+
+	for (; *(s + i) != '\0'; i++)
+		if (*(s + i) == c)
+			return (s + i);
+	if (*(s + i) == c)
+		return (s + i);
+	return ('\0');
+}
+/**
+ * _strdup -  function that duplicates a string
+ * in a newly allocated space in memory.
+ * @str: string to be copied.
+ * Return: Duplicated string in success.
+ */
+
 char *_strdup(char *str)
 {
-	char *result;
-	int len, i;
+	int a, b;
+	char *new_s;
 
 	if (str == NULL)
 		return (NULL);
 
-	len = _strlen(str) + 1;
+	a = _strlen(str) + 1;
 
-	result = malloc(sizeof(char) * len);
+	new_s = malloc(sizeof(char) * (a));
 
-	if (result == NULL)
+	if (new_s == NULL)
 	{
-		errno = ENOMEM;
-		perror("Error");
-		return (NULL);
-	}
-	for (i = 0; i < len ; i++)
-	{
-		result[i] = str[i];
-	}
-
-	return (result);
-}
-
-/**
- * _strncmp - compares 2  strings of a certain size
- *
- * @str1: 1st string
- *
- * @str2: 2nd string
- *
- * @num: number of chars to be compared, 0 if infinite
- *
- * Return: 1 if the strings are similar, 0 if the strings are not
- */
-int _strncmp(char *str1, char *str2, int num)
-{
-	int i;
-
-	if (str1 == NULL && str2 == NULL)
-		return (1);
-
-	if (str1 == NULL || str2 == NULL)
-		return (0);
-
-	if (num == 0)
-	{
-		if (_strlen(str1) != _strlen(str2))
-			return (0);
-		for (i = 0; str1[i]; i++)
-		{
-			if (str1[i] != str2[i])
-				return (0);
-		}
-		return (1);
-	}
-	else
-	{
-		for (i = 0; i < num ; i++)
-		{
-			if (str1[i] != str2[i])
-			return (0);
-		}
-		return (1);
-	}
-}
-
-/**
- * _strcat - concatenate strings.
- *
- * @str1: 1st string
- *
- * @str2: 2nd string
- *
- * Return: pointer to the string
- */
-char *_strcat(char *str1, char *str2)
-{
-	char *result;
-	int len1 = 0, len2 = 0;
-
-	if (str1 == NULL)
-		str1 = "";
-	len1 = _strlen(str1);
-
-	if (str2 == NULL)
-		str2 = "";
-	len2 = _strlen(str2);
-
-	result = malloc(sizeof(char) * (len1 + len2 + 1));
-	if (result == NULL)
-	{
-		errno = ENOMEM;
-		perror("Error");
+		perror("./hsh");
 		return (NULL);
 	}
 
-	for (len1 = 0; str1[len1] != '\0'; len1++)
-		result[len1] = str1[len1];
-	free(str1);
+	for (b = 0; b < a; b++)
+		new_s[b] = str[b];
 
-	for (len2 = 0; str2[len2] != '\0'; len2++)
-	{
-		result[len1] = str2[len2];
-		len1++;
-	}
-
-	result[len1] = '\0';
-	return (result);
+	return (new_s);
 }
+/**
+ * _memcpy - copies n bytes from src to dest memory area
+ *
+ * @n: bytes to be copied
+ * @src: memmory area to be copied from
+ * @dest: momory area copied to
+ *
+ * Return: pointer to dest
+ */
+char *_memcpy(char *dest, char *src, unsigned int n)
+{
+	unsigned int x;
 
+	for (x = 0; x < n; x++)
+		*(dest + x) = *(src + x);
+
+	return (dest);
+}
 /**
  * _strtok - separates strings with delimiters
- *
  * @line: It´s pointer to array we receive in getline.
- *
  * @delim: It´s characters we mark off string in parts.
- *
  * Return: A pointer to the created token
 */
 char *_strtok(char *line, char *delim)
@@ -166,23 +111,32 @@ char *_strtok(char *line, char *delim)
 }
 
 /**
- * buffcat - append string at end of buffer
- *
- * @buffer: buffer to be filled
- *
- * @addStr: string to be put in buffer
- *
- * Return: length of concatenated buffer
+ **_strncpy - copies a string
+ *@dest: the destination string to be copied to
+ *@src: the source string
+ *@n: the amount of characters to be copied
+ *Return: the concatenated string
  */
-int buffcat(char *buffer, char *addStr)
+char *_strncpy(char *dest, char *src, int n)
 {
-	int len, i;
+	int i, j;
+	char *s = dest;
 
-	len = _strlen(buffer);
-	for (i = 0; addStr[i]; i++)
+	i = 0;
+	while (src[i] != '\0' && i < n - 1)
 	{
-		buffer[len + i] = addStr[i];
+		dest[i] = src[i];
+		i++;
 	}
-	buffer[len + i] = '\0';
-	return (len + i);
+	if (i < n)
+	{
+		j = i;
+		while (j < n)
+		{
+			dest[j] = '\0';
+			j++;
+		}
+	}
+	return (s);
 }
+

@@ -1,163 +1,141 @@
 #include "shell.h"
-
-/**
-* _getline - read input.
-*
-* @args: commands passed
-*
-* Return: read bytes.
-*/
-int _getline(prog_args *args)
-{
-	char buffer[BUFFER_SIZE] = {'\0'};
-	static char *commands[10] = {NULL};
-	static char operators[10] = {'\0'};
-	ssize_t bytes_read, i = 0;
-
-	/* check if there are no more commands in the array */
-	/* also check the logical operators */
-	if (!commands[0] || (operators[0] == '&' && errno != 0) ||
-			(operators[0] == '|' && errno == 0))
-	{
-		/*free the memory allocated in the array if it exists */
-		for (i = 0; commands[i]; i++)
-		{
-			free(commands[i]);
-			commands[i] = NULL;
-		}
-
-		/* read from the file descriptor into the buffer */
-		bytes_read = read(args->fd, &buffer, BUFFER_SIZE - 1);
-		if (bytes_read == 0)
-			return (-1);
-
-		/* check  for '\n' or ; */
-		i = 0;
-		do {
-			commands[i] = _strdup(_strtok(i ? NULL : buffer, "\n;"));
-			/*checks and split for && and || operators*/
-			i = handle_logical_operators(commands, i, operators);
-		} while (commands[i++]);
-	}
-
-	/* obtain the next command (command 0) and remove it for the array */
-	args->buffer = commands[0];
-	for (i = 0; commands[i]; i++)
-	{
-		commands[i] = commands[i + 1];
-		operators[i] = operators[i + 1];
-	}
-
-	return (_strlen(args->buffer));
-}
-
-/**
- * _atoi - converts string to integer
- *
- * @str: pointer to the string
- *
- * Return: 0, or string int
- */
-int _atoi(char *str)
-{
-	int sign = 1;
-	unsigned int num = 0;
-
-	while (!('0' <= *str && *str <= '9') && *str != '\0')
-	{
-		if (*str == '-')
-			sign *= -1;
-		if (*str == '+')
-			sign *= +1;
-		str++;
-	}
-
-	while ('0' <= *str && *str <= '9' && *str != '\0')
-	{
-
-		num = (num * 10) + (*str - '0');
-		str++;
-	}
-	return (num * sign);
-}
-
-
-/**
- * long_to_str - converts integer to string.
- *
- * @num: integer to convert
- *
- * @str: buffer to save the integer as string.
- *
- * @base: base for conversion
- *
- * Return: void
- */
-void long_to_str(long num, char *str, int base)
-{
-	int i = 0, is_negative = 0;
-	long quotient = num;
-	char letters[] = {"0123456789abcdefghijklmnopqrstuvwxyz"};
-
-	if (!quotient)
-		str[i++] = '0';
-
-	if (str[0] == '-')
-		is_negative = 1;
-
-	while (quotient)
-	{
-		if (quotient < 0)
-			str[i++] = letters[-(quotient % base)];
-		else
-			str[i++] = letters[quotient % base];
-		quotient /= base;
-	}
-	if (is_negative)
-		str[i++] = '-';
-
-	str[i] = '\0';
-	rev_str(str);
-}
-
-/**
- * rev_str - reverses a string.
- *
- * @str: pointer to string.
- *
- * Return: void.
- */
-void rev_str(char *str)
-{
-
-	int i = 0, len = _strlen(str) - 1;
-	char hold;
-
-	while (i < len)
-	{
-		hold = str[i];
-		str[i++] = str[len];
-		str[len--] = hold;
-	}
-}
-
 /**
  * _strlen - returns length of a string
+ * @s: string to get length of
  *
- * @str: string to get length of
- *
- * Return: length of @str
+ * Return: length of @s
  */
 
-int _strlen(char *str)
+int _strlen(char *s)
 {
-	int len = 0;
+	int length = 0;
 
-	while (*str++)
+	while (*s++)
 	{
-		len++;
+		length++;
 	}
 
-	return (len);
+	return (length);
+}
+/**
+ * _strcmp - function compares two strings.
+ * @s1: first string to compare.
+ * @s2: second string to compare.
+ *
+ * Return: If s1 is less than s2 (less than 0),
+ * If s1 equal to s2 (0), s1 is greater than s2 (greater than 0).
+ */
+int _strcmp(char *s1, char *s2)
+{
+	while (*s1 == *s2)
+	{
+		if (*s1 == '\0')
+		{
+			return (0);
+		}
+		s1++;
+		s2++;
+	}
+	return (*s1 - *s2);
+}
+/**
+ * _strstr - Finds the first occurence of the
+ *	     substring @needle in string @haystack.
+ *
+ * @needle: Substring to be located.
+ * @haystack: Location of substring @needle.
+ *
+ * Return: Pointer to the beginning of located substring.
+ *	   NULL if substring is not found.
+ */
+char *_strstr(char *haystack, char *needle)
+{
+	char *cow;
+	char *tayler;
+
+	while (*haystack != '\0')
+	{
+		cow = haystack;
+		tayler = needle;
+
+		while (*haystack != '\0' && *tayler != '\0' && *haystack == *tayler)
+		{
+			haystack++;
+			tayler++;
+		}
+		if (!*tayler)
+			return (cow);
+		haystack = cow + 1;
+	}
+	return (0);
+}
+/**
+ * _atoi - Convert a string to an integer.
+ * @s: The pointer to convert
+ *
+ * Return: A integer
+ */
+int _atoi(char *s)
+{
+	int c = 0;
+	unsigned int ni = 0;
+	int min = 1;
+	int isi = 0;
+
+	while (s[c])
+	{
+		if (s[c] == 45)
+		{
+			min *= -1;
+		}
+
+		while (s[c] >= 48 && s[c] <= 57)
+		{
+			isi = 1;
+			ni = (ni * 10) + (s[c] - '0');
+			c++;
+		}
+
+		if (isi == 1)
+		{
+			break;
+		}
+
+		c++;
+	}
+
+	ni *= min;
+	return (ni);
+}
+
+/**
+ * _strcat - concatenates strings @dest and @src to @dest
+ *
+ * @dest: the string to append @src to
+ *
+ * @src: the string to be appended to @dest
+ *
+ * Return: a pointer to @dest
+ */
+char *_strcat(char *dest, char *src)
+{
+	char *p = dest;
+
+	/* move dest pointer to end of string */
+	for (; *dest; dest++)
+	{
+		/* empty */
+	}
+
+	/* copy from src to dest */
+	for (; *src; src++, dest++)
+	{
+		*dest = *src;
+	}
+
+	/* set null char at the new end */
+	*dest = 0;
+
+	return (p);
 }
 

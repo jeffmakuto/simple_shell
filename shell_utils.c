@@ -1,215 +1,172 @@
 #include "shell.h"
 
 /**
- * execute_command - execute string of arguments
+ * process_command - processes an array of string commands
  *
- * @args: arguments passed
+ * @cmd: the commands to be processed
  *
- * Return: 0 on success, -1 on fail
+ * Return: array of string commands
  */
-int execute_command(prog_args *args)
+char **process_command(char *cmd)
 {
-	int result = 0, status;
-	pid_t pid;
+	char **args = malloc(sizeof(char *) * MAX_ARGS), *token;
+	int arg_count = 0;
 
-	result = check_builtins(args);
-	if (result != -1)
-		return (result);
-
-	result = find_executable(args);
-	if (result)
-		return (result);
-
-	pid = fork();
-
-	if (pid == -1)
+	if (!args)
 	{
-		perror(args->cmd);
-		exit(EXIT_FAILURE);
-	}
-
-	if (pid == 0)
-	{
-		result = execve(args->tokens[0], args->tokens, args->envp);
-			if (result == -1)
-			{
-				perror(args->cmd);
-				exit(EXIT_FAILURE);
-			}
-	}
-	else
-	{
-		waitpid(pid, &status, 0);
-
-		if (WIFEXITED(status))
-			errno = WEXITSTATUS(status);
-		else if (WIFSIGNALED(status))
-			errno = 128 + WTERMSIG(status);
-	}
-	return (0);
-}
-
-/**
- * process_command - processes an array of string commands into tokens
- *
- * @args: commands passed
- *
- * Return: tokens
- */
-void process_command(prog_args *args)
-{
-	char *delims = " \t";
-	int i, j, count = 2, len;
-
-	len = _strlen(args->buffer);
-	if (len)
-	{
-		if (args->buffer[len - 1] == '\n')
-			args->buffer[len - 1] = '\0';
-	}
-
-	for (i = 0; args->buffer[i]; i++)
-	{
-		for (j = 0; delims[j]; j++)
-		{
-			if (args->buffer[i] == delims[j])
-				count++;
-		}
-	}
-
-	args->tokens = malloc(count * sizeof(char *));
-	if (args->tokens == NULL)
-	{
-		perror(args->prog_name);
-		exit(errno);
-	}
-	i = 0;
-	args->tokens[i] = _strdup(_strtok(args->buffer, delims));
-	args->cmd = _strdup(args->tokens[0]);
-	while (args->tokens[i++])
-	{
-		args->tokens[i] = _strdup(_strtok(NULL, delims));
-	}
-}
-
-/**
- * get_path - tokenize path in directories
- *
- * @args: commands passed
- *
- * Return: array of path dirs
- */
-
-char **get_path(prog_args *args)
-{
-	int i = 0;
-	int count_dirs = 2;
-	char **tokens = NULL;
-	char *PATH;
-
-	PATH = _getenv("PATH", args);
-	if ((PATH == NULL) || PATH[0] == '\0')
-	{
+		perror("./hsh: malloc error");
 		return (NULL);
 	}
-
-	PATH = _strdup(PATH);
-
-	for (i = 0; PATH[i]; i++)
+	/* Ignore anything after the '#' character (comment handling) */
+	token = _strtok(cmd, "#");
+	if (!token)
 	{
-		if (PATH[i] == ':')
-			count_dirs++;
+		free(args);
+		return (NULL);
 	}
-
-	tokens = malloc(sizeof(char *) * count_dirs);
-
-	i = 0;
-	tokens[i] = _strdup(_strtok(PATH, ":"));
-	while (tokens[i++])
+	token = _strtok(cmd, " ");
+	while (token && arg_count < MAX_ARGS)
 	{
-		tokens[i] = _strdup(_strtok(NULL, ":"));
-	}
+		args[arg_count] = _strdup(token);
 
-	free(PATH);
-	PATH = NULL;
-	return (tokens);
-
-}
-
-/**
- * check_file - checks if a file exists, it's not a dir and
- * has excecution permisions for permisions.
- *
- * @file_path: pointer to full file name
- *
- * Return: 0 success, error code on fail
- */
-
-int check_file(char *file_path)
-{
-	struct stat stat_buff;
-
-	if (stat(file_path, &stat_buff) != -1)
-	{
-		if (S_ISDIR(stat_buff.st_mode) ||  access(file_path, X_OK))
+		if (!args[arg_count])
 		{
-			errno = 126;
-			return (126);
+			perror("./hsh: strdup error");
+			/* Free previously allocated strings */
+			free_args(args);
+			return (NULL);
 		}
-		return (0);
+		arg_count++;
+
+		if (_strchr(token, '\n'))
+		{
+			args[arg_count] = NULL;
+			break; /* Exit the loop after setting NULL terminator */
+		}
+		token = _strtok(NULL, " ");
 	}
-	errno = 127;
-	return (127);
+	free(token);
+
+	args[arg_count] = NULL;
+	return (args);
 }
 
 /**
- * replace_variables - replaces specific variables in the input string with
- * their values
+ * execute_command - execute string of arguments
  *
- * @args: commands passed
+ * @args: string of arguments to be executed
  *
- * Return: void
+ * @envp: environment variable arguments
+ *
+ * Return: Void
  */
-void replace_variables(prog_args *args)
+void execute_command(char **args, char **envp)
 {
-	int i, j;
-	char line[BUFFER_SIZE] = {0}, expansion[BUFFER_SIZE] = {'\0'}, *temp;
+	pid_t pid;
+	int status;
 
-	if (args->buffer == NULL)
+	pid = fork();
+	if (pid < 0)
+	{
+		perror("./hsh: fork error");
 		return;
-	buffcat(line, args->buffer);
-	for (i = 0; line[i]; i++)
-		if (line[i] == '#')
-			line[i--] = '\0';
-		else if (line[i] == '$' && line[i + 1] == '?')
-		{
-			line[i] = '\0';
-			long_to_str(errno, expansion, 10);
-			buffcat(line, expansion);
-			buffcat(line, args->buffer + i + 2);
-		}
-		else if (line[i] == '$' && line[i + 1] == '$')
-		{
-			line[i] = '\0';
-			long_to_str(getpid(), expansion, 10);
-			buffcat(line, expansion);
-			buffcat(line, args->buffer + i + 2);
-		}
-		else if (line[i] == '$' && (line[i + 1] == ' ' || line[i + 1] == '\0'))
-			continue;
-		else if (line[i] == '$')
-		{
-			for (j = 1; line[i + j] && line[i + j] != ' '; j++)
-				expansion[j - 1] = line[i + j];
-			temp = _getenv(expansion, args);
-			line[i] = '\0', expansion[0] = '\0';
-			buffcat(expansion, line + i + j);
-			temp ? buffcat(line, temp) : 1;
-			buffcat(line, expansion);
-		}
-	if (!_strncmp(args->buffer, line, 0))
-	{
-		free(args->buffer);
-		args->buffer = _strdup(line);
 	}
+	if (pid == 0)
+	{
+		if (execve(args[0], args, envp) == -1)
+		{
+			perror("./hsh: execve error");
+			exit(EXIT_FAILURE);
+		}
+	}
+	else
+		waitpid(pid, &status, 0);
 }
+
+/**
+ * is_absolute_path - Checks if the given path is an absolute path.
+ *
+ * @path: The path to check.
+ *
+ * Return: true if the path is an absolute path and executable,
+ * false otherwise.
+ */
+bool is_absolute_path(char *path)
+{
+	if (path[0] == '/')
+	{
+		if (is_executable(path))
+			return (true);
+		perror("./hsh: ");
+		return (false);
+	}
+	return (false);
+}
+
+/**
+ * is_executable - Checks if the given path is executable.
+ *
+ * @path: The path to check.
+ *
+ * Return: 1 if the path is executable, 0 otherwise.
+ */
+int is_executable(char *path)
+{
+	/* Check if the given path is executable */
+	return (access(path, X_OK) == 0);
+}
+
+/**
+ * find_executable - Searches for the executable in the system's
+ * PATH environment variable.
+ *
+ * @cmd: The command to find.
+ *
+ * @envp: The environment variables
+ *
+ * Return: A pointer to the executable path if found, NULL otherwise.
+ */
+char *find_executable(char *cmd, char **envp)
+{
+	char *path = _getenv("PATH", envp), *path_env, *dir, *executable_path;
+	size_t dir_len, cmd_len;
+	char *found_executable = NULL;
+
+	if (is_absolute_path(cmd))
+		return (_strdup(cmd));
+	if (!path)
+	{
+		perror("./hsh: PATH environment variable not found");
+		return (NULL);
+	}
+	path_env = _strdup(path);
+	dir = _strtok(path_env, ":");
+	while (dir)
+	{
+		dir_len = _strlen(dir);
+		cmd_len = _strlen(cmd);
+		executable_path = malloc(dir_len + cmd_len + 2);
+		if (!executable_path)
+		{
+			perror("./hsh: Memory allocation failed");
+			free(path_env);
+			return (NULL);
+		}
+		_memcpy(executable_path, dir, dir_len);
+		executable_path[dir_len] = '/';
+		_memcpy(executable_path + dir_len + 1, cmd, cmd_len + 1);
+		if (is_executable(executable_path))
+		{
+			found_executable = executable_path;
+			break;
+		}
+		free(executable_path);
+		dir = _strtok(NULL, ":");
+	}
+	free(path_env);
+	if (found_executable)
+		return (found_executable);
+	perror("./hsh: ");
+	return (NULL);
+}
+
