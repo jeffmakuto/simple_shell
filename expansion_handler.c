@@ -51,48 +51,6 @@ void expand_variables(info_t *info)
 }
 
 /**
- * expand_alias - expand the alias
- * @info: commands passed
- *
- * Return: void, sets errno.
- */
-void expand_alias(info_t *info)
-{
-	int i, j, expanded = 0;
-	char line[BUFFER_SIZE] = {0}, expansion[BUFFER_SIZE] = {'\0'}, *temp;
-
-	if (info->buff == NULL)
-		return;
-
-	buffer_cat(line, info->buff);
-
-	for (i = 0; line[i]; i++)
-	{
-		for (j = 0; line[i + j] && line[i + j] != ' '; j++)
-			expansion[j] = line[i + j];
-		expansion[j] = '\0';
-
-		temp = get_alias(info, expansion);
-		if (temp)
-		{
-			expansion[0] = '\0';
-			buffer_cat(expansion, line + i + j);
-			line[i] = '\0';
-			buffer_cat(line, temp);
-			line[_strlen(line)] = '\0';
-			buffer_cat(line, expansion);
-			expanded = 1;
-		}
-		break;
-	}
-	if (expanded)
-	{
-		free(info->buff);
-		info->buff = _strdup(line);
-	}
-}
-
-/**
  * buffer_cat - append string at end of buffer
  * @buffer: buffer to be filled
  * @str_to_add: string to be put in buffer

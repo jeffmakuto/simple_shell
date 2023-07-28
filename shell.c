@@ -78,11 +78,6 @@ void start_shell(info_t *info, int ac, char *av[], char **env)
 	info->env[i] = NULL;
 	env = info->env;
 
-	info->alias_list = malloc(sizeof(char *) * 20);
-	for (i = 0; i < 20; i++)
-	{
-		info->alias_list[i] = NULL;
-	}
 }
 /**
  * run_shell - loops the prompt
@@ -105,7 +100,6 @@ void run_shell(char *prompt, info_t *info)
 		}
 		if (len >= 1)
 		{
-			expand_alias(info);
 			expand_variables(info);
 			process_command(info);
 			if (info->tokens[0])

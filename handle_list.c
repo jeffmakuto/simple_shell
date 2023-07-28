@@ -13,8 +13,6 @@ int builtins_list(info_t *info)
 		{"setenv", setenv_action},
 		{"unsetenv", unsetenv_action},
 		{"exit", exit_action},
-		{"help", help_action},
-		{"alias", alias_action},
 		{"env", env_action},
 		{NULL, NULL}
 	};

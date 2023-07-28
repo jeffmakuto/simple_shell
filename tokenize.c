@@ -1,7 +1,7 @@
 #include "shell.h"
 /**
- * tokenize - this function separate the string using a designed delimiter
- * @data: a pointer to the program's data
+ * process_command - this function separate the string using a delimiter
+ * @info: a pointer to the program's data
  * Return: an array of the different parts of the string
  */
 void process_command(info_t *info)
