@@ -1,5 +1,5 @@
 /**
- * countChars - count the number of characters in a string.
+ * count_chars - count the number of characters in a string.
  *
  * @str: pointer to string
  *
@@ -7,7 +7,7 @@
  *
  * Return: 0, or string integer
  */
-int countChars(char *str, char *chars)
+int count_chars(char *str, char *chars)
 {
 	int i = 0, count = 0;
 

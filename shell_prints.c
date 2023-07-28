@@ -24,7 +24,7 @@ int _printe(char *str)
 }
 
 /**
- * printErr - prints error codes with their meaning
+ * print_err - prints error codes with their meaning
  *
  * @args: commands passed
  *
@@ -32,17 +32,17 @@ int _printe(char *str)
  *
  * Return: numbers of bytes printed
  */
-int printErr(int err, PROGARGS *args)
+int print_err(int err, prog_args *args)
 {
-	char numToStr[INITIAL_ENVP_SIZE] = {'\0'};
+	char num_to_str[INITIAL_ENVP_SIZE] = {'\0'};
 
-	longToStr((long) args->count, numToStr, INITIAL_ENVP_SIZE);
+	long_to_str((long) args->count, num_to_str, INITIAL_ENVP_SIZE);
 
 	if (err == 2 || err == 3)
 	{
-		_printe(args->progName);
+		_printe(args->prog_name);
 		_printe(": ");
-		_printe(numToStr);
+		_printe(num_to_str);
 		_printe(": ");
 		_printe(args->tokens[0]);
 		if (err == 2)
@@ -54,18 +54,18 @@ int printErr(int err, PROGARGS *args)
 	}
 	else if (err == 127)
 	{
-		_printe(args->progName);
+		_printe(args->prog_name);
 		_printe(": ");
-		_printe(numToStr);
+		_printe(num_to_str);
 		_printe(": ");
 		_printe(args->cmd);
 		_printe(": not found\n");
 	}
 	else if (err == 126)
 	{
-		_printe(args->progName);
+		_printe(args->prog_name);
 		_printe(": ");
-		_printe(numToStr);
+		_printe(num_to_str);
 		_printe(": ");
 		_printe(args->cmd);
 		_printe(": Permission denied\n");

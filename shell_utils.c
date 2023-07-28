@@ -1,22 +1,22 @@
 #include "shell.h"
 
 /**
- * executeCommand - execute string of arguments
+ * execute_command - execute string of arguments
  *
  * @args: arguments passed
  *
  * Return: 0 on success, -1 on fail
  */
-int executeCommand(PROGARGS *args)
+int execute_command(prog_args *args)
 {
 	int result = 0, status;
 	pid_t pid;
 
-	result = checkBuiltins(args);
+	result = check_builtins(args);
 	if (result != -1)
 		return (result);
 
-	result = findExecutable(args);
+	result = find_executable(args);
 	if (result)
 		return (result);
 
@@ -50,13 +50,13 @@ int executeCommand(PROGARGS *args)
 }
 
 /**
- * processCommand - processes an array of string commands into tokens
+ * process_command - processes an array of string commands into tokens
  *
  * @args: commands passed
  *
  * Return: tokens
  */
-void processCommand(PROGARGS *args)
+void process_command(prog_args *args)
 {
 	char *delims = " \t";
 	int i, j, count = 2, len;
@@ -80,7 +80,7 @@ void processCommand(PROGARGS *args)
 	args->tokens = malloc(count * sizeof(char *));
 	if (args->tokens == NULL)
 	{
-		perror(args->progName);
+		perror(args->prog_name);
 		exit(errno);
 	}
 	i = 0;
@@ -93,17 +93,17 @@ void processCommand(PROGARGS *args)
 }
 
 /**
- * getPath - tokenize path in directories
+ * get_path - tokenize path in directories
  *
  * @args: commands passed
  *
  * Return: array of path dirs
  */
 
-char **getPath(PROGARGS *args)
+char **get_path(prog_args *args)
 {
 	int i = 0;
-	int countDirs = 2;
+	int count_dirs = 2;
 	char **tokens = NULL;
 	char *PATH;
 
@@ -118,10 +118,10 @@ char **getPath(PROGARGS *args)
 	for (i = 0; PATH[i]; i++)
 	{
 		if (PATH[i] == ':')
-			countDirs++;
+			count_dirs++;
 	}
 
-	tokens = malloc(sizeof(char *) * countDirs);
+	tokens = malloc(sizeof(char *) * count_dirs);
 
 	i = 0;
 	tokens[i] = _strdup(_strtok(PATH, ":"));
@@ -137,21 +137,21 @@ char **getPath(PROGARGS *args)
 }
 
 /**
- * checkFile - checks if a file exists, it's not a dir and
+ * check_file - checks if a file exists, it's not a dir and
  * has excecution permisions for permisions.
  *
- * @filePath: pointer to full file name
+ * @file_path: pointer to full file name
  *
  * Return: 0 success, error code on fail
  */
 
-int checkFile(char *filePath)
+int check_file(char *file_path)
 {
-	struct stat statBuff;
+	struct stat stat_buff;
 
-	if (stat(filePath, &statBuff) != -1)
+	if (stat(file_path, &stat_buff) != -1)
 	{
-		if (S_ISDIR(statBuff.st_mode) ||  access(filePath, X_OK))
+		if (S_ISDIR(stat_buff.st_mode) ||  access(file_path, X_OK))
 		{
 			errno = 126;
 			return (126);
@@ -163,14 +163,14 @@ int checkFile(char *filePath)
 }
 
 /**
- * replaceVariables - replaces specific variables in the input string with
+ * replace_variables - replaces specific variables in the input string with
  * their values
  *
  * @args: commands passed
  *
  * Return: void
  */
-void replaceVariables(PROGARGS *args)
+void replace_variables(prog_args *args)
 {
 	int i, j;
 	char line[BUFFER_SIZE] = {0}, expansion[BUFFER_SIZE] = {'\0'}, *temp;
@@ -184,14 +184,14 @@ void replaceVariables(PROGARGS *args)
 		else if (line[i] == '$' && line[i + 1] == '?')
 		{
 			line[i] = '\0';
-			longToStr(errno, expansion, 10);
+			long_to_str(errno, expansion, 10);
 			buffcat(line, expansion);
 			buffcat(line, args->buffer + i + 2);
 		}
 		else if (line[i] == '$' && line[i + 1] == '$')
 		{
 			line[i] = '\0';
-			longToStr(getpid(), expansion, 10);
+			long_to_str(getpid(), expansion, 10);
 			buffcat(line, expansion);
 			buffcat(line, args->buffer + i + 2);
 		}

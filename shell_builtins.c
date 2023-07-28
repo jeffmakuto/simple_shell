@@ -1,24 +1,24 @@
 #include "shell.h"
 
 /**
- * checkBuiltins - checks if a command is a built-in one and
+ * check_builtins - checks if a command is a built-in one and
  * performs associated action
  *
  * @args: commands passed
  *
  * Return: Return of the executed action, or -1.
  */
-int checkBuiltins(PROGARGS *args)
+int check_builtins(prog_args *args)
 {
 	int i;
 
-	BuiltinCmd builtins[] = {
-		{"cd", cdAction},
-		{"exit", exitAction},
-		{"setenv", setenvAction},
-		{"unsetenv", unsetenvAction},
-		{"env", envAction},
-		{"alias", aliasAction},
+	builtin_cmd builtins[] = {
+		{"cd", cd_action},
+		{"exit", exit_action},
+		{"setenv", setenv_action},
+		{"unsetenv", unsetenv_action},
+		{"env", env_action},
+		{"alias", alias_action},
 		{NULL, NULL}
 	};
 
@@ -33,25 +33,25 @@ int checkBuiltins(PROGARGS *args)
 }
 
 /**
- * cdAction - change directory to the specified path.
+ * cd_action - change directory to the specified path.
  *
  * @args: commands passed
  *
  * Return: 0 on sucess
  */
-int cdAction(PROGARGS *args)
+int cd_action(prog_args *args)
 {
-	char *homeDir = _getenv("HOME", args), *oldDir = NULL;
-	char prevDir[MAX_PATH_LEN] = {0};
+	char *home_dir = _getenv("HOME", args), *old_dir = NULL;
+	char prev_dir[MAX_PATH_LEN] = {0};
 	int err = 0;
 
 	if (args->tokens[1])
 	{
 		if (_strncmp(args->tokens[1], "-", 0))
 		{
-			oldDir = _getenv("OLDPWD", args);
-			if (oldDir)
-				err = changeDirectory(args, oldDir);
+			old_dir = _getenv("OLDPWD", args);
+			if (old_dir)
+				err = change_directory(args, old_dir);
 			_print(_getenv("PWD", args));
 			_print("\n");
 
@@ -59,59 +59,59 @@ int cdAction(PROGARGS *args)
 		}
 		else
 		{
-			return (changeDirectory(args, args->tokens[1]));
+			return (change_directory(args, args->tokens[1]));
 		}
 	}
 	else
 	{
-		if (!homeDir)
-			homeDir = getcwd(prevDir, MAX_PATH_LEN);
+		if (!home_dir)
+			home_dir = getcwd(prev_dir, MAX_PATH_LEN);
 
-		return (changeDirectory(args, homeDir));
+		return (change_directory(args, home_dir));
 	}
 	return (0);
 }
 
 /**
- * changeDirectory - hange the current working directory to the
+ * change_directory - hange the current working directory to the
  * target directory.
  *
  * @args: commands passed
  *
- * @newDir: path to be set as current work directory
+ * @new_dir: path to be set as current work directory
  *
  * Return: 0 on success, number declared in args
  */
-int changeDirectory(PROGARGS *args, char *newDir)
+int change_directory(prog_args *args, char *new_dir)
 {
-	char prevDir[MAX_PATH_LEN] = {0};
+	char prev_dir[MAX_PATH_LEN] = {0};
 	int err = 0;
 
-	getcwd(prevDir, 128);
+	getcwd(prev_dir, 128);
 
-	if (!_strncmp(prevDir, newDir, 0))
+	if (!_strncmp(prev_dir, new_dir, 0))
 	{
-		err = chdir(newDir);
+		err = chdir(new_dir);
 		if (err == -1)
 		{
 			errno = 2;
 			return (3);
 		}
-		_setenv("PWD", newDir, args);
+		_setenv("PWD", new_dir, args);
 	}
-	_setenv("OLDPWD", prevDir, args);
+	_setenv("OLDPWD", prev_dir, args);
 	return (0);
 }
 
 /**
- * setenvAction - initialize a new environment variable or modify an
+ * setenv_action - initialize a new environment variable or modify an
  * existing one.
  *
  * @args: commands passed
  *
  * Return: 0 on sucess
  */
-int setenvAction(PROGARGS *args)
+int setenv_action(prog_args *args)
 {
 	if (args->tokens[1] == NULL || args->tokens[2] == NULL)
 		return (0);
@@ -128,13 +128,13 @@ int setenvAction(PROGARGS *args)
 }
 
 /**
- * unsetenvAction - remove an environment variable.
+ * unsetenv_action - remove an environment variable.
  *
  * @args: commands passed
  *
  * Return: .void
  */
-int unsetenvAction(PROGARGS *args)
+int unsetenv_action(prog_args *args)
 {
 	if (args->tokens[1] == NULL)
 		return (0);

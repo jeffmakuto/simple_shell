@@ -14,12 +14,12 @@
 
 int main(int ac, char *av[], char *envp[])
 {
-	PROGARGS shellArgs = {NULL}, *args = &shellArgs;
+	prog_args shell_args = {NULL}, *args = &shell_args;
 	char *prompt = NULL;
 
-	startShell(args, ac, av, envp);
+	start_shell(args, ac, av, envp);
 
-	signal(SIGINT, handleCtrlCSignal);
+	signal(SIGINT, handle_ctrl_c_signal);
 
 	if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO) && ac == 1)
 	{
@@ -28,19 +28,19 @@ int main(int ac, char *av[], char *envp[])
 	}
 	errno = 0;
 
-	runShell(prompt, args);
+	run_shell(prompt, args);
 
 	return (0);
 }
 
 /**
- * handleCtrlCSignal - Handles Cntrl + C
+ * handle_c_ctrl_c_signal - Handles Cntrl + C
  *
  * @signal: unused parameter.(Signal)
  *
  * Return: void
  */
-void handleCtrlCSignal(int signal)
+void handle_ctrl_c_signal(int signal)
 {
 	(void)signal;
 	_print("\n");
@@ -48,7 +48,7 @@ void handleCtrlCSignal(int signal)
 }
 
 /**
- * startShell - launches the shell
+ * start_shell - launches the shell
  *
  * @args: commands  passed
  *
@@ -61,11 +61,11 @@ void handleCtrlCSignal(int signal)
  * Return: void
  *
  */
-void startShell(PROGARGS *args, int ac, char *av[], char **envp)
+void start_shell(prog_args *args, int ac, char *av[], char **envp)
 {
 	int i = 0;
 
-	args->progName = av[0];
+	args->prog_name = av[0];
 	args->buffer = NULL;
 	args->cmd = NULL;
 	args->count = 0;
@@ -77,7 +77,7 @@ void startShell(PROGARGS *args, int ac, char *av[], char **envp)
 		args->fd = open(av[1], O_RDONLY);
 		if (args->fd == -1)
 		{
-			_printe(args->progName);
+			_printe(args->prog_name);
 			_printe("open error");
 			_printe(av[1]);
 			_printe("\n");
@@ -96,19 +96,19 @@ void startShell(PROGARGS *args, int ac, char *av[], char **envp)
 	args->envp[i] = NULL;
 	envp = args->envp;
 
-	args->aliasList = malloc(sizeof(char *) * INITIAL_ENVP_SIZE);
+	args->alias_list = malloc(sizeof(char *) * INITIAL_ENVP_SIZE);
 	for (i = 0; i < INITIAL_ENVP_SIZE; i++)
-		args->aliasList[i] = NULL;
+		args->alias_list[i] = NULL;
 }
 
 /**
- * runShell - loops the prompt
+ * run_shell - loops the prompt
  *
  * @prompt: prompt
  *
  * @args: infinite loop for prompt
  */
-void runShell(char *prompt, PROGARGS *args)
+void run_shell(char *prompt, prog_args *args)
 {
 	int err = 0, len = 0;
 
@@ -119,34 +119,34 @@ void runShell(char *prompt, PROGARGS *args)
 
 		if (err == EOF)
 		{
-			freeArgs(args);
+			free_args(args);
 			exit(errno);
 		}
 		if (len >= 1)
 		{
-			expandAlias(args);
-			replaceVariables(args);
-			processCommand(args);
+			expand_alias(args);
+			replace_variables(args);
+			process_command(args);
 			if (args->tokens[0])
 			{
-				err = executeCommand(args);
+				err = execute_command(args);
 				if (err)
-					printErr(err, args);
+					print_err(err, args);
 			}
-			cleanupAfterExecution(args);
+			cleanup_after_execution(args);
 		}
 	}
 }
 
 /**
- * findExecutable - look for an executable file  in path
+ * find_executable - look for an executable file  in path
  *
  * @args: commands passed
  *
  * Return: 0 success, error code on fail
  */
 
-int findExecutable(PROGARGS *args)
+int find_executable(prog_args *args)
 {
 	int i = 0, result = 0;
 	char **dirs;
@@ -155,14 +155,14 @@ int findExecutable(PROGARGS *args)
 		return (2);
 
 	if (args->cmd[0] == '/' || args->cmd[0] == '.')
-		return (checkFile(args->cmd));
+		return (check_file(args->cmd));
 
 	free(args->tokens[0]);
 	args->tokens[0] = _strcat(_strdup("/"), args->cmd);
 	if (!args->tokens[0])
 		return (2);
 
-	dirs = getPath(args);
+	dirs = get_path(args);
 
 	if (!dirs || !dirs[0])
 	{
@@ -172,18 +172,18 @@ int findExecutable(PROGARGS *args)
 	for (i = 0; dirs[i]; i++)
 	{
 		dirs[i] = _strcat(dirs[i], args->tokens[0]);
-		result = checkFile(dirs[i]);
+		result = check_file(dirs[i]);
 		if (result == 0 || result == 126)
 		{
 			errno = 0;
 			free(args->tokens[0]);
 			args->tokens[0] = _strdup(dirs[i]);
-			freePtrs(dirs);
+			free_ptrs(dirs);
 			return (result);
 		}
 	}
 	free(args->tokens[0]);
 	args->tokens[0] = NULL;
-	freePtrs(dirs);
+	free_ptrs(dirs);
 	return (result);
 }

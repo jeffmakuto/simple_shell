@@ -7,12 +7,12 @@
 *
 * Return: read bytes.
 */
-int _getline(PROGARGS *args)
+int _getline(prog_args *args)
 {
 	char buffer[BUFFER_SIZE] = {'\0'};
 	static char *commands[10] = {NULL};
 	static char operators[10] = {'\0'};
-	ssize_t bytesRead, i = 0;
+	ssize_t bytes_read, i = 0;
 
 	/* check if there are no more commands in the array */
 	/* also check the logical operators */
@@ -27,8 +27,8 @@ int _getline(PROGARGS *args)
 		}
 
 		/* read from the file descriptor into the buffer */
-		bytesRead = read(args->fd, &buffer, BUFFER_SIZE - 1);
-		if (bytesRead == 0)
+		bytes_read = read(args->fd, &buffer, BUFFER_SIZE - 1);
+		if (bytes_read == 0)
 			return (-1);
 
 		/* check  for '\n' or ; */
@@ -36,7 +36,7 @@ int _getline(PROGARGS *args)
 		do {
 			commands[i] = _strdup(_strtok(i ? NULL : buffer, "\n;"));
 			/*checks and split for && and || operators*/
-			i = handleLogicalOperators(commands, i, operators);
+			i = handle_logical_operators(commands, i, operators);
 		} while (commands[i++]);
 	}
 
@@ -83,7 +83,7 @@ int _atoi(char *str)
 
 
 /**
- * longToStr - converts integer to string.
+ * long_to_str - converts integer to string.
  *
  * @num: integer to convert
  *
@@ -93,9 +93,9 @@ int _atoi(char *str)
  *
  * Return: void
  */
-void longToStr(long num, char *str, int base)
+void long_to_str(long num, char *str, int base)
 {
-	int i = 0, isNegative = 0;
+	int i = 0, is_negative = 0;
 	long quotient = num;
 	char letters[] = {"0123456789abcdefghijklmnopqrstuvwxyz"};
 
@@ -103,7 +103,7 @@ void longToStr(long num, char *str, int base)
 		str[i++] = '0';
 
 	if (str[0] == '-')
-		isNegative = 1;
+		is_negative = 1;
 
 	while (quotient)
 	{
@@ -113,7 +113,7 @@ void longToStr(long num, char *str, int base)
 			str[i++] = letters[quotient % base];
 		quotient /= base;
 	}
-	if (isNegative)
+	if (is_negative)
 		str[i++] = '-';
 
 	str[i] = '\0';

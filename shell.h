@@ -24,7 +24,7 @@
 /* Struct definitions */
 
 /**
- * struct PROGARGS - Represents the arguments and information for a
+ * struct prog_args - Represents the arguments and information for a
  * builtin command.
  *
  * @progName: The name of the program or command.
@@ -44,59 +44,59 @@
  * This struct holds various information related to a builtin command.
  * It is used to pass and store command-specific arguments and data.
  */
-typedef struct PROGARGS
+typedef struct prog_args
 {
-	char *progName;
+	char *prog_name;
 	char *buffer;
 	char *cmd;
 	int count;
 	int fd;
 	char **tokens;
 	char **envp;
-	char **aliasList;
-} PROGARGS;
+	char **alias_list;
+} prog_args;
 
 /**
- * struct BuiltinCmd - Represents a built-in command.
+ * struct builtin_cmd - Represents a built-in command.
  *
  * @command: The command string.
  *
  * @action: A pointer to the function that implements the command's action.
  *
- * The BuiltinCmd struct defines a built-in command and its associated action.
+ * The builtin_cmd struct defines a built-in command and its associated action.
  */
-typedef struct BuiltinCmd
+typedef struct builtin_cmd
 {
 	char *command;
-	int (*action)(PROGARGS *args);
-} BuiltinCmd;
+	int (*action)(prog_args *args);
+} builtin_cmd;
 
 /* Prototype functions */
-void startShell(PROGARGS *args, int ac, char *av[], char *envp[]);
-void runShell(char *prompt, PROGARGS *args);
-void handleCtrlCSignal(int signal);
-int findExecutable(PROGARGS *args);
-int checkFile(char *filePath);
-char **getPath(PROGARGS *args);
-int executeCommand(PROGARGS *args);
-void processCommand(PROGARGS *args);
-void replaceVariables(PROGARGS *args);
-void freeArgs(PROGARGS *args);
-void freePtrs(char **arr);
-void cleanupAfterExecution(PROGARGS *args);
-int handleLogicalOperators(char *commands[], int i, char operators[]);
-int checkBuiltins(PROGARGS *args);
-int cdAction(PROGARGS *args);
-int changeDirectory(PROGARGS *args, char *newDir);
-int envAction(PROGARGS *args);
-int setenvAction(PROGARGS *args);
-int unsetenvAction(PROGARGS *args);
-int exitAction(PROGARGS *args);
-void expandAlias(PROGARGS *args);
-int aliasAction(PROGARGS *args);
-int printAlias(PROGARGS *args, char *alias);
-char *getAlias(PROGARGS *args, char *alias);
-int setAlias(char *aliasStr, PROGARGS *args);
+void start_shell(prog_args *args, int ac, char *av[], char *envp[]);
+void run_shell(char *prompt, prog_args *args);
+void handle_ctrl_c_signal(int signal);
+int find_executable(prog_args *args);
+int check_file(char *file_path);
+char **get_path(prog_args *args);
+int execute_command(prog_args *args);
+void process_command(prog_args *args);
+void replace_variables(prog_args *args);
+void free_args(prog_args *args);
+void free_ptrs(char **arr);
+void cleanup_after_execution(prog_args *args);
+int handle_logical_operators(char *commands[], int i, char operators[]);
+int check_builtins(prog_args *args);
+int cd_action(prog_args *args);
+int change_directory(prog_args *args, char *new_dir);
+int env_action(prog_args *args);
+int setenv_action(prog_args *args);
+int unsetenv_action(prog_args *args);
+int exit_action(prog_args *args);
+void expand_alias(prog_args *args);
+int alias_action(prog_args *args);
+int print_alias(prog_args *args, char *alias);
+char *get_alias(prog_args *args, char *alias);
+int set_alias(char *alias_str, prog_args *args);
 
 /*auxilliaries*/
 int _strlen(char *str);
@@ -105,16 +105,17 @@ int _atoi(char *str);
 char *_strdup(char *str);
 char *_strtok(char *line, char *delim);
 char *_strcat(char *dest, char *src);
-char *_getenv(char *name, PROGARGS *args);
-int _setenv(char *name, char *value, PROGARGS *args);
-int _unsetenv(char *name, PROGARGS *args);
-void _printenv(PROGARGS *args);
-int _getline(PROGARGS *args);
-void longToStr(long num, char *str, int base);
-int buffcat(char *buffer, char *addStr);
+char *_getenv(char *name, prog_args *args);
+int _setenv(char *name, char *value, prog_args *args);
+int _unsetenv(char *name, prog_args *args);
+void _printenv(prog_args *args);
+int _getline(prog_args *args);
+void long_to_str(long num, char *str, int base);
+int buffcat(char *buffer, char *add_str);
 void rev_str(char *str);
 int _print(char *str);
 int _printe(char *str);
-int printErr(int err, PROGARGS *args);
-int countChars(char *str, char *chars);
+int print_err(int err, prog_args *args);
+int count_chars(char *str, char *chars);
+
 #endif /* SHELL_H */

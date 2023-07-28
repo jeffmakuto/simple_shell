@@ -1,13 +1,13 @@
 #include "shell.h"
 
 /**
- * expandAlias - expand the alias
+ * expand_alias - expand the alias
  *
  * @args: commands passed
  *
  * Return: void
  */
-void expandAlias(PROGARGS *args)
+void expand_alias(prog_args *args)
 {
 	int i, j, expanded = 0;
 	char line[BUFFER_SIZE] = {0}, expansion[BUFFER_SIZE] = {'\0'}, *temp;
@@ -23,7 +23,7 @@ void expandAlias(PROGARGS *args)
 			expansion[j] = line[i + j];
 		expansion[j] = '\0';
 
-		temp = getAlias(args, expansion);
+		temp = get_alias(args, expansion);
 		if (temp)
 		{
 			expansion[0] = '\0';
@@ -44,25 +44,25 @@ void expandAlias(PROGARGS *args)
 }
 
 /**
- * aliasAction - handle aliases
+ * alias_action - handle aliases
  *
  * @args: commands passed
  *
  * Return: 0 on sucess
  */
-int aliasAction(PROGARGS *args)
+int alias_action(prog_args *args)
 {
 	int i = 0;
 
 	if (args->tokens[1] == NULL)
-		return (printAlias(args, NULL));
+		return (print_alias(args, NULL));
 
 	while (args->tokens[++i])
 	{
-		if (countChars(args->tokens[i], "="))
-			setAlias(args->tokens[i], args);
+		if (count_chars(args->tokens[i], "="))
+			set_alias(args->tokens[i], args);
 		else
-			printAlias(args, args->tokens[i]);
+			print_alias(args, args->tokens[i]);
 	}
 
 	return (0);
@@ -70,7 +70,7 @@ int aliasAction(PROGARGS *args)
 
 
 /**
- * printAlias - handle alias
+ * print_alias - handle alias
  *
  * @args: commands passed
  *
@@ -78,28 +78,28 @@ int aliasAction(PROGARGS *args)
  *
  * Return: 0 on sucess
  */
-int printAlias(PROGARGS *args, char *alias)
+int print_alias(prog_args *args, char *alias)
 {
-	int i, j, aliasLen;
+	int i, j, alias_len;
 	char buffer[BUFFER_SIZE] = {'\0'};
 
-	if (args->aliasList)
+	if (args->alias_list)
 	{
-		aliasLen = _strlen(alias);
-		for (i = 0; args->aliasList[i]; i++)
+		alias_len = _strlen(alias);
+		for (i = 0; args->alias_list[i]; i++)
 		{
-			if (!alias || (_strncmp(args->aliasList[i], alias, aliasLen)
-				&&	args->aliasList[i][aliasLen] == '='))
+			if (!alias || (_strncmp(args->alias_list[i], alias, alias_len)
+				&&	args->alias_list[i][alias_len] == '='))
 			{
-				for (j = 0; args->aliasList[i][j]; j++)
+				for (j = 0; args->alias_list[i][j]; j++)
 				{
-					buffer[j] = args->aliasList[i][j];
-					if (args->aliasList[i][j] == '=')
+					buffer[j] = args->alias_list[i][j];
+					if (args->alias_list[i][j] == '=')
 						break;
 				}
 				buffer[j + 1] = '\0';
 				buffcat(buffer, "'");
-				buffcat(buffer, args->aliasList[i] + j + 1);
+				buffcat(buffer, args->alias_list[i] + j + 1);
 				buffcat(buffer, "'\n");
 				_print(buffer);
 			}
@@ -110,7 +110,7 @@ int printAlias(PROGARGS *args, char *alias)
 }
 
 /**
- * getAlias -handle alias
+ * get_alias -handle alias
  *
  * @args: commands passed
  *
@@ -118,21 +118,21 @@ int printAlias(PROGARGS *args, char *alias)
  *
  * Return: 0 on success, number declared in the args, NULL if not found
  */
-char *getAlias(PROGARGS *args, char *name)
+char *get_alias(prog_args *args, char *name)
 {
-	int i, aliasLen;
+	int i, alias_len;
 
-	if (name == NULL || args->aliasList == NULL)
+	if (name == NULL || args->alias_list == NULL)
 		return (NULL);
 
-	aliasLen = _strlen(name);
+	alias_len = _strlen(name);
 
-	for (i = 0; args->aliasList[i]; i++)
+	for (i = 0; args->alias_list[i]; i++)
 	{/* check if varname exist in env */
-		if (_strncmp(name, args->aliasList[i], aliasLen) &&
-			args->aliasList[i][aliasLen] == '=')
+		if (_strncmp(name, args->alias_list[i], alias_len) &&
+			args->alias_list[i][alias_len] == '=')
 		{/* returns the value of the key NAME=  when find it */
-			return (args->aliasList[i] + aliasLen + 1);
+			return (args->alias_list[i] + alias_len + 1);
 		}
 	}
 	return (NULL);
@@ -140,36 +140,36 @@ char *getAlias(PROGARGS *args, char *name)
 }
 
 /**
- * setAlias - creates alias and overwrites one if it exists
+ * set_alias - creates alias and overwrites one if it exists
  *
- * @aliasStr: alias to be set
+ * @alias_str: alias to be set
  *
  * @args: commands passed
  *
  * Return: 0 on sucess
  */
-int setAlias(char *aliasStr, PROGARGS *args)
+int set_alias(char *alias_str, prog_args *args)
 {
 	int i, j;
 	char buffer[BUFFER_SIZE] = {'0'}, *temp = NULL;
 
-	if (aliasStr == NULL ||  args->aliasList == NULL)
+	if (alias_str == NULL ||  args->alias_list == NULL)
 		return (1);
-	for (i = 0; aliasStr[i]; i++)
-		if (aliasStr[i] != '=')
-			buffer[i] = aliasStr[i];
+	for (i = 0; alias_str[i]; i++)
+		if (alias_str[i] != '=')
+			buffer[i] = alias_str[i];
 		else
 		{/* check if value of the alias already exists in another alias */
-			temp = getAlias(args, aliasStr + i + 1);
+			temp = get_alias(args, alias_str + i + 1);
 			break;
 		}
 
 	/* check if varname exist in the alias list */
-	for (j = 0; args->aliasList[j]; j++)
-		if (_strncmp(buffer, args->aliasList[j], i) &&
-			args->aliasList[j][i] == '=')
+	for (j = 0; args->alias_list[j]; j++)
+		if (_strncmp(buffer, args->alias_list[j], i) &&
+			args->alias_list[j][i] == '=')
 		{/* if the alias alredy exist */
-			free(args->aliasList[j]);
+			free(args->alias_list[j]);
 			break;
 		}
 
@@ -178,9 +178,9 @@ int setAlias(char *aliasStr, PROGARGS *args)
 	{/* override existing alias */
 		buffcat(buffer, "=");
 		buffcat(buffer, temp);
-		args->aliasList[j] = _strdup(buffer);
+		args->alias_list[j] = _strdup(buffer);
 	}
 	else
-		args->aliasList[j] = _strdup(aliasStr);
+		args->alias_list[j] = _strdup(alias_str);
 	return (0);
 }

@@ -1,16 +1,16 @@
 #include "shell.h"
 
 /**
- * cleanupAfterExecution - frees required memory
+ * cleanup_after_execution - frees required memory
  *
  * @args: commands passed
  *
  * Return: void
  */
-void cleanupAfterExecution(PROGARGS *args)
+void cleanup_after_execution(prog_args *args)
 {
 	if (args->tokens)
-		freePtrs(args->tokens);
+		free_ptrs(args->tokens);
 	if (args->buffer)
 		free(args->buffer);
 	if (args->cmd)
@@ -22,31 +22,31 @@ void cleanupAfterExecution(PROGARGS *args)
 }
 
 /**
- * freeArgs - frees all memory
+ * free_args - frees all memory
  *
  * @args: commands passed
  *
  * Return: void
  */
-void freeArgs(PROGARGS *args)
+void free_args(prog_args *args)
 {
 	if (args->fd != 0)
 	{
 		if (close(args->fd))
-			perror(args->progName);
+			perror(args->prog_name);
 	}
-	cleanupAfterExecution(args);
-	freePtrs(args->envp);
+	cleanup_after_execution(args);
+	free_ptrs(args->envp);
 }
 
 /**
- * freePtrs - frees pointer memory
+ * free_ptrs - frees pointer memory
  *
  * @arr: array of pointers
  *
  * Return: void
  */
-void freePtrs(char **arr)
+void free_ptrs(char **arr)
 {
 	int i;
 
@@ -61,13 +61,13 @@ void freePtrs(char **arr)
 }
 
 /**
- * exitAction - exit the shell
+ * exit_action - exit the shell
  *
  * @args: commands passed
  *
  * Return: 0 on sucess
  */
-int exitAction(PROGARGS *args)
+int exit_action(prog_args *args)
 {
 	int i;
 
@@ -82,11 +82,11 @@ int exitAction(PROGARGS *args)
 			}
 		errno = _atoi(args->tokens[1]);
 	}
-	freeArgs(args);
+	free_args(args);
 	exit(errno);
 }
 /**
-* handleLogicalOperators - handle command execution with the && operator.
+* handle_logical_operators - handle command execution with the && operator.
 *
 * @commands: array of the commands.
 *
@@ -96,7 +96,7 @@ int exitAction(PROGARGS *args)
 *
 * Return: index of the last command in the array
 */
-int handleLogicalOperators(char *commands[], int i, char operators[])
+int handle_logical_operators(char *commands[], int i, char operators[])
 {
 	char *temp = NULL;
 	int j;
