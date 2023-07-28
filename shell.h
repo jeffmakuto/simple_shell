@@ -53,6 +53,7 @@ typedef struct PROGARGS
 	int fd;
 	char **tokens;
 	char **envp;
+	char **aliasList;
 } PROGARGS;
 
 /**
@@ -91,6 +92,11 @@ int envAction(PROGARGS *args);
 int setenvAction(PROGARGS *args);
 int unsetenvAction(PROGARGS *args);
 int exitAction(PROGARGS *args);
+void expandAlias(PROGARGS *args);
+int aliasAction(PROGARGS *args);
+int printAlias(PROGARGS *args, char *alias);
+char *getAlias(PROGARGS *args, char *alias);
+int setAlias(char *aliasStr, PROGARGS *args);
 
 /*auxilliaries*/
 int _strlen(char *str);
@@ -110,5 +116,5 @@ void rev_str(char *str);
 int _print(char *str);
 int _printe(char *str);
 int printErr(int err, PROGARGS *args);
-
+int countChars(char *str, char *chars);
 #endif /* SHELL_H */

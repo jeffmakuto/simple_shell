@@ -95,6 +95,10 @@ void startShell(PROGARGS *args, int ac, char *av[], char **envp)
 	}
 	args->envp[i] = NULL;
 	envp = args->envp;
+
+	args->aliasList = malloc(sizeof(char *) * INITIAL_ENVP_SIZE);
+	for (i = 0; i < INITIAL_ENVP_SIZE; i++)
+		args->aliasList[i] = NULL;
 }
 
 /**
@@ -120,6 +124,7 @@ void runShell(char *prompt, PROGARGS *args)
 		}
 		if (len >= 1)
 		{
+			expandAlias(args);
 			replaceVariables(args);
 			processCommand(args);
 			if (args->tokens[0])

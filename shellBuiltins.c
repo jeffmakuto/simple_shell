@@ -18,6 +18,7 @@ int checkBuiltins(PROGARGS *args)
 		{"setenv", setenvAction},
 		{"unsetenv", unsetenvAction},
 		{"env", envAction},
+		{"alias", aliasAction},
 		{NULL, NULL}
 	};
 
