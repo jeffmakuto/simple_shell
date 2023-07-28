@@ -1,120 +1,120 @@
 #include "shell.h"
-
 /**
- * process_command_line_arguments - processes command line arguments
- *
- * @ac: number of commandline arguments
- *
- * @av: array of command-line arguments
- *
- * @envp: array of environment variables
- *
- * Return: 0 on sucess, else 1 on failure
- */
-int process_command_line_arguments(int ac, char **av, char **envp)
-{
-	char **args;
-
-	if (ac > 1)
-	{
-		args = process_command(av[1]);
-
-		if (args)
-		{
-			execute_command(args, envp);
-			free(args);
-
-			return (0);
-		}
-		else
-			return (1);
-	}
-	return (1);
-}
-
-/**
- * run_interactive_mode - Runs the shell in interactive mode.
- *
- * @envp: The environment variables.
- *
- * Return: Void
- */
-void run_interactive_mode(char **envp)
-{
-	char *cmd = NULL;
-	size_t n = 0;
-	ssize_t bytes_read;
-	int should_exit = 0;
-
-	while (!should_exit)
-	{
-		write(STDOUT_FILENO, PROMPT, _strlen(PROMPT));
-		bytes_read = getline(&cmd, &n, stdin);
-
-		if (bytes_read == -1)
-		{
-			free(cmd);
-			perror("getline error");
-			exit(EXIT_FAILURE);
-		}
-
-		if (*cmd != '\n')
-			should_exit = process_command_input(cmd, envp);
-	}
-	free(cmd);
-}
-
-/**
- * run_non_interactive_mode - Runs the shell in non-interactive mode.
- *
- * @envp: The environment variables.
- *
- * Return: Void
- */
-void run_non_interactive_mode(char **envp)
-{
-	char *cmd = NULL;
-	size_t n = 0;
-	ssize_t bytes_read;
-	int should_exit = 0;
-
-	while (!should_exit && (bytes_read = getline(&cmd, &n, stdin)) != -1)
-	{
-		if (*cmd != '\n')
-		{
-			/* Null-terminate the command by replacing the newline character */
-			cmd[bytes_read - 1] = '\0';
-			should_exit = process_command_input(cmd, envp);
-		}
-	}
-	free(cmd);
-}
-
-/**
- * main - entry point
- *
- * @ac: number of commandline arguments
- *
- * @av: array of strings of commandline arguments
- *
- * @envp: array of strings of environment variables
- *
+ * main - start the shell
+ * @ac: argument count
+ * @av: argument vector
+ * @env:no of values from the command line
  * Return: 0 on success
  */
-int main(int ac, char **av, char **envp)
+int main(int ac, char *av[], char *env[])
 {
-	if (ac > 1)
+	info_t info_struct = {NULL}, *info = &info_struct;
+	char *prompt = NULL;
+
+	start_shell(info, ac, av, env);
+
+	signal(SIGINT, handle_ctrl_c);
+
+	if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO) && ac == 1)
 	{
-		if (process_command_line_arguments(ac, av, envp) == 0)
-			return (0);
+		errno = 2;
+		prompt = PROMPT_MSG;
 	}
-
-	if (isatty(STDIN_FILENO))
-		run_interactive_mode(envp);
-	else
-		run_non_interactive_mode(envp);
-
+	errno = 0;
+	run_shell(prompt, info);
 	return (0);
 }
 
+/**
+ * handle_ctrl_c - print the prompt
+ * @UNUSED: option of the prototype
+ */
+void handle_ctrl_c(int signal)
+{
+	(void)signal;
+	_print("\n");
+	_print(PROMPT_MSG);
+}
 
+/**
+ * start_shell - initialize struct with the info of the shell
+ * @info: commands passed
+ * @ac: argument count
+ * @av: argument vector
+ * @env: environment variables
+ */
+void start_shell(info_t *info, int ac, char *av[], char **env)
+{
+	int i = 0;
+
+	info->prog_name = av[0];
+	info->buff = NULL;
+	info->cmd = NULL;
+	info->count = 0;
+
+	if (ac == 1)
+		info->fd = STDIN_FILENO;
+	else
+	{
+		info->fd = open(av[1], O_RDONLY);
+		if (info->fd == -1)
+		{
+			_printe(info->prog_name);
+			_printe(": 0: Can't open ");
+			_printe(av[1]);
+			_printe("\n");
+			exit(127);
+		}
+	}
+	info->tokens = NULL;
+	info->env = malloc(sizeof(char *) * 50);
+	if (env)
+	{
+		for (; env[i]; i++)
+		{
+			info->env[i] = _strdup(env[i]);
+		}
+	}
+	info->env[i] = NULL;
+	env = info->env;
+
+	info->alias_list = malloc(sizeof(char *) * 20);
+	for (i = 0; i < 20; i++)
+	{
+		info->alias_list[i] = NULL;
+	}
+}
+/**
+ * run_shell - loops the prompt
+ * @prompt: prompt
+ * @info: commands passed
+ */
+void run_shell(char *prompt, info_t *info)
+{
+	int err = 0, len = 0;
+
+	while (++(info->count))
+	{
+		_print(prompt);
+		err = len = _getline(info);
+
+		if (err == EOF)
+		{
+			free_info(info);
+			exit(errno);
+		}
+		if (len >= 1)
+		{
+			expand_alias(info);
+			expand_variables(info);
+			process_command(info);
+			if (info->tokens[0])
+			{
+				err = execute(info);
+				if (err != 0)
+					_print_error(err, info);
+			}
+			cleanup_after_execution(info);
+		}
+	}
+}
