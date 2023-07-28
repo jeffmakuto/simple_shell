@@ -8,8 +8,8 @@
 int _getline(info_t *info)
 {
 	char buffer[BUFFER_SIZE] = {'\0'};
-	static char *commands[10] = {NULL};
-	static char operators[10] = {'\0'};
+	static char *commands[INITIAL_ENV_SIZE] = {NULL};
+	static char operators[INITIAL_ENV_SIZE] = {'\0'};
 	ssize_t bytes_read, i = 0;
 
 	/* check if there are no more commands in the array */
