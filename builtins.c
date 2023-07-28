@@ -32,7 +32,7 @@ int exit_action(info_t *info)
 int cd_action(info_t *info)
 {
 	char *home_dir = _getenv("HOME", info), *old_dir = NULL;
-	char prev_dir[128] = {0};
+	char prev_dir[MAX_PATH_LEN] = {0};
 	int err = 0;
 
 	if (info->tokens[1])
@@ -55,7 +55,7 @@ int cd_action(info_t *info)
 	else
 	{
 		if (!home_dir)
-			home_dir = getcwd(prev_dir, 128);
+			home_dir = getcwd(prev_dir, MAX_PATH_LEN);
 
 		return (change_dir(info, home_dir));
 	}
@@ -70,10 +70,10 @@ int cd_action(info_t *info)
  */
 int change_dir(info_t *info, char *new_dir)
 {
-	char prev_dir[128] = {0};
+	char prev_dir[MAX_PATH_LEN] = {0};
 	int err = 0;
 
-	getcwd(prev_dir, 128);
+	getcwd(prev_dir, MAX_PATH_LEN);
 
 	if (!_strncmp(prev_dir, new_dir, 0))
 	{

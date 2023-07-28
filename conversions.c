@@ -12,7 +12,7 @@ void long_to_string(long num, char *str, int base)
 {
 	int i = 0, is_negative = 0;
 	long quotient = num;
-	char letters[] = {"0123456789abcdef"};
+	char letters[] = {"0123456789abcdefghijklmnopqrstuvwxyz"};
 
 	if (quotient == 0)
 		str[i++] = '0';

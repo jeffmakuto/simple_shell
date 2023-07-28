@@ -8,7 +8,7 @@
 int env_action(info_t *info)
 {
 	int i;
-	char var_name[50] = {'\0'};
+	char var_name[MAX_PATH_LEN] = {'\0'};
 	char *var_copy = NULL;
 
 	if (info->tokens[1] == NULL)

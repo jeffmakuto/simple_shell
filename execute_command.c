@@ -35,7 +35,7 @@ int execute(info_t *info)
 		}
 		else
 		{
-			wait(&status);
+			waitpid(pid, &status, 0);
 			if (WIFEXITED(status))
 				errno = WEXITSTATUS(status);
 			else if (WIFSIGNALED(status))
