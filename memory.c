@@ -37,7 +37,7 @@ void free_info(info_t *info)
 }
 
 /**
- * free_ptrs - free ptr memory and array
+ * free_ptrs - free pointers memory
  * @arr: array of pointers
  * Return: void
  */

@@ -18,7 +18,7 @@ int main(int ac, char *av[], char *env[])
 	if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO) && ac == 1)
 	{
 		errno = 2;
-		prompt = PROMPT_MSG;
+		prompt = PROMPT;
 	}
 	errno = 0;
 	run_shell(prompt, info);
@@ -33,7 +33,7 @@ void handle_ctrl_c(int signal)
 {
 	(void)signal;
 	_print("\n");
-	_print(PROMPT_MSG);
+	_print(PROMPT);
 }
 
 /**
@@ -67,7 +67,7 @@ void start_shell(info_t *info, int ac, char *av[], char **env)
 		}
 	}
 	info->tokens = NULL;
-	info->env = malloc(sizeof(char *) * 50);
+	info->env = malloc(sizeof(char *) * MAX_PATH_LEN);
 	if (env)
 	{
 		for (; env[i]; i++)

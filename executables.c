@@ -14,7 +14,7 @@ int find_executable(info_t *info)
 	char **dirs;
 
 	if (!info->cmd)
-		return (2);
+		return (1);
 
 	if (info->cmd[0] == '/' || info->cmd[0] == '.')
 		return (check_file(info->cmd));
@@ -22,7 +22,7 @@ int find_executable(info_t *info)
 	free(info->tokens[0]);
 	info->tokens[0] = _strcat(_strdup("/"), info->cmd);
 	if (!info->tokens[0])
-		return (2);
+		return (1);
 
 	dirs = get_path(info);
 

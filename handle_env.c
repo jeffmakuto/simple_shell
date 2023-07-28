@@ -1,8 +1,8 @@
 #include "shell.h"
 
 /**
- * _getenv - get value of env var
- * @name: env var
+ * _getenv - get value of environment  variable
+ * @name: environment variable
  * @info: commands passed
  * Return: ptr to value of var or NULL
  */
@@ -27,7 +27,7 @@ char *_getenv(char *name, info_t *info)
 }
 
 /**
- * _setenv - overwrite env var or create
+ * _setenv - overwrite environment var or create one
  * @name: name of the var
  * @value: new value
  * @info: commands passed

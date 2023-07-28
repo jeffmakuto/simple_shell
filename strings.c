@@ -51,8 +51,8 @@ char *_strdup(char *str)
 
 /**
  * _strncmp - Compare strings
- * @str1: String on
- * @str2: String two
+ * @str1: 1st String
+ * @str2: s2nd String
  * @num: num of char to be compared, 0 if infinite
  * Return: 1 if the strings are similar, 0 if the strings not
  */
@@ -90,8 +90,8 @@ int _strncmp(char *str1, char *str2, int num)
 
 /**
  * _strcat - concatenate strings.
- * @str1: String one
- * @str2: String two
+ * @str1: 1st String
+ * @str2: 2nd String
  *
  * Return: ptr to the str
  */

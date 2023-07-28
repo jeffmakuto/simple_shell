@@ -17,15 +17,14 @@
 /* struct definitions */
 
 /**
- * struct info- struct for the program's data
+ * struct info- commands passed to the shell
  * @prog_name: the name of the executable
- * @buff: pointer to the input read for _getline
- * @cmd: pointer to the first command typed by the user
+ * @buff: input read from _getline
+ * @cmd: 1st command typed by the user
  * @count: number of excecuted comands
  * @fd: file descriptor to the input of commands
- * @tokens: pointer to array of tokenized input
+ * @tokens: array of tokenized input strings
  * @env: copy of the environ
- * @alias_list: array of pointers with aliases.
  */
 typedef struct info
 {
@@ -36,13 +35,12 @@ typedef struct info
 	int fd;
 	char **tokens;
 	char **env;
-	char **alias_list;
 } info_t;
 
 /**
  * struct builtins - struct for the builtins
  * @command: the name of the builtin
- * @action: the associated function to be called for each builtin
+ * @action: the associated action to be called for each builtin
  */
 typedef struct builtins
 {

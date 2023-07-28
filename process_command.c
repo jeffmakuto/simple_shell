@@ -1,7 +1,7 @@
 #include "shell.h"
 /**
- * process_command - this function separate the string using a delimiter
- * @info: a pointer to the program's data
+ * process_command - separates strings using delimiters
+ * @info: commands passed
  * Return: an array of the different parts of the string
  */
 void process_command(info_t *info)

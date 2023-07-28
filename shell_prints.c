@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * _print - print array of char to stdout
+ * _print - write to stdout
  * @str: ptr to array printed
  * Return: number of printed bytes,-1 on error
  */
@@ -10,7 +10,7 @@ int _print(char *str)
 	return (write(STDOUT_FILENO, str, _strlen(str)));
 }
 /**
- * _printe - print array of char to stdout
+ * _printe - write errors to stdout
  * @str: ptr to the array
  * Return: number of bytes printed, -1 on error
  */
@@ -20,7 +20,7 @@ int _printe(char *str)
 }
 
 /**
- * _print_error - print array of char in stdo
+ * _print_error - write error codes in stdout
  * @info: commands passed
  * @err: error code
  * Return: number of bytes printed, -1 on error.
