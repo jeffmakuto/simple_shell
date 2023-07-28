@@ -23,7 +23,7 @@ int checkBuiltins(PROGARGS *args)
 
 	for (i = 0; builtins[i].command != NULL; i++)
 	{
-		if (_strcmp(builtins[i].command, args->cmd, 0))
+		if (_strncmp(builtins[i].command, args->cmd, 0))
 		{
 			return (builtins[i].action(args));
 		}

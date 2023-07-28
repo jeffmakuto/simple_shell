@@ -85,7 +85,7 @@ int _unsetenv(char *name, PROGARGS *args)
 {
 	int i, nameLen = 0;
 
-	if (key == NULL || args->envp == NULL)
+	if (name == NULL || args->envp == NULL)
 		return (0);
 
 	nameLen = _strlen(name);
@@ -135,7 +135,7 @@ void _printenv(PROGARGS *args)
  *
  * Return: 0 on success
  */
-int envAction(PROGARGS)
+int envAction(PROGARGS *args)
 {
 	int i;
 	char varName[MAX_PATH_LEN] = {'\0'};

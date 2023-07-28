@@ -39,6 +39,7 @@ int main(int ac, char *av[], char *envp[])
  * @signal: unused parameter.(Signal) */
 void handleCtrlCSignal(int signal)
 {
+	(void)signal;
 	_print("\n");
 	_print(PROMPT);
 }
@@ -46,7 +47,7 @@ void handleCtrlCSignal(int signal)
 /**
  * startShell - launches the shell
  *
- * @args: arguments passed
+ * @args: commands  passed
  *
  * @ac: argument count
  *
@@ -121,10 +122,60 @@ void runShell(char *prompt, PROGARGS *args)
 			if (args->tokens[0])
 			{
 				err = executeCommand(args);
-				if (erro)
+				if (err)
 					printErr(err, args);
 			}
 			cleanupAfterExecution(args);
 		}
 	}
+}
+
+/**
+ * findExecutable - look for an executable file  in path
+ *
+ * @args: commands passed
+ *
+ * Return: 0 success, error code on fail
+ */
+
+int findExecutable(PROGARGS *args)
+{
+	int i = 0, result = 0;
+	char **dirs;
+
+	if (!args->cmd)
+		return (2);
+
+	if (args->cmd[0] == '/' || args->cmd[0] == '.')
+		return (checkFile(args->cmd));
+
+	free(args->tokens[0]);
+	args->tokens[0] = _strcat(_strdup("/"), args->cmd);
+	if (!args->tokens[0])
+		return (2);
+
+	dirs = getPath(args);
+
+	if (!dirs || !dirs[0])
+	{
+		errno = 127;
+		return (127);
+	}
+	for (i = 0; dirs[i]; i++)
+	{
+		dirs[i] = _strcat(dirs[i], args->tokens[0]);
+		result = checkFile(dirs[i]);
+		if (result == 0 || result == 126)
+		{
+			errno = 0;
+			free(args->tokens[0]);
+			args->tokens[0] = _strdup(dirs[i]);
+			freePtrs(dirs);
+			return (result);
+		}
+	}
+	free(args->tokens[0]);
+	args->tokens[0] = NULL;
+	freePtrs(dirs);
+	return (result);
 }

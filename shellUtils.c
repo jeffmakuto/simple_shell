@@ -12,7 +12,7 @@ int executeCommand(PROGARGS *args)
 	int result = 0, status;
 	pid_t pid;
 
-	result = builtins(args);
+	result = checkBuiltins(args);
 	if (result != -1)
 		return (result);
 
@@ -31,7 +31,7 @@ int executeCommand(PROGARGS *args)
 	if (pid == 0)
 	{
 		result = execve(args->tokens[0], args->tokens, args->envp);
-			if (retval == -1)
+			if (result == -1)
 			{
 				perror(args->cmd);
 				exit(EXIT_FAILURE);
@@ -137,21 +137,21 @@ char **getPath(PROGARGS *args)
 }
 
 /**
- * findExecutable - checks if a file exists, it's not a dir and
+ * checkFile - checks if a file exists, it's not a dir and
  * has excecution permisions for permisions.
  *
- * @pathFile: pointer to full file name
+ * @filePath: pointer to full file name
  *
  * Return: 0 success, error code on fail
  */
 
-int findExecutable(char *pathFile)
+int checkFile(char *filePath)
 {
 	struct stat statBuff;
 
-	if (stat(pathFile, &statBuff) != -1)
+	if (stat(filePath, &statBuff) != -1)
 	{
-		if (S_ISDIR(statBuff.st_mode) ||  access(pathFile, X_OK))
+		if (S_ISDIR(statBuff.st_mode) ||  access(filePath, X_OK))
 		{
 			errno = 126;
 			return (126);

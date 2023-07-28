@@ -61,7 +61,7 @@ int printErr(int err, PROGARGS *args)
 		_printe(args->cmd);
 		_printe(": not found\n");
 	}
-	else if (errorcode == 126)
+	else if (err == 126)
 	{
 		_printe(args->progName);
 		_printe(": ");

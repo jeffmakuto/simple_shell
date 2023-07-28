@@ -27,13 +27,13 @@
  * struct PROGARGS - Represents the arguments and information for a
  * builtin command.
  *
- * @programName: The name of the program or command.
+ * @progName: The name of the program or command.
  *
  * @buffer: The buffer to store the input command line.
  *
  * @cmd: The command string.
  *
- * @execCount: The number of times the command has been executed.
+ * @count: The number of times the command has been executed.
  *
  * @fd: The file descriptor used for I/O redirection.
  *
@@ -46,10 +46,10 @@
  */
 typedef struct PROGARGS
 {
-	char *programName;
+	char *progName;
 	char *buffer;
 	char *cmd;
-	int execCount;
+	int count;
 	int fd;
 	char **tokens;
 	char **envp;
@@ -74,11 +74,11 @@ typedef struct BuiltinCmd
 void startShell(PROGARGS *args, int ac, char *av[], char *envp[]);
 void runShell(char *prompt, PROGARGS *args);
 void handleCtrlCSignal(int signal);
+int findExecutable(PROGARGS *args);
 int checkFile(char *filePath);
 char **getPath(PROGARGS *args);
-int findExecutable(PROGARGS *args);
 int executeCommand(PROGARGS *args);
-void splitCommands(PROGARGS *args);
+void processCommand(PROGARGS *args);
 void replaceVariables(PROGARGS *args);
 void freeArgs(PROGARGS *args);
 void freePtrs(char **arr);
@@ -87,7 +87,7 @@ int handleLogicalOperators(char *commands[], int i, char operators[]);
 int checkBuiltins(PROGARGS *args);
 int cdAction(PROGARGS *args);
 int changeDirectory(PROGARGS *args, char *newDir);
-int envpAction(PROGARGS *args);
+int envAction(PROGARGS *args);
 int setenvAction(PROGARGS *args);
 int unsetenvAction(PROGARGS *args);
 int exitAction(PROGARGS *args);
