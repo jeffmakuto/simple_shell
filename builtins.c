@@ -63,7 +63,7 @@ int cd_action(info_t *info)
 }
 
 /**
- * set_work_directory - set work dir
+ * change_dir - set work dir
  * @info: commands passed
  * @new_dir: path to be set as work dir
  * Return: 0 on success, number declared in args

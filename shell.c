@@ -27,7 +27,7 @@ int main(int ac, char *av[], char *env[])
 
 /**
  * handle_ctrl_c - print the prompt
- * @UNUSED: option of the prototype
+ * @signal: signal sent
  */
 void handle_ctrl_c(int signal)
 {

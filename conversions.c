@@ -1,7 +1,7 @@
 #include "shell.h"
 
 /**
- * long_to_str - convert integer to a string.
+ * long_to_string - convert integer to a string.
  * @num: integer to concert
  * @str: buffer to save the integer as string.
  * @base: base for conversion
