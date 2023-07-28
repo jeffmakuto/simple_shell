@@ -127,7 +127,7 @@ int setenvAction(PROGARGS *args)
 }
 
 /**
- * _unsetenv - remove an environment variable.
+ * unsetenvAction - remove an environment variable.
  *
  * @args: commands passed
  *

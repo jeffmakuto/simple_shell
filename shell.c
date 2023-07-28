@@ -36,7 +36,10 @@ int main(int ac, char *av[], char *envp[])
 /**
  * handleCtrlCSignal - Handles Cntrl + C
  *
- * @signal: unused parameter.(Signal) */
+ * @signal: unused parameter.(Signal)
+ *
+ * Return: void
+ */
 void handleCtrlCSignal(int signal)
 {
 	(void)signal;

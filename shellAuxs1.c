@@ -36,7 +36,7 @@ char *_strdup(char *str)
 /**
  * _strncmp - compares 2  strings of a certain size
  *
- * @st1: 1st string
+ * @str1: 1st string
  *
  * @str2: 2nd string
  *
