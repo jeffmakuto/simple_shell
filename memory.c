@@ -33,7 +33,6 @@ void free_info(info_t *info)
 	}
 	cleanup_after_execution(info);
 	free_ptrs(info->env);
-	free_ptrs(info->alias_list);
 }
 
 /**
