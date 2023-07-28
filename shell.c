@@ -1,119 +1,130 @@
 #include "shell.h"
+
 /**
- * main - start the shell
- * @argc: argument count
- * @argv: argument vector
- * @env:no of values from the command line
+ * main - entry point
+ *
+ * @ac: number of commandline arguments
+ *
+ * @av: array of strings of commandline arguments
+ *
+ * @envp: array of strings of environment variables
+ *
  * Return: 0 on success
  */
-int main(int argc, char *argv[], char *env[])
+
+int main(int ac, char *av[], char *envp[])
 {
-	data_of_program data_struct = {NULL}, *data = &data_struct;
-	char *prompt = "";
+	PROGARGS shellArgs = {NULL}, *args = &shellArgs;
+	char *prompt = NULL;
 
-	inicialize_data(data, argc, argv, env);
+	startShell(args, ac, av, envp);
 
-	signal(SIGINT, handle_ctrl_c);
+	signal(SIGINT, handleCtrlCSignal);
 
-	if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO) && argc == 1)
+	if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO) && ac == 1)
 	{
 		errno = 2;
-		prompt = PROMPT_MSG;
+		prompt = PROMPT;
 	}
 	errno = 0;
-	sisifo(prompt, data);
+
+	runShell(prompt, args);
+
 	return (0);
 }
 
 /**
- * handle_ctrl_c - print the prompt
- * @UNUSED: option of the prototype
- */
-void handle_ctrl_c(int opr UNUSED)
+ * handleCtrlCSignal - Handles Cntrl + C
+ *
+ * @signal: unused parameter.(Signal) */
+void handleCtrlCSignal(int signal)
 {
 	_print("\n");
-	_print(PROMPT_MSG);
+	_print(PROMPT);
 }
 
 /**
- * inicialize_data - initialize struct with the info of the program
- * @data: ptr to data structure
- * @argv: argument vector
- * @env: env
- * @argc: argument count
+ * startShell - launches the shell
+ *
+ * @args: arguments passed
+ *
+ * @ac: argument count
+ *
+ * @av: argument vector
+ *
+ * @envp: environment varibles
+ *
+ * Return: void
+ *
  */
-void inicialize_data(data_of_program *data, int argc, char *argv[], char **env)
+void startShell(PROGARGS *args, int ac, char *av[], char **envp)
 {
 	int i = 0;
 
-	data->program_name = argv[0];
-	data->input_line = NULL;
-	data->command_name = NULL;
-	data->exec_counter = 0;
+	args->progName = av[0];
+	args->buffer = NULL;
+	args->cmd = NULL;
+	args->count = 0;
 
-	if (argc == 1)
-		data->file_descriptor = STDIN_FILENO;
+	if (ac == 1)
+		args->fd = STDIN_FILENO;
 	else
 	{
-		data->file_descriptor = open(argv[1], O_RDONLY);
-		if (data->file_descriptor == -1)
+		args->fd = open(av[1], O_RDONLY);
+		if (args->fd == -1)
 		{
-			_printe(data->program_name);
-			_printe(": 0: Can't open ");
-			_printe(argv[1]);
+			_printe(args->progName);
+			_printe("open error");
+			_printe(av[1]);
 			_printe("\n");
 			exit(127);
 		}
 	}
-	data->tokens = NULL;
-	data->env = malloc(sizeof(char *) * 50);
-	if (env)
+	args->tokens = NULL;
+	args->envp = malloc(sizeof(char *) * MAX_PATH_LEN);
+	if (envp)
 	{
-		for (; env[i]; i++)
+		for (; envp[i]; i++)
 		{
-			data->env[i] = str_duplicate(env[i]);
+			args->envp[i] = _strdup(envp[i]);
 		}
 	}
-	data->env[i] = NULL;
-	env = data->env;
-
-	data->alias_list = malloc(sizeof(char *) * 20);
-	for (i = 0; i < 20; i++)
-	{
-		data->alias_list[i] = NULL;
-	}
+	args->envp[i] = NULL;
+	envp = args->envp;
 }
-/**
- * sisifo - loops the prompt
- * @prompt: prompt
- * @data: infinite loop for prompt
- */
-void sisifo(char *prompt, data_of_program *data)
-{
-	int error_code = 0, string_len = 0;
 
-	while (++(data->exec_counter))
+/**
+ * runShell - loops the prompt
+ *
+ * @prompt: prompt
+ *
+ * @args: infinite loop for prompt
+ */
+void runShell(char *prompt, PROGARGS *args)
+{
+	int err = 0, len = 0;
+
+	while (++(args->count))
 	{
 		_print(prompt);
-		error_code = string_len = _getline(data);
+		err = len = _getline(args);
 
-		if (error_code == EOF)
+		if (err == EOF)
 		{
-			free_all_data(data);
+			freeArgs(args);
 			exit(errno);
 		}
-		if (string_len >= 1)
+		if (len >= 1)
 		{
-			expand_alias(data);
-			expand_variables(data);
-			tokenize(data);
-			if (data->tokens[0])
+			replaceVariables(args);
+			processCommand(args);
+			if (args->tokens[0])
 			{
-				error_code = execute(data);
-				if (error_code != 0)
-					_print_error(error_code, data);
+				err = executeCommand(args);
+				if (erro)
+					printErr(err, args);
 			}
-			free_recurrent_data(data);
+			cleanupAfterExecution(args);
 		}
 	}
 }
