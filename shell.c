@@ -16,10 +16,7 @@ int main(int ac, char *av[], char *env[])
 	signal(SIGINT, handle_ctrl_c);
 
 	if (isatty(STDIN_FILENO) && isatty(STDOUT_FILENO) && ac == 1)
-	{
-		errno = 2;
 		prompt = PROMPT;
-	}
 	errno = 0;
 	run_shell(prompt, info);
 	return (0);
@@ -45,7 +42,7 @@ void handle_ctrl_c(int signal)
  */
 void start_shell(info_t *info, int ac, char *av[], char **env)
 {
-	int i = 0;
+	int i = 0, size = 0;
 
 	info->prog_name = av[0];
 	info->buff = NULL;
@@ -67,17 +64,17 @@ void start_shell(info_t *info, int ac, char *av[], char **env)
 		}
 	}
 	info->tokens = NULL;
-	info->env = malloc(sizeof(char *) * MAX_PATH_LEN);
-	if (env)
+	while (env && env[size])
+		size++;
+	info->env = malloc(sizeof(char *) * (size + 1));
+	if (info->env == NULL)
 	{
-		for (; env[i]; i++)
-		{
-			info->env[i] = _strdup(env[i]);
-		}
+		perror(info->prog_name);
+		exit(EXIT_FAILURE);
 	}
+	for (; i < size; i++)
+		info->env[i] = _strdup(env[i]);
 	info->env[i] = NULL;
-	env = info->env;
-
 }
 /**
  * run_shell - loops the prompt
@@ -88,13 +85,13 @@ void run_shell(char *prompt, info_t *info)
 {
 	int err = 0, len = 0;
 
-	while (++(info->count))
+	while (1)
 	{
-		_print(prompt);
-		err = len = _getline(info);
+		err = len = _getline(info, prompt);
 
 		if (err == EOF)
 		{
+			_print(prompt ? "\n" : NULL);
 			free_info(info);
 			exit(errno);
 		}

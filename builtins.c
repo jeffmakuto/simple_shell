@@ -7,7 +7,7 @@
  */
 int exit_action(info_t *info)
 {
-	int i;
+	int i, status = errno;
 
 	if (info->tokens[1] != NULL)
 	{
@@ -18,10 +18,10 @@ int exit_action(info_t *info)
 				errno = 2;
 				return (2);
 			}
-		errno = _atoi(info->tokens[1]);
+		status = _atoi(info->tokens[1]);
 	}
 	free_info(info);
-	exit(errno);
+	exit(status);
 }
 
 /**
@@ -42,8 +42,11 @@ int cd_action(info_t *info)
 			old_dir = _getenv("OLDPWD", info);
 			if (old_dir)
 				err = change_dir(info, old_dir);
-			_print(_getenv("PWD", info));
-			_print("\n");
+			if (err == 0)
+			{
+				_print(_getenv("PWD", info));
+				_print("\n");
+			}
 
 			return (err);
 		}
@@ -70,7 +73,7 @@ int cd_action(info_t *info)
  */
 int change_dir(info_t *info, char *new_dir)
 {
-	char prev_dir[MAX_PATH_LEN] = {0};
+	char prev_dir[MAX_PATH_LEN] = {0}, cur_dir[MAX_PATH_LEN] = {0};
 	int err = 0;
 
 	getcwd(prev_dir, MAX_PATH_LEN);
@@ -83,8 +86,10 @@ int change_dir(info_t *info, char *new_dir)
 			errno = 2;
 			return (3);
 		}
-		_setenv("PWD", new_dir, info);
+		if (getcwd(cur_dir, MAX_PATH_LEN))
+			_setenv("PWD", cur_dir, info);
 	}
 	_setenv("OLDPWD", prev_dir, info);
+	errno = 0;
 	return (0);
 }
