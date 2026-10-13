@@ -52,8 +52,7 @@ typedef struct builtins
 void start_shell(info_t *info, int ac, char *av[], char **env);
 void run_shell(char *prompt, info_t *info);
 void handle_ctrl_c(int signal);
-int _getline(info_t *info);
-int handle_logical_operators(char *commands[], int i, char operators[]);
+int _getline(info_t *info, char *prompt);
 void expand_variables(info_t *info);
 int buffer_cat(char *buffer, char *str_to_add);
 void process_command(info_t *info);

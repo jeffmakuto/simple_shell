@@ -16,8 +16,10 @@ int find_executable(info_t *info)
 	if (!info->cmd)
 		return (1);
 
-	if (info->cmd[0] == '/' || info->cmd[0] == '.')
-		return (check_file(info->cmd));
+	/* a command containing a '/' is a path, it's not searched in PATH */
+	for (i = 0; info->cmd[i]; i++)
+		if (info->cmd[i] == '/')
+			return (check_file(info->cmd));
 
 	free(info->tokens[0]);
 	info->tokens[0] = _strcat(_strdup("/"), info->cmd);
@@ -28,6 +30,7 @@ int find_executable(info_t *info)
 
 	if (!dirs || !dirs[0])
 	{
+		free_ptrs(dirs);
 		errno = 127;
 		return (127);
 	}
@@ -44,8 +47,9 @@ int find_executable(info_t *info)
 			return (result);
 		}
 	}
+	/* keep tokens[0] set, the rest of the tokens are freed after it */
 	free(info->tokens[0]);
-	info->tokens[0] = NULL;
+	info->tokens[0] = _strdup(info->cmd);
 	free_ptrs(dirs);
 	return (result);
 }
@@ -78,6 +82,11 @@ char **get_path(info_t *info)
 	}
 
 	tokens = malloc(sizeof(char *) * count_dirs);
+	if (tokens == NULL)
+	{
+		free(PATH);
+		return (NULL);
+	}
 
 	i = 0;
 	tokens[i] = _strdup(_strtok(PATH, ":"));

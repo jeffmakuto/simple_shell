@@ -17,7 +17,7 @@ void long_to_string(long num, char *str, int base)
 	if (quotient == 0)
 		str[i++] = '0';
 
-	if (str[0] == '-')
+	if (num < 0)
 		is_negative = 1;
 
 	while (quotient)

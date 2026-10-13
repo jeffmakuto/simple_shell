@@ -12,7 +12,10 @@ int env_action(info_t *info)
 	char *var_copy = NULL;
 
 	if (info->tokens[1] == NULL)
+	{
 		_printenv(info);
+		errno = 0;
+	}
 	else
 	{
 		for (i = 0; info->tokens[1][i]; i++)
@@ -34,6 +37,7 @@ int env_action(info_t *info)
 					_setenv(var_name, var_copy, info);
 					free(var_copy);
 				}
+				errno = 0;
 				return (0);
 			}
 			var_name[i] = info->tokens[1][i];
@@ -62,7 +66,7 @@ int setenv_action(info_t *info)
 	}
 
 	_setenv(info->tokens[1], info->tokens[2], info);
-
+	errno = 0;
 	return (0);
 }
 
@@ -82,6 +86,6 @@ int unsetenv_action(info_t *info)
 		return (5);
 	}
 	_unsetenv(info->tokens[1], info);
-
+	errno = 0;
 	return (0);
 }

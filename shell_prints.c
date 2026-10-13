@@ -10,7 +10,7 @@ int _print(char *str)
 	return (write(STDOUT_FILENO, str, _strlen(str)));
 }
 /**
- * _printe - write errors to stdout
+ * _printe - write errors to stderr
  * @str: ptr to the array
  * Return: number of bytes printed, -1 on error
  */
@@ -20,7 +20,7 @@ int _printe(char *str)
 }
 
 /**
- * _print_error - write error codes in stdout
+ * _print_error - write error messages in stderr
  * @info: commands passed
  * @err: error code
  * Return: number of bytes printed, -1 on error.
@@ -39,9 +39,9 @@ int _print_error(int err, info_t *info)
 		_printe(": ");
 		_printe(info->tokens[0]);
 		if (err == 2)
-			_printe(": Invalid number: ");
+			_printe(": Illegal number: ");
 		else
-			_printe(": cd error ");
+			_printe(": can't cd to ");
 		_printe(info->tokens[1]);
 		_printe("\n");
 	}

@@ -1,95 +1,117 @@
 #include "shell.h"
 
 /**
-* _getline - read input from the  prompt.
-* @info: commands passed
-* Return: read bytes.
-*/
-int _getline(info_t *info)
+ * read_line - read one line from a file descriptor
+ * @fd: file descriptor to read from
+ * @line: buffer of BUFFER_SIZE bytes where the line is stored
+ * Return: number of chars stored, -1 on EOF with nothing read
+ */
+static int read_line(int fd, char *line)
 {
-	char buffer[BUFFER_SIZE] = {'\0'};
-	static char *commands[INITIAL_ENV_SIZE] = {NULL};
-	static char operators[INITIAL_ENV_SIZE] = {'\0'};
-	ssize_t bytes_read, i = 0;
+	static char buf[BUFFER_SIZE];
+	static ssize_t len, pos;
+	int n = 0;
 
-	/* check if there are no more commands in the array */
-	/* and checks the logical operators */
-	if (!commands[0] || (operators[0] == '&' && errno != 0) ||
-		(operators[0] == '|' && errno == 0))
+	while (n < BUFFER_SIZE - 1)
 	{
-		/*free the memory allocated in the array if it exists */
-		for (i = 0; commands[i]; i++)
+		if (pos >= len)
 		{
-			free(commands[i]);
-			commands[i] = NULL;
+			pos = 0;
+			len = read(fd, buf, BUFFER_SIZE);
+			if (len <= 0)
+			{
+				len = 0;
+				break;
+			}
 		}
-
-		/* read from the file descriptor into buffer */
-		bytes_read = read(info->fd, &buffer, BUFFER_SIZE - 1);
-		if (bytes_read == 0)
-			return (-1);
-
-		/* check for \n or ; */
-		i = 0;
-		do {
-			commands[i] = _strdup(_strtok(i ? NULL : buffer, "\n;"));
-			/*checks and split for && and || operators*/
-			i = handle_logical_operators(commands, i, operators);
-		} while (commands[i++]);
+		line[n] = buf[pos++];
+		if (line[n++] == '\n')
+			break;
 	}
-
-	/*obtain the next command (command 0) and remove it for the array*/
-	info->buff = commands[0];
-	for (i = 0; commands[i]; i++)
-	{
-		commands[i] = commands[i + 1];
-		operators[i] = operators[i + 1];
-	}
-
-	return (_strlen(info->buff));
+	line[n] = '\0';
+	return (n == 0 ? -1 : n);
 }
 
+/**
+ * is_blank - check if a string only contains spaces and tabs
+ * @str: string to check
+ * Return: 1 if blank, 0 otherwise
+ */
+static int is_blank(char *str)
+{
+	for (; *str; str++)
+		if (*str != ' ' && *str != '\t' && *str != '\n')
+			return (0);
+	return (1);
+}
 
 /**
-* handle_logical_operators - handles && and || operators
-* @commands: array of the commands.
-* @i: index in the array_commands to be checked
-* @operators: array of the logical operators for each previous command
-*
-* Return: index of the last command in the array_commands.
-*/
-int handle_logical_operators(char *commands[], int i, char operators[])
+ * split_line - split a line in commands on '\n', ';', "&&" and "||"
+ * and remove the comments
+ * @line: line to split (it's modified)
+ * @commands: array filled with the commands, NULL terminated
+ * @operators: logical operator ('\0', '&' or '|') before each command
+ */
+static void split_line(char *line, char *commands[], char operators[])
 {
-	char *temp = NULL;
-	int j;
+	int i, n = 0;
+	char *start = line, op = '\0', c;
 
-	/* checks for the & char in the command line*/
-	for (j = 0; commands[i] != NULL  && commands[i][j]; j++)
+	for (i = 0; ; i++)
 	{
-		if (commands[i][j] == '&' && commands[i][j + 1] == '&')
+		if (line[i] == '#' && (i == 0 || line[i - 1] == ' ' ||
+			line[i - 1] == '\t' || line[i - 1] == '\0'))
+			line[i] = '\0';
+		c = line[i];
+		if (c != '\0' && c != '\n' && c != ';' &&
+			!((c == '&' || c == '|') && line[i + 1] == c))
+			continue;
+		line[i] = '\0';
+		if (!is_blank(start))
 		{
-			/* split the line when chars && was found */
-			temp = commands[i];
-			commands[i][j] = '\0';
-			commands[i] = _strdup(commands[i]);
-			commands[i + 1] = _strdup(temp + j + 2);
-			i++;
-			operators[i] = '&';
-			free(temp);
-			j = 0;
+			commands[n] = _strdup(start);
+			operators[n++] = op;
 		}
-		if (commands[i][j] == '|' && commands[i][j + 1] == '|')
-		{
-			/* split the line when chars || was found */
-			temp = commands[i];
-			commands[i][j] = '\0';
-			commands[i] = _strdup(commands[i]);
-			commands[i + 1] = _strdup(temp + j + 2);
-			i++;
-			operators[i] = '|';
-			free(temp);
-			j = 0;
-		}
+		if (c == '\0')
+			break;
+		op = (c == '&' || c == '|') ? c : '\0';
+		if (op)
+			line[++i] = '\0';
+		start = line + i + 1;
 	}
-	return (i);
+	commands[n] = NULL;
+}
+
+/**
+ * _getline - get the next command to execute
+ * @info: commands passed
+ * @prompt: prompt printed before reading a new line, can be NULL
+ * Return: length of the command, -1 on EOF.
+ */
+int _getline(info_t *info, char *prompt)
+{
+	static char *commands[BUFFER_SIZE];
+	static char operators[BUFFER_SIZE];
+	static int next;
+	char line[BUFFER_SIZE];
+
+	/* skip the commands whose && or || condition is not met */
+	while (commands[next] && ((operators[next] == '&' && errno != 0) ||
+		(operators[next] == '|' && errno == 0)))
+		free(commands[next++]);
+
+	if (!commands[next])
+	{
+		next = 0;
+		_print(prompt);
+		if (read_line(info->fd, line) == -1)
+			return (-1);
+		info->count++;
+		split_line(line, commands, operators);
+		if (!commands[0])
+			return (0);
+	}
+
+	info->buff = commands[next++];
+	return (_strlen(info->buff));
 }

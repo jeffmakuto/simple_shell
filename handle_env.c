@@ -36,31 +36,41 @@ char *_getenv(char *name, info_t *info)
 
 int _setenv(char *name, char *value, info_t *info)
 {
-	int i, name_len = 0, new_name = 1;
+	int i, j, name_len = 0;
+	char *new_var, **new_env;
 
 	if (name == NULL || value == NULL || info->env == NULL)
 		return (1);
 
 	name_len = _strlen(name);
+	new_var = _strcat(_strcat(_strdup(name), "="), value);
+	if (new_var == NULL)
+		return (2);
 
 	for (i = 0; info->env[i]; i++)
 	{
 		if (_strncmp(name, info->env[i], name_len) &&
 		 info->env[i][name_len] == '=')
 		{
-			new_name = 0;
-
 			free(info->env[i]);
-			break;
+			info->env[i] = new_var;
+			return (0);
 		}
 	}
-	info->env[i] = _strcat(_strdup(name), "=");
-	info->env[i] = _strcat(info->env[i], value);
 
-	if (new_name)
+	/* new variable: make room for one more pointer */
+	new_env = malloc(sizeof(char *) * (i + 2));
+	if (new_env == NULL)
 	{
-		info->env[i + 1] = NULL;
+		free(new_var);
+		return (2);
 	}
+	for (j = 0; j < i; j++)
+		new_env[j] = info->env[j];
+	new_env[i] = new_var;
+	new_env[i + 1] = NULL;
+	free(info->env);
+	info->env = new_env;
 	return (0);
 }
 
